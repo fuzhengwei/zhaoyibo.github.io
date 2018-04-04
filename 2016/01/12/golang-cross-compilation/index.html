@@ -107,7 +107,7 @@
 <meta name="keywords" content="Golang">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Golang 学习笔记——交叉编译 &amp; 部署">
-<meta property="og:url" content="https://ideassea.com/2016/01/12/golang-cross-compilation/index.html">
+<meta property="og:url" content="https://zhaoyibo.github.io/2016/01/12/golang-cross-compilation/index.html">
 <meta property="og:site_name" content="Ideas Sea">
 <meta property="og:description" content="用 Golang 写了一个小功能，想部署到的服务器上。这里就简单记录一下过程吧。我现在用的 Go 的版本是1.5.1，直接用安装包安装的，Mac OS X 平台。 交叉编译Golang 的交叉编译还是蛮方便的。首先用 go env 查看一下本机的 go 环境12345678910111213141516$ go envGOARCH=&amp;quot;amd64&amp;quot;GOBIN=&amp;quot;&amp;quo">
 <meta property="og:locale" content="zh-CN">
@@ -123,7 +123,7 @@
 
 
 
-  <link rel="canonical" href="https://ideassea.com/2016/01/12/golang-cross-compilation/"/>
+  <link rel="canonical" href="https://zhaoyibo.github.io/2016/01/12/golang-cross-compilation/"/>
 
 
 
@@ -293,7 +293,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://ideassea.com/2016/01/12/golang-cross-compilation/">
+    <link itemprop="mainEntityOfPage" href="https://zhaoyibo.github.io/2016/01/12/golang-cross-compilation/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Yibo">
@@ -390,7 +390,7 @@
 <p>也有几种实现 Go 语言 daemon 的方案，不过得先了解 Linux 的守护进程是咋实现的。对此我也不是太了解，就采用了另一种方式，用第三方的工具来管理（也是谢大《Go Web 编程》书中推荐的）—— Supervisor。</p>
 <p>p.s. 其实想简单点的话，也可以用 <code>nohup commend &amp;</code> 来后台运行，至于其与 daemon 的区别，可以参考 <a href="http://www.aichengxu.com/view/12417" target="_blank" rel="noopener">linux 的nohup &amp; 和daemon 总结</a></p>
 <h3 id="Supervisor"><a href="#Supervisor" class="headerlink" title="Supervisor"></a>Supervisor</h3><p><a href="https://github.com/Supervisor/supervisor" title="Supervisord" target="_blank" rel="noopener">Supervisor</a> 是用 Python 实现的一个进程管理工具，它会帮你把它转成 Daemon 程序（并且它要求被管理的程序必须是非 Daemon 的）</p>
-<p>因为后边我又将 Supervisor 用于管理其他进程，并做更深一步的使用，故将其内容从本文拆分出去，传送门在此：<a href="http://ideassea.com/supervisor-basic/" title="supervisor base">Supervisor 基础</a></p>
+<p>因为后边我又将 Supervisor 用于管理其他进程，并做更深一步的使用，故将其内容从本文拆分出去，传送门在此：<a href="http://ideassea.com/supervisor-basic/" title="supervisor base" target="_blank" rel="noopener">Supervisor 基础</a></p>
 <p>参考<br><a href="http://tonybai.com/2014/10/20/cross-compilation-with-golang/" target="_blank" rel="noopener">Golang跨平台交叉编译</a> </p>
 
       
@@ -413,7 +413,7 @@
     <strong>本文作者： </strong>Yibo</li>
   <li class="post-copyright-link">
     <strong>本文链接：</strong>
-    <a href="https://ideassea.com/2016/01/12/golang-cross-compilation/" title="Golang 学习笔记——交叉编译 & 部署">https://ideassea.com/2016/01/12/golang-cross-compilation/</a>
+    <a href="https://zhaoyibo.github.io/2016/01/12/golang-cross-compilation/" title="Golang 学习笔记——交叉编译 & 部署">https://zhaoyibo.github.io/2016/01/12/golang-cross-compilation/</a>
   </li>
   <li class="post-copyright-license">
     <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！</li>

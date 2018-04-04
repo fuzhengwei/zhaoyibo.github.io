@@ -5,9 +5,9 @@
   
   <link href="/atom.xml" rel="self"/>
   
-  <link href="https://ideassea.com/"/>
+  <link href="https://zhaoyibo.github.io/"/>
   <updated>2018-04-01T16:58:39.000Z</updated>
-  <id>https://ideassea.com/</id>
+  <id>https://zhaoyibo.github.io/</id>
   
   <author>
     <name>Yibo</name>
@@ -18,8 +18,8 @@
   
   <entry>
     <title>再说 Spring AOP</title>
-    <link href="https://ideassea.com/2018/04/01/spring-aop-words-again/"/>
-    <id>https://ideassea.com/2018/04/01/spring-aop-words-again/</id>
+    <link href="https://zhaoyibo.github.io/2018/04/01/spring-aop-words-again/"/>
+    <id>https://zhaoyibo.github.io/2018/04/01/spring-aop-words-again/</id>
     <published>2018-04-01T08:14:29.000Z</published>
     <updated>2018-04-01T16:58:39.000Z</updated>
     
@@ -35,14 +35,14 @@
     </summary>
     
     
-      <category term="Java" scheme="https://ideassea.com/tags/Java/"/>
+      <category term="Java" scheme="https://zhaoyibo.github.io/tags/Java/"/>
     
   </entry>
   
   <entry>
     <title>Java7/8 中的 HashMap 和 ConcurrentHashMap 全解析</title>
-    <link href="https://ideassea.com/2018/02/03/java7-8-hashmap-and-concurrenthashmap/"/>
-    <id>https://ideassea.com/2018/02/03/java7-8-hashmap-and-concurrenthashmap/</id>
+    <link href="https://zhaoyibo.github.io/2018/02/03/java7-8-hashmap-and-concurrenthashmap/"/>
+    <id>https://zhaoyibo.github.io/2018/02/03/java7-8-hashmap-and-concurrenthashmap/</id>
     <published>2018-02-03T01:59:00.000Z</published>
     <updated>2018-03-20T02:57:57.000Z</updated>
     
@@ -56,14 +56,14 @@
     </summary>
     
     
-      <category term="Java" scheme="https://ideassea.com/tags/Java/"/>
+      <category term="Java" scheme="https://zhaoyibo.github.io/tags/Java/"/>
     
   </entry>
   
   <entry>
     <title>Git 中的各种后悔药</title>
-    <link href="https://ideassea.com/2017/11/14/git-undo/"/>
-    <id>https://ideassea.com/2017/11/14/git-undo/</id>
+    <link href="https://zhaoyibo.github.io/2017/11/14/git-undo/"/>
+    <id>https://zhaoyibo.github.io/2017/11/14/git-undo/</id>
     <published>2017-11-14T06:18:45.000Z</published>
     <updated>2018-04-01T08:28:21.000Z</updated>
     
@@ -82,14 +82,14 @@
     </summary>
     
     
-      <category term="Git" scheme="https://ideassea.com/tags/Git/"/>
+      <category term="Git" scheme="https://zhaoyibo.github.io/tags/Git/"/>
     
   </entry>
   
   <entry>
     <title>给图片加文字水印（纯前端实现）</title>
-    <link href="https://ideassea.com/2017/10/25/text-watermark/"/>
-    <id>https://ideassea.com/2017/10/25/text-watermark/</id>
+    <link href="https://zhaoyibo.github.io/2017/10/25/text-watermark/"/>
+    <id>https://zhaoyibo.github.io/2017/10/25/text-watermark/</id>
     <published>2017-10-24T21:15:36.000Z</published>
     <updated>2017-10-24T21:40:32.000Z</updated>
     
@@ -106,8 +106,8 @@
   
   <entry>
     <title>使用 shell 脚本自动创建/移除并挂载交换文件</title>
-    <link href="https://ideassea.com/2017/10/23/shell-script-for-swap/"/>
-    <id>https://ideassea.com/2017/10/23/shell-script-for-swap/</id>
+    <link href="https://zhaoyibo.github.io/2017/10/23/shell-script-for-swap/"/>
+    <id>https://zhaoyibo.github.io/2017/10/23/shell-script-for-swap/</id>
     <published>2017-10-23T00:19:46.000Z</published>
     <updated>2018-04-01T08:20:52.000Z</updated>
     
@@ -119,14 +119,14 @@
     </summary>
     
     
-      <category term="Linux" scheme="https://ideassea.com/tags/Linux/"/>
+      <category term="Linux" scheme="https://zhaoyibo.github.io/tags/Linux/"/>
     
   </entry>
   
   <entry>
     <title>Golang 错误处理</title>
-    <link href="https://ideassea.com/2017/07/30/golang-error-handle/"/>
-    <id>https://ideassea.com/2017/07/30/golang-error-handle/</id>
+    <link href="https://zhaoyibo.github.io/2017/07/30/golang-error-handle/"/>
+    <id>https://zhaoyibo.github.io/2017/07/30/golang-error-handle/</id>
     <published>2017-07-30T07:49:25.000Z</published>
     <updated>2017-08-02T00:54:56.000Z</updated>
     
@@ -138,14 +138,14 @@
     </summary>
     
     
-      <category term="Golang" scheme="https://ideassea.com/tags/Golang/"/>
+      <category term="Golang" scheme="https://zhaoyibo.github.io/tags/Golang/"/>
     
   </entry>
   
   <entry>
     <title>MySQL高性能表设计规范</title>
-    <link href="https://ideassea.com/2017/07/28/high-performance-mysql-schema/"/>
-    <id>https://ideassea.com/2017/07/28/high-performance-mysql-schema/</id>
+    <link href="https://zhaoyibo.github.io/2017/07/28/high-performance-mysql-schema/"/>
+    <id>https://zhaoyibo.github.io/2017/07/28/high-performance-mysql-schema/</id>
     <published>2017-07-27T20:04:45.000Z</published>
     <updated>2017-08-02T00:58:14.000Z</updated>
     
@@ -156,14 +156,14 @@
     </summary>
     
     
-      <category term="MySQL" scheme="https://ideassea.com/tags/MySQL/"/>
+      <category term="MySQL" scheme="https://zhaoyibo.github.io/tags/MySQL/"/>
     
   </entry>
   
   <entry>
     <title>崇礼50KM | 我的首野，我的新大陆</title>
-    <link href="https://ideassea.com/2017/07/22/trail-running-2017-columbia168-chongli/"/>
-    <id>https://ideassea.com/2017/07/22/trail-running-2017-columbia168-chongli/</id>
+    <link href="https://zhaoyibo.github.io/2017/07/22/trail-running-2017-columbia168-chongli/"/>
+    <id>https://zhaoyibo.github.io/2017/07/22/trail-running-2017-columbia168-chongli/</id>
     <published>2017-07-21T18:32:40.000Z</published>
     <updated>2017-08-15T21:47:35.000Z</updated>
     
@@ -179,14 +179,14 @@
     </summary>
     
     
-      <category term="Running" scheme="https://ideassea.com/tags/Running/"/>
+      <category term="Running" scheme="https://zhaoyibo.github.io/tags/Running/"/>
     
   </entry>
   
   <entry>
     <title>R.I.P. Chester Bennington, 1976-2017</title>
-    <link href="https://ideassea.com/2017/07/21/rip-chester-bennington/"/>
-    <id>https://ideassea.com/2017/07/21/rip-chester-bennington/</id>
+    <link href="https://zhaoyibo.github.io/2017/07/21/rip-chester-bennington/"/>
+    <id>https://zhaoyibo.github.io/2017/07/21/rip-chester-bennington/</id>
     <published>2017-07-21T05:45:00.000Z</published>
     <updated>2017-08-30T01:02:02.000Z</updated>
     
@@ -201,8 +201,8 @@
   
   <entry>
     <title>Ghost 1.0.0 调教指南</title>
-    <link href="https://ideassea.com/2017/07/20/improve-ghost/"/>
-    <id>https://ideassea.com/2017/07/20/improve-ghost/</id>
+    <link href="https://zhaoyibo.github.io/2017/07/20/improve-ghost/"/>
+    <id>https://zhaoyibo.github.io/2017/07/20/improve-ghost/</id>
     <published>2017-07-19T22:16:48.000Z</published>
     <updated>2017-07-31T18:26:06.000Z</updated>
     
@@ -213,16 +213,16 @@
     </summary>
     
     
-      <category term="Ghost" scheme="https://ideassea.com/tags/Ghost/"/>
+      <category term="Ghost" scheme="https://zhaoyibo.github.io/tags/Ghost/"/>
     
-      <category term="Blog" scheme="https://ideassea.com/tags/Blog/"/>
+      <category term="Blog" scheme="https://zhaoyibo.github.io/tags/Blog/"/>
     
   </entry>
   
   <entry>
     <title>Ghost vs Hexo</title>
-    <link href="https://ideassea.com/2017/07/19/ghost-vs-hexo/"/>
-    <id>https://ideassea.com/2017/07/19/ghost-vs-hexo/</id>
+    <link href="https://zhaoyibo.github.io/2017/07/19/ghost-vs-hexo/"/>
+    <id>https://zhaoyibo.github.io/2017/07/19/ghost-vs-hexo/</id>
     <published>2017-07-19T08:06:43.000Z</published>
     <updated>2017-07-19T21:45:19.000Z</updated>
     
@@ -234,18 +234,18 @@
     </summary>
     
     
-      <category term="Ghost" scheme="https://ideassea.com/tags/Ghost/"/>
+      <category term="Ghost" scheme="https://zhaoyibo.github.io/tags/Ghost/"/>
     
-      <category term="Blog" scheme="https://ideassea.com/tags/Blog/"/>
+      <category term="Blog" scheme="https://zhaoyibo.github.io/tags/Blog/"/>
     
-      <category term="Hexo" scheme="https://ideassea.com/tags/Hexo/"/>
+      <category term="Hexo" scheme="https://zhaoyibo.github.io/tags/Hexo/"/>
     
   </entry>
   
   <entry>
     <title>HBase 1.2.6 完全分布式部署</title>
-    <link href="https://ideassea.com/2017/07/18/hbase-fully-distributed/"/>
-    <id>https://ideassea.com/2017/07/18/hbase-fully-distributed/</id>
+    <link href="https://zhaoyibo.github.io/2017/07/18/hbase-fully-distributed/"/>
+    <id>https://zhaoyibo.github.io/2017/07/18/hbase-fully-distributed/</id>
     <published>2017-07-18T03:19:59.000Z</published>
     <updated>2017-08-03T22:40:45.000Z</updated>
     
@@ -293,16 +293,16 @@
     </summary>
     
     
-      <category term="Hadoop" scheme="https://ideassea.com/tags/Hadoop/"/>
+      <category term="Hadoop" scheme="https://zhaoyibo.github.io/tags/Hadoop/"/>
     
-      <category term="HBase" scheme="https://ideassea.com/tags/HBase/"/>
+      <category term="HBase" scheme="https://zhaoyibo.github.io/tags/HBase/"/>
     
   </entry>
   
   <entry>
     <title>ElasticSearch 实践过程中遇到的几个小问题</title>
-    <link href="https://ideassea.com/2017/02/22/elasticsearch-issue/"/>
-    <id>https://ideassea.com/2017/02/22/elasticsearch-issue/</id>
+    <link href="https://zhaoyibo.github.io/2017/02/22/elasticsearch-issue/"/>
+    <id>https://zhaoyibo.github.io/2017/02/22/elasticsearch-issue/</id>
     <published>2017-02-21T23:23:00.000Z</published>
     <updated>2017-07-18T04:51:44.000Z</updated>
     
@@ -314,16 +314,16 @@
     </summary>
     
     
-      <category term="ELK" scheme="https://ideassea.com/tags/ELK/"/>
+      <category term="ELK" scheme="https://zhaoyibo.github.io/tags/ELK/"/>
     
-      <category term="ElasticSearch" scheme="https://ideassea.com/tags/ElasticSearch/"/>
+      <category term="ElasticSearch" scheme="https://zhaoyibo.github.io/tags/ElasticSearch/"/>
     
   </entry>
   
   <entry>
     <title>Spring原理初探——IoC、AOP</title>
-    <link href="https://ideassea.com/2016/08/11/spring-ioc-aop/"/>
-    <id>https://ideassea.com/2016/08/11/spring-ioc-aop/</id>
+    <link href="https://zhaoyibo.github.io/2016/08/11/spring-ioc-aop/"/>
+    <id>https://zhaoyibo.github.io/2016/08/11/spring-ioc-aop/</id>
     <published>2016-08-11T00:23:00.000Z</published>
     <updated>2018-03-20T00:38:55.000Z</updated>
     
@@ -336,16 +336,16 @@
     </summary>
     
     
-      <category term="Java" scheme="https://ideassea.com/tags/Java/"/>
+      <category term="Java" scheme="https://zhaoyibo.github.io/tags/Java/"/>
     
-      <category term="Spring" scheme="https://ideassea.com/tags/Spring/"/>
+      <category term="Spring" scheme="https://zhaoyibo.github.io/tags/Spring/"/>
     
   </entry>
   
   <entry>
     <title>JVM 监控以及内存分析</title>
-    <link href="https://ideassea.com/2016/08/01/jvm-monitoring/"/>
-    <id>https://ideassea.com/2016/08/01/jvm-monitoring/</id>
+    <link href="https://zhaoyibo.github.io/2016/08/01/jvm-monitoring/"/>
+    <id>https://zhaoyibo.github.io/2016/08/01/jvm-monitoring/</id>
     <published>2016-07-31T23:21:00.000Z</published>
     <updated>2018-03-20T00:42:20.000Z</updated>
     
@@ -356,16 +356,16 @@
     </summary>
     
     
-      <category term="Java" scheme="https://ideassea.com/tags/Java/"/>
+      <category term="Java" scheme="https://zhaoyibo.github.io/tags/Java/"/>
     
-      <category term="JVM" scheme="https://ideassea.com/tags/JVM/"/>
+      <category term="JVM" scheme="https://zhaoyibo.github.io/tags/JVM/"/>
     
   </entry>
   
   <entry>
     <title>hg flow</title>
-    <link href="https://ideassea.com/2016/06/02/hg-flow/"/>
-    <id>https://ideassea.com/2016/06/02/hg-flow/</id>
+    <link href="https://zhaoyibo.github.io/2016/06/02/hg-flow/"/>
+    <id>https://zhaoyibo.github.io/2016/06/02/hg-flow/</id>
     <published>2016-06-01T23:18:00.000Z</published>
     <updated>2017-07-17T23:36:54.000Z</updated>
     
@@ -378,14 +378,14 @@
     </summary>
     
     
-      <category term="CVS" scheme="https://ideassea.com/tags/CVS/"/>
+      <category term="CVS" scheme="https://zhaoyibo.github.io/tags/CVS/"/>
     
   </entry>
   
   <entry>
     <title>同步一个 fork</title>
-    <link href="https://ideassea.com/2016/04/14/syncing-a-fork/"/>
-    <id>https://ideassea.com/2016/04/14/syncing-a-fork/</id>
+    <link href="https://zhaoyibo.github.io/2016/04/14/syncing-a-fork/"/>
+    <id>https://zhaoyibo.github.io/2016/04/14/syncing-a-fork/</id>
     <published>2016-04-13T23:16:00.000Z</published>
     <updated>2017-07-18T05:52:26.000Z</updated>
     
@@ -397,14 +397,14 @@
     </summary>
     
     
-      <category term="CVS" scheme="https://ideassea.com/tags/CVS/"/>
+      <category term="CVS" scheme="https://zhaoyibo.github.io/tags/CVS/"/>
     
   </entry>
   
   <entry>
     <title>Java 中 Integer 的缓存策略</title>
-    <link href="https://ideassea.com/2016/04/14/java-interger-cache/"/>
-    <id>https://ideassea.com/2016/04/14/java-interger-cache/</id>
+    <link href="https://zhaoyibo.github.io/2016/04/14/java-interger-cache/"/>
+    <id>https://zhaoyibo.github.io/2016/04/14/java-interger-cache/</id>
     <published>2016-04-13T23:13:00.000Z</published>
     <updated>2017-10-11T21:52:09.000Z</updated>
     
@@ -416,14 +416,14 @@
     </summary>
     
     
-      <category term="Java" scheme="https://ideassea.com/tags/Java/"/>
+      <category term="Java" scheme="https://zhaoyibo.github.io/tags/Java/"/>
     
   </entry>
   
   <entry>
     <title>DigitalOcean 搭建 Shadowsocks 服务和优化方案</title>
-    <link href="https://ideassea.com/2016/02/23/shadowsocks-optimization/"/>
-    <id>https://ideassea.com/2016/02/23/shadowsocks-optimization/</id>
+    <link href="https://zhaoyibo.github.io/2016/02/23/shadowsocks-optimization/"/>
+    <id>https://zhaoyibo.github.io/2016/02/23/shadowsocks-optimization/</id>
     <published>2016-02-22T23:08:00.000Z</published>
     <updated>2017-07-18T03:08:46.000Z</updated>
     
@@ -440,8 +440,8 @@
   
   <entry>
     <title>在 Mac OS X 上编译 native-hadoop library</title>
-    <link href="https://ideassea.com/2016/02/12/build-native-hadoop-library-on-mac-osx/"/>
-    <id>https://ideassea.com/2016/02/12/build-native-hadoop-library-on-mac-osx/</id>
+    <link href="https://zhaoyibo.github.io/2016/02/12/build-native-hadoop-library-on-mac-osx/"/>
+    <id>https://zhaoyibo.github.io/2016/02/12/build-native-hadoop-library-on-mac-osx/</id>
     <published>2016-02-11T23:02:00.000Z</published>
     <updated>2017-10-11T22:00:28.000Z</updated>
     
@@ -453,7 +453,7 @@
     </summary>
     
     
-      <category term="Hadoop" scheme="https://ideassea.com/tags/Hadoop/"/>
+      <category term="Hadoop" scheme="https://zhaoyibo.github.io/tags/Hadoop/"/>
     
   </entry>
   

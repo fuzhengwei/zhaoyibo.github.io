@@ -107,7 +107,7 @@
 <meta name="keywords" content="Operations,Supervisor">
 <meta property="og:type" content="article">
 <meta property="og:title" content="管理多个 Supervisor——集群管理">
-<meta property="og:url" content="https://ideassea.com/2016/02/02/nodervisor/index.html">
+<meta property="og:url" content="https://zhaoyibo.github.io/2016/02/02/nodervisor/index.html">
 <meta property="og:site_name" content="Ideas Sea">
 <meta property="og:description" content="继前两篇文章（Supervisor 基础、监控并报警）后，用 Supervisor 管理单个机器上的进程没啥问题了。但是 A 机器上的 Supervisor 只能管理 A 机器上的进程，管理不了 B 上边的。在当今这个云的时代，大家都玩集群了，如果用其管理的话，需要打开 N 个网页去各各机器上的进程显然是不现实的（OP 们要哭晕在厕所了）。其实之前仔细看配置文件的话，应该会想到一种解决的办法——通">
 <meta property="og:locale" content="zh-CN">
@@ -125,7 +125,7 @@
 
 
 
-  <link rel="canonical" href="https://ideassea.com/2016/02/02/nodervisor/"/>
+  <link rel="canonical" href="https://zhaoyibo.github.io/2016/02/02/nodervisor/"/>
 
 
 
@@ -295,7 +295,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://ideassea.com/2016/02/02/nodervisor/">
+    <link itemprop="mainEntityOfPage" href="https://zhaoyibo.github.io/2016/02/02/nodervisor/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Yibo">
@@ -377,7 +377,7 @@
       
 
       
-        <p>继前两篇文章（<a href="http://ideassea.com/supervisor-basic/">Supervisor 基础</a>、<a href="http://ideassea.com/supervisor-event/">监控并报警</a>）后，用 Supervisor 管理单个机器上的进程没啥问题了。但是 A 机器上的 Supervisor 只能管理 A 机器上的进程，管理不了 B 上边的。在当今这个云的时代，大家都玩集群了，如果用其管理的话，需要打开 N 个网页去各各机器上的进程显然是不现实的（OP 们要哭晕在厕所了）。<br>其实之前仔细看配置文件的话，应该会想到一种解决的办法——通过 <a href="http://supervisord.org/api.html" target="_blank" rel="noopener">XML-RPC 接口</a>。</p>
+        <p>继前两篇文章（<a href="http://ideassea.com/supervisor-basic/" target="_blank" rel="noopener">Supervisor 基础</a>、<a href="http://ideassea.com/supervisor-event/" target="_blank" rel="noopener">监控并报警</a>）后，用 Supervisor 管理单个机器上的进程没啥问题了。但是 A 机器上的 Supervisor 只能管理 A 机器上的进程，管理不了 B 上边的。在当今这个云的时代，大家都玩集群了，如果用其管理的话，需要打开 N 个网页去各各机器上的进程显然是不现实的（OP 们要哭晕在厕所了）。<br>其实之前仔细看配置文件的话，应该会想到一种解决的办法——通过 <a href="http://supervisord.org/api.html" target="_blank" rel="noopener">XML-RPC 接口</a>。</p>
 <p><img src="https://ws1.sinaimg.cn/large/6e3b2269ly1fq0fau7ca0j20zk0hmjtu" alt="nodervisor-dashboard"></p>
 <a id="more"></a>
 <h2 id="现有解决方案"><a href="#现有解决方案" class="headerlink" title="现有解决方案"></a>现有解决方案</h2><p>本来以为网上解决方案会比较多呢，结果 google 搜到的都是一些不相关的（因为 Supervisor 本来就是一个单词），百度就找到一篇<a href="http://blog.csdn.net/u013411478/article/details/25387587" target="_blank" rel="noopener">《Supervisor集群管理WEB UI》</a>，大致看了一下，可行，不过我是主要做后端开发的，php 一窍不通，决定去官网看看。<br>官网上关于多实例管理的方案还是那四个：(<a href="http://supervisord.org/plugins.html#dashboards-and-tools-for-multiple-supervisor-instances" target="_blank" rel="noopener">http://supervisord.org/plugins.html#dashboards-and-tools-for-multiple-supervisor-instances</a>)</p>
@@ -455,7 +455,7 @@
     <strong>本文作者： </strong>Yibo</li>
   <li class="post-copyright-link">
     <strong>本文链接：</strong>
-    <a href="https://ideassea.com/2016/02/02/nodervisor/" title="管理多个 Supervisor——集群管理">https://ideassea.com/2016/02/02/nodervisor/</a>
+    <a href="https://zhaoyibo.github.io/2016/02/02/nodervisor/" title="管理多个 Supervisor——集群管理">https://zhaoyibo.github.io/2016/02/02/nodervisor/</a>
   </li>
   <li class="post-copyright-license">
     <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！</li>
