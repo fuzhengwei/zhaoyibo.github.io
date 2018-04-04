@@ -391,49 +391,29 @@
       
 
       
-        <h2 id="Java中哪个JSON库的解析速度是最快的？"><a href="#Java中哪个JSON库的解析速度是最快的？" class="headerlink" title="Java中哪个JSON库的解析速度是最快的？"></a>Java中哪个JSON库的解析速度是最快的？</h2><p>JSON已经成为当前服务器与WEB应用之间数据传输的公认标准，不过正如许多我们所习以为常的事情一样，你会觉得这是理所当然的便不再深入思考了。我们很少会去想用到的这些JSON库到底有什么不同，但事实上它们的确是不太一样的。因此，我们运行了一个基准测试来对常用的几个JSON库进行了测试，看看在解析不同大小的文件时哪个库的速度是最快的。下面我会把结果分享给大家。<a id="more"></a></p>
-<p>JSON通常用于传输及解析大文件。这对运行在Hadoop或者是Spark集群上的数据处理程序而言是个很常见的场景。在给定的文件大小下，你可以看到不同库之间的解析速度存在着明显的差别。</p>
-<p>高吞吐量的情况下，会频繁地传输并解析小文件，因此一开始的时候可能性能的差距并不明显。但如果你需要在非常高负载下频繁地解析大量的小文件，差距就开始增大了。微服务及分布式架构经常会使用JSON来传输此类文件，因为这已经是WEB API的事实标准。</p>
-<p>不是所有的JSON库都叫”特仑苏”。如何根据使用场景才选择正确的库是相当重要的。希望这个基准测试能够对你有所帮助。</p>
+        <h2 id="Java中哪个JSON库的解析速度是最快的？"><a href="#Java中哪个JSON库的解析速度是最快的？" class="headerlink" title="Java中哪个JSON库的解析速度是最快的？"></a>Java中哪个JSON库的解析速度是最快的？</h2><p>JSON已经成为当前服务器与WEB应用之间数据传输的公认标准，不过正如许多我们所习以为常的事情一样，你会觉得这是理所当然的便不再深入思考了。我们很少会去想用到的这些JSON库到底有什么不同，但事实上它们的确是不太一样的。因此，我们运行了一个基准测试来对常用的几个JSON库进行了测试，看看在解析不同大小的文件时哪个库的速度是最快的。下面我会把结果分享给大家。<a id="more"></a><br>JSON通常用于传输及解析大文件。这对运行在Hadoop或者是Spark集群上的数据处理程序而言是个很常见的场景。在给定的文件大小下，你可以看到不同库之间的解析速度存在着明显的差别。<br>高吞吐量的情况下，会频繁地传输并解析小文件，因此一开始的时候可能性能的差距并不明显。但如果你需要在非常高负载下频繁地解析大量的小文件，差距就开始增大了。微服务及分布式架构经常会使用JSON来传输此类文件，因为这已经是WEB API的事实标准。<br>不是所有的JSON库都叫”特仑苏”。如何根据使用场景才选择正确的库是相当重要的。希望这个基准测试能够对你有所帮助。</p>
 <!--more-->
 <h2 id="JSON库"><a href="#JSON库" class="headerlink" title="JSON库"></a>JSON库</h2><h3 id="JSON-simple-vs-GSON-vs-Jackson-vs-JSONP"><a href="#JSON-simple-vs-GSON-vs-Jackson-vs-JSONP" class="headerlink" title="JSON.simple vs GSON vs Jackson vs JSONP"></a>JSON.simple vs GSON vs Jackson vs JSONP</h3><p>我们选择了四个主流的JSON库来进行基准测试：JSON.simple， GSON, Jackson以及JSONP。在Java中进行JSON解析通常都会用到这几个库，选择它们的原因是它们在Github项目中的亮相频率很高。</p>
 <p>下面便是我们所测试的JSON库：</p>
 <ul>
-<li><p>Yidong Fang的JSON.simple(<a href="https://github.com/fangyidong/json-simple)。JSON.simple是一个JSON编解码的Java工具库。它旨在打造一个轻量简单且高性能的工具库。" target="_blank" rel="noopener">https://github.com/fangyidong/json-simple)。JSON.simple是一个JSON编解码的Java工具库。它旨在打造一个轻量简单且高性能的工具库。</a></p>
-</li>
-<li><p>Google的GSON(<a href="https://github.com/google/gson)。GSON这个Java库能够在Java对象和JSON间进行相互转换。同时它还提供了对Java泛型的完整支持，而且还不需要你在类上面添加注解。无需添加注解使用起来则更为便捷，同时在无法修改源代码的情况下这还是一个必要的先决条件。" target="_blank" rel="noopener">https://github.com/google/gson)。GSON这个Java库能够在Java对象和JSON间进行相互转换。同时它还提供了对Java泛型的完整支持，而且还不需要你在类上面添加注解。无需添加注解使用起来则更为便捷，同时在无法修改源代码的情况下这还是一个必要的先决条件。</a></p>
-</li>
-<li><p>FasterXML的Jackson项目（<a href="https://github.com/FasterXML/jackson）。Jackson是一个数据处理的工具套件，它的亮点是流式的JSON解析器及生成器。它是专为Java设计的，同时也能处理其它非JSON的编码。从我们在Github中的统计来看，它应该是最流行的JSON解析器。" target="_blank" rel="noopener">https://github.com/FasterXML/jackson）。Jackson是一个数据处理的工具套件，它的亮点是流式的JSON解析器及生成器。它是专为Java设计的，同时也能处理其它非JSON的编码。从我们在Github中的统计来看，它应该是最流行的JSON解析器。</a></p>
-</li>
-<li><p>Oracle的JSONP(<a href="https://jsonp.java.net/)。JSONP" target="_blank" rel="noopener">https://jsonp.java.net/)。JSONP</a> (JSON Processing)是JSON处理的一套Java API,从名字来看它就是用来生成及解析JSON串的。这是JSR353规范的一个开源实现。</p>
-</li>
+<li>Yidong Fang的JSON.simple(<a href="https://github.com/fangyidong/json-simple)。JSON.simple是一个JSON编解码的Java工具库。它旨在打造一个轻量简单且高性能的工具库。" target="_blank" rel="noopener">https://github.com/fangyidong/json-simple)。JSON.simple是一个JSON编解码的Java工具库。它旨在打造一个轻量简单且高性能的工具库。</a></li>
+<li>Google的GSON(<a href="https://github.com/google/gson)。GSON这个Java库能够在Java对象和JSON间进行相互转换。同时它还提供了对Java泛型的完整支持，而且还不需要你在类上面添加注解。无需添加注解使用起来则更为便捷，同时在无法修改源代码的情况下这还是一个必要的先决条件。" target="_blank" rel="noopener">https://github.com/google/gson)。GSON这个Java库能够在Java对象和JSON间进行相互转换。同时它还提供了对Java泛型的完整支持，而且还不需要你在类上面添加注解。无需添加注解使用起来则更为便捷，同时在无法修改源代码的情况下这还是一个必要的先决条件。</a></li>
+<li>FasterXML的Jackson项目（<a href="https://github.com/FasterXML/jackson）。Jackson是一个数据处理的工具套件，它的亮点是流式的JSON解析器及生成器。它是专为Java设计的，同时也能处理其它非JSON的编码。从我们在Github中的统计来看，它应该是最流行的JSON解析器。" target="_blank" rel="noopener">https://github.com/FasterXML/jackson）。Jackson是一个数据处理的工具套件，它的亮点是流式的JSON解析器及生成器。它是专为Java设计的，同时也能处理其它非JSON的编码。从我们在Github中的统计来看，它应该是最流行的JSON解析器。</a></li>
+<li>Oracle的JSONP(<a href="https://jsonp.java.net/)。JSONP" target="_blank" rel="noopener">https://jsonp.java.net/)。JSONP</a> (JSON Processing)是JSON处理的一套Java API,从名字来看它就是用来生成及解析JSON串的。这是JSR353规范的一个开源实现。</li>
 </ul>
-<h2 id="基准测试"><a href="#基准测试" class="headerlink" title="基准测试"></a>基准测试</h2><p>我们同时使用大文件和小文件对这些库进行了基准测试。随着文件大小的不同，处理这些文本所需要的系统资源也会随之上升。</p>
-<p>这个基准测试主要关注两个关键场景：大文件下(190MB)的解析速度与小文件（1KB）下的解析速度。大文件取自这里：<a href="https://github.com/zeMirco/sf-city-lots-json。小文件是从这里随机生成的：http://www.json-generator.com/。" target="_blank" rel="noopener">https://github.com/zeMirco/sf-city-lots-json。小文件是从这里随机生成的：http://www.json-generator.com/。</a></p>
-<p>不管是大文件还是小文件，我们都会用同一个库重复运行10次。对于每一个大文件，我们都会用同一个库来分别运行10次。而对于小文件，在单个库的单次运行中会重复执行10000次。在小文件测试的各次迭代中，文件内容都不会驻留在内存里，测试所运行的机器是AWS的c3.large实例。</p>
-<p>大文件的完整测试结果如下，我对小文件的结果求了个平均值。想要看完整的结果，请移步这里。如果想看小文件测试的源码，请从这里下载。</p>
-<p><strong>大文件结果</strong><br><img src="https://ws1.sinaimg.cn/large/6e3b2269ly1fq0fawj78gj20os0f5jx2" alt="json-ultimate-1"></p>
-<p>结果相差甚大！Jackson与JSON.simple领跑了这轮测试，整体来看Jackson又要略优于JSON.simple。从测试运行的平均结果来看，Jackson与JSON.simple在大文件上的表现要优秀一些，而JSONP排名第三落后甚远，GSON更是遥遥垫底。</p>
-<p>我们再把结果换算成百分比看下。平均来看Jackson要胜出一筹。下面是结果的百分比数据，可以从两个维度来进行比较：</p>
-<p><img src="https://ws1.sinaimg.cn/large/6e3b2269ly1fq0fawvumfj20os0ag770" alt="json-ultimate-2"></p>
-<p>不同库之间的性能差别着实不小。</p>
+<h2 id="基准测试"><a href="#基准测试" class="headerlink" title="基准测试"></a>基准测试</h2><p>我们同时使用大文件和小文件对这些库进行了基准测试。随着文件大小的不同，处理这些文本所需要的系统资源也会随之上升。<br>这个基准测试主要关注两个关键场景：大文件下(190MB)的解析速度与小文件（1KB）下的解析速度。大文件取自这里：<a href="https://github.com/zeMirco/sf-city-lots-json。小文件是从这里随机生成的：http://www.json-generator.com/。" target="_blank" rel="noopener">https://github.com/zeMirco/sf-city-lots-json。小文件是从这里随机生成的：http://www.json-generator.com/。</a><br>不管是大文件还是小文件，我们都会用同一个库重复运行10次。对于每一个大文件，我们都会用同一个库来分别运行10次。而对于小文件，在单个库的单次运行中会重复执行10000次。在小文件测试的各次迭代中，文件内容都不会驻留在内存里，测试所运行的机器是AWS的c3.large实例。<br>大文件的完整测试结果如下，我对小文件的结果求了个平均值。</p>
+<p><strong>大文件结果</strong><br><img src="https://ws1.sinaimg.cn/large/6e3b2269ly1fq0fawj78gj20os0f5jx2" alt="json-ultimate-1"><br>结果相差甚大！Jackson与JSON.simple领跑了这轮测试，整体来看Jackson又要略优于JSON.simple。从测试运行的平均结果来看，Jackson与JSON.simple在大文件上的表现要优秀一些，而JSONP排名第三落后甚远，GSON更是遥遥垫底。<br>我们再把结果换算成百分比看下。平均来看Jackson要胜出一筹。下面是结果的百分比数据，可以从两个维度来进行比较：<br><img src="https://ws1.sinaimg.cn/large/6e3b2269ly1fq0fawvumfj20os0ag770" alt="json-ultimate-2"><br>不同库之间的性能差别着实不小。</p>
 <p>结论：Jackson以略微优势胜出。JSON.simple紧随其后，而剩下两个库则远远落后。</p>
-<p><strong>小文件结果</strong><br><img src="https://ws1.sinaimg.cn/large/6e3b2269ly1fq0fax6y1ij20os0pswq9" alt="json-ultimate-3"></p>
-<p>上表记录的是对每个文件解析10次的平均时间，总的平均时间见下方。各个库在小文件测试中夺冠的次数如下：</p>
+<p><strong>小文件结果</strong><br><img src="https://ws1.sinaimg.cn/large/6e3b2269ly1fq0fax6y1ij20os0pswq9" alt="json-ultimate-3"><br>上表记录的是对每个文件解析10次的平均时间，总的平均时间见下方。各个库在小文件测试中夺冠的次数如下：</p>
 <ul>
 <li>GSON - 14</li>
 <li>JSONP - 5</li>
 <li>Jackson -1</li>
 <li>JSON.simple - 0</li>
 </ul>
-<p>这个结果貌似很有说服力。然而，从所有文件的平均结果来看，GSON这个冠军还是当之无愧的，JSON.simple和JSONP的二三名之争应该没什么悬念。Jackson这轮却是垫底了。尽管JSON.simple没有在任何文件上夺得第一，但总体来看它的解析速度却是排名第二位的。而JSONP尽管在许多文件上都拿到了冠军，但平均来看却只拿到了第三名的成绩。</p>
-<p>还有一个值得注意的是，尽管Jackson是这轮最慢的库，但是它在所有文件中的表现都非常一致，其它三个库虽然偶然会比Jackson快很多，但在另一些文件上的解析速度却是旗鼓相当甚至更差。</p>
-<p>我们再把这些数字转换成百分比看看，还是同样的两个维度：</p>
-<p><img src="https://ws1.sinaimg.cn/large/6e3b2269ly1fq0faxkmdgj20os0agacs" alt="json-ultimate-4"></p>
-<p>和大文件测试相比，这次的差距相对要小一些，但也还是不容忽视的。</p>
+<p>这个结果貌似很有说服力。然而，从所有文件的平均结果来看，GSON这个冠军还是当之无愧的，JSON.simple和JSONP的二三名之争应该没什么悬念。Jackson这轮却是垫底了。尽管JSON.simple没有在任何文件上夺得第一，但总体来看它的解析速度却是排名第二位的。而JSONP尽管在许多文件上都拿到了冠军，但平均来看却只拿到了第三名的成绩。<br>还有一个值得注意的是，尽管Jackson是这轮最慢的库，但是它在所有文件中的表现都非常一致，其它三个库虽然偶然会比Jackson快很多，但在另一些文件上的解析速度却是旗鼓相当甚至更差。<br>我们再把这些数字转换成百分比看看，还是同样的两个维度：<br><img src="https://ws1.sinaimg.cn/large/6e3b2269ly1fq0faxkmdgj20os0agacs" alt="json-ultimate-4"><br>和大文件测试相比，这次的差距相对要小一些，但也还是不容忽视的。</p>
 <p>结论：很不幸的是，JSON.simple又以微弱的劣势与冠军失之交臂，这轮GSON胜。JSONP仍是千年老三而这回Jackson则赶了个晚集。</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>解析速度并非衡量一个JSON库的唯一指标，但它的确非常重要。通过运行这次基准测试，我们发现没有一个库能在所有文件上击败对手。大文件中表现优秀的却在小文件上栽了根头，反之亦然。</p>
-<p>如果要从解析速度来看选择哪个库的话还得取决于你的使用场景。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>解析速度并非衡量一个JSON库的唯一指标，但它的确非常重要。通过运行这次基准测试，我们发现没有一个库能在所有文件上击败对手。大文件中表现优秀的却在小文件上栽了根头，反之亦然。<br>如果要从解析速度来看选择哪个库的话还得取决于你的使用场景。</p>
 <ul>
 <li>如果你的应用经常会处理大的JSON文件，那么Jackson应该是你的菜。GSON在大文件上表现得相当吃力。</li>
 <li>如果你主要是处理小文件请求，比如某个微服务或者分布式架构的初始化，那么GSON当是首选。Jackson在小文件上的表现则不如人意。</li>

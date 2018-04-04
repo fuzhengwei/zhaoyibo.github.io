@@ -409,8 +409,9 @@
 <p>在你还没有被完全“体制化”时，为何不多学些语言，哪怕只是浅尝辄止，潜移默化中也许你的思维壁垒就松动了。不管是 Golang 、Python 或 Ruby 还是其他语言，当看到一些语法习惯与之前熟悉的 C 和 Java 不同时，的确潜意识里就会产生抵触情绪，觉得这不好，还是自己习惯的那套好。长此以往，如果不能冲破自己的心理，“坐以待毙”，被时间淘汰恐怕只是早晚的事儿。所以这里的关键——不是非要学习 Golang，而是要不断地学！</p>
 <h2 id="安装-Go-tools"><a href="#安装-Go-tools" class="headerlink" title="安装 Go tools"></a>安装 Go tools</h2><p>首先在<a href="https://golang.org/dl/" target="_blank" rel="noopener">官网</a>下载对应平台的安装包。（墙内下载：<a href="http://www.golangtc.com/download" target="_blank" rel="noopener">http://www.golangtc.com/download</a> ）</p>
 <p>这里以 OS X 为例：<br>下载后直接运行 pkg 文件，一路 next，安装完成后 Go 的发行版会被安装到 <code>/usr/local/go</code> 中。</p>
-<p>p.s. Mac 上也可以直接用 Homebrew 安装 Go</p>
-<p>然后将 <code>/usr/local/go/bin</code> 目录添加到 <code>PATH</code> 环境变量中。</p>
+<blockquote>
+<p>Mac 上也可以直接用 Homebrew 安装 Go<br>然后将 <code>/usr/local/go/bin</code> 目录添加到 <code>PATH</code> 环境变量中。</p>
+</blockquote>
 <h2 id="测试是否安装成功"><a href="#测试是否安装成功" class="headerlink" title="测试是否安装成功"></a>测试是否安装成功</h2><p>先直接试试再说：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ go</span><br></pre></td></tr></table></figure>
 <p>只要没报 <code>command not found: go</code> 话应该就是没啥问题的。</p>
@@ -419,7 +420,7 @@
 <p>（GOPATH这个环境变量下边还会细说）<br>然后在这个 workspace 下创建一个存放源码的目录：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ src/codingon.com/hello</span><br></pre></td></tr></table></figure>
 <p>在 <code>hello</code> 目录下创建一个名为 <code>hello.go</code> 的文件，内容如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">package main</span><br><span class="line"></span><br><span class="line">import &quot;fmt&quot;</span><br><span class="line"></span><br><span class="line">func main() &#123;</span><br><span class="line">    fmt.Printf(&quot;hello, world\n&quot;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">"fmt"</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    fmt.Printf(<span class="string">"hello, world\n"</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>通过下边的命令编译安装并运行</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ go install codingon.com/hello</span><br><span class="line">$ $GOPATH/bin/hello</span><br></pre></td></tr></table></figure>
 <p>也可以直接用下边的命令“解释”运行。区别是上边的会在 <code>$GOPATH</code> 下生成 <code>bin</code> 目录，而下边的不会（其实是生成了一个临时目录，在运行结束后自动删除掉了）</p>
@@ -439,16 +440,11 @@
 <h2 id="学习-Go"><a href="#学习-Go" class="headerlink" title="学习 Go"></a>学习 Go</h2><p>Go 从 1.0 到 1.5 语法感觉没什么变化，网上关于其语法的文章也很多，官网也有语法讲解和训练（ <a href="https://tour.golang.org" target="_blank" rel="noopener">https://tour.golang.org</a> ）。</p>
 <p>以下是一些 Golang 的学习资源：</p>
 <ol>
-<li><p>Go 指南：官网链接：<a href="https://go-tour-zh.appspot.com/welcome/1（需要梯子），如果无法打开请用国内链接：http://tour.studygolang.com/" target="_blank" rel="noopener">https://go-tour-zh.appspot.com/welcome/1（需要梯子），如果无法打开请用国内链接：http://tour.studygolang.com/</a></p>
-</li>
-<li><p>《The Way to Go》,如果看英文感觉吃力，github上无闻大牛已经做了中文译本：<a href="https://github.com/Unknwon/the-way-to-go_ZH_CN" target="_blank" rel="noopener">https://github.com/Unknwon/the-way-to-go_ZH_CN</a></p>
-</li>
-<li><p>《Go 学习笔记 第四版》雨痕写的，该电子书在 github 开源：<a href="https://github.com/qyuhen/book" target="_blank" rel="noopener">https://github.com/qyuhen/book</a></p>
-</li>
-<li><p>《Go Web编程》，是谢大（beego的作者）写的书，github中文目录链接：<a href="https://github.com/astaxie/build-web-application-with-golang/blob/master/zh/preface.md" target="_blank" rel="noopener">https://github.com/astaxie/build-web-application-with-golang/blob/master/zh/preface.md</a></p>
-</li>
-<li><p>《Go 编程基础》视频教程，此教程是无闻大牛讲解的，github视频链接：<a href="https://github.com/Unknwon/go-fundamental-programming" target="_blank" rel="noopener">https://github.com/Unknwon/go-fundamental-programming</a></p>
-</li>
+<li>Go 指南：官网链接：<a href="https://go-tour-zh.appspot.com/welcome/1（需要梯子），如果无法打开请用国内链接：http://tour.studygolang.com/" target="_blank" rel="noopener">https://go-tour-zh.appspot.com/welcome/1（需要梯子），如果无法打开请用国内链接：http://tour.studygolang.com/</a></li>
+<li>《The Way to Go》,如果看英文感觉吃力，github上无闻大牛已经做了中文译本：<a href="https://github.com/Unknwon/the-way-to-go_ZH_CN" target="_blank" rel="noopener">https://github.com/Unknwon/the-way-to-go_ZH_CN</a></li>
+<li>《Go 学习笔记 第四版》雨痕写的，该电子书在 github 开源：<a href="https://github.com/qyuhen/book" target="_blank" rel="noopener">https://github.com/qyuhen/book</a></li>
+<li>《Go Web编程》，是谢大（beego的作者）写的书，github中文目录链接：<a href="https://github.com/astaxie/build-web-application-with-golang/blob/master/zh/preface.md" target="_blank" rel="noopener">https://github.com/astaxie/build-web-application-with-golang/blob/master/zh/preface.md</a></li>
+<li>《Go 编程基础》视频教程，此教程是无闻大牛讲解的，github视频链接：<a href="https://github.com/Unknwon/go-fundamental-programming" target="_blank" rel="noopener">https://github.com/Unknwon/go-fundamental-programming</a></li>
 </ol>
 
       

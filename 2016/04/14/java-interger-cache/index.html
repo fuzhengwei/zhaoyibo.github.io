@@ -405,12 +405,7 @@
 <p>实际上在 Java 5 中引入这个特性的时候，范围是固定的 -128 至 +127。后来在 Java 6 中，最大值映射到 <code>java.lang.Integer.IntegerCache.high</code>，可以使用 JVM 的启动参数设置最大值。这使我们可以根据应用程序的实际情况灵活地调整来提高性能。<br>是什么原因选择这个 -128 到 127 这个范围呢？因为这个范围的整数值是使用最广泛的，另外在程序中第一次使用 Integer 的时候也需要一定的额外时间来初始化这个缓存，范围越大初始化的时间也越长。</p>
 <h3 id="Java-语言规范中的缓存行为"><a href="#Java-语言规范中的缓存行为" class="headerlink" title="Java 语言规范中的缓存行为"></a>Java 语言规范中的缓存行为</h3><p>在 <a href="http://docs.oracle.com/javase/specs/jls/se8/html/jls-5.html#jls-5.1.7" target="_blank" rel="noopener">Boxing Conversion</a> 部分的 <a href="http://docs.oracle.com/javase/specs/jls/se8/html/index.html" target="_blank" rel="noopener">Java 语言规范（JLS）</a>规定如下：</p>
 <p>如果一个变量 p 的值属于：-128 至 127 之间的整数(<a href="http://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.1" target="_blank" rel="noopener">§3.10.1</a>)，true 和 false 的布尔值(<a href="http://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.3" target="_blank" rel="noopener">§3.10.3</a>)，’\u0000’ 至 ‘\u007f’ 之间的字符(<a href="http://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.4" target="_blank" rel="noopener">§3.10.4</a>)中时，将 p 包装成 a 和 b 两个对象时，可以直接使用 a == b 判断 a 和 b 的值是否相等。</p>
-<h3 id="其他缓存的对象"><a href="#其他缓存的对象" class="headerlink" title="其他缓存的对象"></a>其他缓存的对象</h3><p>这种缓存行为不仅适用于 Integer 对象，针对所有整数类型的类都有类似的缓存机制。</p>
-<p>有 ByteCache 用于缓存 Byte 对象</p>
-<p>有 ShortCache 用于缓存 Short 对象</p>
-<p>有 LongCache 用于缓存 Long 对象</p>
-<p>有 CharacterCache 用于缓存 Character 对象</p>
-<p>Byte，Short，Long 有固定范围: -128 到 127。对于 Character, 范围是 0 到 127。除了 Integer 可以通过参数改变范围外，其它的都不行。</p>
+<h3 id="其他缓存的对象"><a href="#其他缓存的对象" class="headerlink" title="其他缓存的对象"></a>其他缓存的对象</h3><p>这种缓存行为不仅适用于 Integer 对象，针对所有整数类型的类都有类似的缓存机制。<br>有 ByteCache 用于缓存 Byte 对象<br>有 ShortCache 用于缓存 Short 对象<br>有 LongCache 用于缓存 Long 对象<br>有 CharacterCache 用于缓存 Character 对象<br>Byte，Short，Long 有固定范围: -128 到 127。对于 Character, 范围是 0 到 127。除了 Integer 可以通过参数改变范围外，其它的都不行。</p>
 
       
     </div>
