@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.1.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.1.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.1.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.1.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="目录：  类型列表 标识符 &amp;amp; 关键字 变量 常量 布尔类型 bool 数值类型 字符串类型 错误类型型 一些技巧（分组声明、枚举、运算符）">
+<meta name="keywords" content="Golang">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Golang 学习笔记（三）——变量常量 基础类型">
+<meta property="og:url" content="https://ideassea.com/2016/01/05/golang-note-3/index.html">
+<meta property="og:site_name" content="Ideas Sea">
+<meta property="og:description" content="目录：  类型列表 标识符 &amp;amp; 关键字 变量 常量 布尔类型 bool 数值类型 字符串类型 错误类型型 一些技巧（分组声明、枚举、运算符）">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2017-07-17T19:21:50.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Golang 学习笔记（三）——变量常量 基础类型">
+<meta name="twitter:description" content="目录：  类型列表 标识符 &amp;amp; 关键字 变量 常量 布尔类型 bool 数值类型 字符串类型 错误类型型 一些技巧（分组声明、枚举、运算符）">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Ideas Sea" type="application/atom+xml" />
+
+
+
+
+  <link rel="canonical" href="https://ideassea.com/2016/01/05/golang-note-3/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Golang 学习笔记（三）——变量常量 基础类型 | Ideas Sea</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> 
+
+<div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ideas Sea</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+          
+  <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />标签</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+</li>
+
+      
+
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+  
+
+
+
+ </div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+    <div class="reading-progress-bar"></div>
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://ideassea.com/2016/01/05/golang-note-3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yibo">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://ws2.sinaimg.cn/large/006tKfTcly1fq0mwrckglj30sg0sg0u8.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ideas Sea">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Golang 学习笔记（三）——变量常量 基础类型</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-01-05T15:33:00+08:00">2016-01-05</time>
+            
+
+            
+            
+              
+                
+              
+            
+
+            
+              
+              <span class="post-meta-divider">|</span>
+              
+
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">更新于：</span>
+              
+              <time title="更新于" itemprop="dateModified" datetime="2017-07-18T03:21:50+08:00">2017-07-18</time>
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>目录：</p>
+<ul>
+<li>类型列表</li>
+<li>标识符 &amp; 关键字</li>
+<li>变量</li>
+<li>常量</li>
+<li>布尔类型 bool</li>
+<li>数值类型</li>
+<li>字符串类型</li>
+<li>错误类型型</li>
+<li>一些技巧（分组声明、枚举、运算符）</li>
+</ul>
+<a id="more"></a>
+<h2 id="类型列表"><a href="#类型列表" class="headerlink" title="类型列表"></a>类型列表</h2><table>
+<thead>
+<tr>
+<th>类型</th>
+<th style="text-align:center">长度</th>
+<th style="text-align:center">零值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>bool</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">false</td>
+<td>true/false, 默认false</td>
+</tr>
+<tr>
+<td>byte</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">0x0</td>
+<td>uint8 别名</td>
+</tr>
+<tr>
+<td>rune</td>
+<td style="text-align:center">4</td>
+<td style="text-align:center">0</td>
+<td>int32 别名 代表一个 unicode code point</td>
+</tr>
+<tr>
+<td>int/unit</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">0</td>
+<td>与计算架构相关 32bit/64bit</td>
+</tr>
+<tr>
+<td>int8/uint8</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">0; 0x0</td>
+<td>-128 ~ 127; 0 ~ 255</td>
+</tr>
+<tr>
+<td>int16/uint16</td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">0</td>
+<td>-32768 ~ 32767; 0 ~ 65535</td>
+</tr>
+<tr>
+<td>int32/uint32</td>
+<td style="text-align:center">4</td>
+<td style="text-align:center">0</td>
+<td>-21亿 ~ 21亿， 0 ~ 42亿</td>
+</tr>
+<tr>
+<td>int64/uint64</td>
+<td style="text-align:center">8</td>
+<td style="text-align:center">0</td>
+<td>-922亿亿 ~ 922亿亿, 0 ~ 1844亿亿</td>
+</tr>
+<tr>
+<td>float32</td>
+<td style="text-align:center">4</td>
+<td style="text-align:center">0</td>
+<td>精确到7位小数</td>
+</tr>
+<tr>
+<td>float64</td>
+<td style="text-align:center">8</td>
+<td style="text-align:center">0</td>
+<td>精确到15位小数</td>
+</tr>
+<tr>
+<td>complex64</td>
+<td style="text-align:center">8</td>
+<td style="text-align:center">0</td>
+<td></td>
+</tr>
+<tr>
+<td>complex128</td>
+<td style="text-align:center">16</td>
+<td style="text-align:center">0</td>
+<td></td>
+</tr>
+<tr>
+<td>uintptr</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">nil</td>
+<td>指针(可以存指针的整数型)</td>
+</tr>
+<tr>
+<td>array</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">元素为零值</td>
+<td>值类型, 数组</td>
+</tr>
+<tr>
+<td>struct</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">type{}</td>
+<td>值类型, 结构体</td>
+</tr>
+<tr>
+<td>string</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">“”</td>
+<td>值类型, 字符串类型, 常用</td>
+</tr>
+<tr>
+<td>slice</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">nil</td>
+<td>引用类型, 切片</td>
+</tr>
+<tr>
+<td>map</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">nil</td>
+<td>引用类型, 字典</td>
+</tr>
+<tr>
+<td>channel</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">nil</td>
+<td>引用类型, 通道</td>
+</tr>
+<tr>
+<td>interface</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">nil</td>
+<td>接口类型, 接口</td>
+</tr>
+<tr>
+<td>function</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">nil</td>
+<td>函数类型, 函数</td>
+</tr>
+</tbody>
+</table>
+<h3 id="基础类型"><a href="#基础类型" class="headerlink" title="基础类型"></a>基础类型</h3><p>其中，Go 语言中的内置基础类型为：  </p>
+<ul>
+<li>布尔型：bool  </li>
+<li>数值型：<ul>
+<li>整数型：int int64 int32(rune) int16 int8 uint8(byte) uint16 uint32 uint64 uint  </li>
+<li>浮点型：float32 float64   </li>
+<li>复数型：complex64 complex128  </li>
+</ul>
+</li>
+<li>字符串：string  </li>
+<li>错误型：error  </li>
+</ul>
+<h3 id="关于类型转换"><a href="#关于类型转换" class="headerlink" title="关于类型转换"></a>关于类型转换</h3><p>不支持隐式类型转换，必须进行显式类型转换</p>
+<p>转换只发生在两种互相兼容的类型之间: 各类数值类型之间不允许相互赋值或操作，不然会在编译时报错<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;type&gt;(expression)</span><br></pre></td></tr></table></figure></p>
+<h2 id="标识符-amp-关键字"><a href="#标识符-amp-关键字" class="headerlink" title="标识符 &amp; 关键字"></a>标识符 &amp; 关键字</h2><p>1.标识符</p>
+<p>在Go语言中，变量、常量、函数、结构体和接口被统称为“程序实体”，而它们的名字被统称为“标识符”。</p>
+<p>标识符可以是任何 Unicode 编码可以表示的字母字符、数字以及下划线“_”，不能以数字或下划线开头。</p>
+<p>注意：Go语言中，访问权限由名字首字母大小写来控制，首字母大写为 public，小写为包级私有。</p>
+<p>2.关键字</p>
+<table>
+<thead>
+<tr>
+<th>用途</th>
+<th>关键字</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>程序声明</td>
+<td>import package</td>
+</tr>
+<tr>
+<td>实体声明与定义</td>
+<td>chan const func struct interface map type var</td>
+</tr>
+<tr>
+<td>流程控制</td>
+<td>break case continue default defer else fallthrough for go goto if import range return select switch</td>
+</tr>
+</tbody>
+</table>
+<h2 id="变量"><a href="#变量" class="headerlink" title="变量"></a>变量</h2><p>1.变量声明</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">//第一种，指定变量类型，声明后若不赋值，使用默认值</span><br><span class="line">var v_name v_type</span><br><span class="line">v_name = value</span><br><span class="line"></span><br><span class="line">//第二种，Go 会根据值自行推断变量类型</span><br><span class="line">var v_name = value</span><br><span class="line"></span><br><span class="line">//第三种，省略var, 注意 :=左侧的变量不应该是已经声明过的，否则会导致编译错误.</span><br><span class="line">v_name := value</span><br><span class="line"></span><br><span class="line">// e.g.</span><br><span class="line">var a int = 10</span><br><span class="line">var b = 10</span><br><span class="line">c : = 10</span><br></pre></td></tr></table></figure>
+<p>2.多变量声明</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">//类型相同多个变量, 非全局变量</span><br><span class="line">var vname1, vname2, vname3 type</span><br><span class="line">vname1, vname2, vname3 = v1, v2, v3 // 平行赋值</span><br><span class="line"></span><br><span class="line">var vname1, vname2, vname3 = v1, v2, v3 // 自动类型推断</span><br><span class="line"></span><br><span class="line">vname1, vname2, vname3 := v1, v2, v3 //出现在:=左侧的变量不应该是已经被声明过的，否则会导致编译错误</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">//类型不同多个变量, 全局变量, 局部变量不能使用这种方式</span><br><span class="line">var (</span><br><span class="line">    vname1 v_type1</span><br><span class="line">    vname2 v_type2</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<p>注意：</p>
+<ul>
+<li>多变量赋值时，将先行计算所有左侧变量的值，再进行赋值</li>
+<li>已声明但是没有使用的变量会在编译阶段报错</li>
+<li>对于不需要的变量，用<code>_</code>忽略， e.g. <code>v, _ := func1()</code></li>
+</ul>
+<h2 id="常量"><a href="#常量" class="headerlink" title="常量"></a>常量</h2><p>常量可以是字符，字符串，布尔或数字，常量赋值是编译期的行为<br>1.常量声明</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">在编译阶段就能确定下来的值,在运行时无法改变该值</span><br><span class="line">常量可以定义为数值、布尔值或字符串等类型</span><br><span class="line"></span><br><span class="line">const constantName = value</span><br><span class="line">const Pi float32 = 3.1415926</span><br><span class="line"></span><br><span class="line">const c_name [type] = value</span><br><span class="line">const c_name1, c_name2 = value1, value2</span><br><span class="line">const (</span><br><span class="line">    c_name1 = vluae1</span><br><span class="line">    c_name2 = value2</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">=右侧，必须为常量或常量表达式，如果使用到了函数，必须为内置函数（编译期行为）</span><br><span class="line"></span><br><span class="line">const i = 10000</span><br></pre></td></tr></table></figure>
+<p>注意：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">说明：</span><br><span class="line"></span><br><span class="line">A.常量必须是编译期能确定的Number(char/integer/float/complex)、String和bool</span><br><span class="line"></span><br><span class="line">B.在定义常量数组时，如果不提供初始化值，则表示与上行常量类型，值，完全相同</span><br><span class="line"></span><br><span class="line">    const (</span><br><span class="line">        a = &quot;abc&quot;</span><br><span class="line">        b</span><br><span class="line">    )</span><br><span class="line">    //则 b = &quot;abc&quot;</span><br><span class="line"></span><br><span class="line">C.常量可以用`len`, `cap`, `unsafe.Sizeof()`常量计算表达式的值.  常量表达式中，函数必须是内置函数，否则编译不过</span><br></pre></td></tr></table></figure>
+<h2 id="bool"><a href="#bool" class="headerlink" title="bool"></a>bool</h2><p>Go 语言中，不尔类型为 bool，值是 true 或 false，默认为 false。不能把非0值当做 true。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">var isActive bool // 全局变量声明</span><br><span class="line">var enabled, disabled = true, false // 忽略类型的声明</span><br></pre></td></tr></table></figure>
+<h2 id="数值类型"><a href="#数值类型" class="headerlink" title="数值类型"></a>数值类型</h2><p>整数类型有无符号和带符号两种。Go 中的整数类型有 int, int8, int16, int32, int64, rune 和 byte, uint8, uint16, uint32, uint64。其中 rune 是 int32 的别称，byte 是 uint8 的别称。<br>这些类型变量之间不允许相互赋值或操作，不然会在编译时报错。尽管 int 的长度也是 int32，但他俩也不可互用。<br>浮点数有 float32 和 float64 两种，默认为 float64。<br>Go 语言还支持复数，默认为 complex128。</p>
+<h3 id="byte-与-rune"><a href="#byte-与-rune" class="headerlink" title="byte 与 rune"></a>byte 与 rune</h3><p><code>byte</code>与<code>rune</code>都属于别名类型，<code>byte</code>是<code>uint8</code>的别名类型，而<code>rune</code>则是<code>int32</code>的别名类型。</p>
+<p><code>byte</code>类型的值需用8个比特位表示，其表示法与<code>uint8</code>类型无异。</p>
+<p>一个<code>rune</code>类型的值即可表示一个 Unicode 字符。用于代表 Unicode 字符的编码值也被称为 Unicode 代码点。一个 Unicode 代码点通常由“U+”和一个以十六进制表示法表示的整数表示。例如，英文字母“A”的 Unicode 代码点为“U+0041”。</p>
+<p><code>rune</code>类型的值需要由单引号<code>&#39;</code>包裹。例如<code>&#39;A&#39;</code>。这种表示方法一目了然。还有其他几种形式表示<code>rune</code>类型值，但都不常用，不再赘述。</p>
+<h2 id="字符串类型"><a href="#字符串类型" class="headerlink" title="字符串类型"></a>字符串类型</h2><p>Go 语言中的字符串都是采用 UTF-8 字符集编码。字符串是用一对双引号（””）或反引号（``）括起来定义，分别是解释型表示法和原生表示法。二者的区别是，前者表示的值是所见即所得的（除了回车符）。在那对反引号之间的内容就是该字符串值本身。而后者所表示的值中的转义符会起作用并在程序编译期间被转义。</p>
+<p>字符串值是不可变的，这点和 Java 中字符串类似。我们一旦创建了一个此类型的值，就不可能再对它本身做任何修改。（可以通过将 string 转为 []btye 再转回 string 的方式实现）</p>
+<p>注意，我们在一个字符串值或者一个字符串类型的变量之上应用 Go 语言的内置函数 <code>len</code> 将会得到代表它的那个字节数组的长度。这可能与我们看到的表象是不同的。</p>
+<h2 id="错误类型"><a href="#错误类型" class="headerlink" title="错误类型"></a>错误类型</h2><p>error 类型实际上是抽象了 Error() 方法的 error 接口，Golang 使用该接口进行标准的错误处理。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">type error interface &#123;</span><br><span class="line">	Error() string</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以自己实现这个接口，也可以使用 errors 包</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">var e error = errors.New(&quot;error message&quot;)</span><br></pre></td></tr></table></figure>
+<p>一般情况下，如果函数需要返回错误，就将 error 作为多个返回值中的最后一个（但这并非是强制要求）。参考模型：  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">func Foo(param int) (n int, err error) &#123;</span><br><span class="line"> 	// ...</span><br><span class="line">&#125;</span><br><span class="line">if n, err := Foo(0); err != nil &#123;</span><br><span class="line">	// 错误处理</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="一些技巧"><a href="#一些技巧" class="headerlink" title="一些技巧"></a>一些技巧</h2><h3 id="分组声明"><a href="#分组声明" class="headerlink" title="分组声明"></a>分组声明</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">import (</span><br><span class="line">    &quot;fmt&quot;</span><br><span class="line">    &quot;os&quot;</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">const (</span><br><span class="line">    i = 100  //首行必须有常量表达式</span><br><span class="line">    pi = 3.1415</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">var (  //全局变量可用，函数体内不支持</span><br><span class="line">    i int</span><br><span class="line">    pi float32</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<h3 id="枚举"><a href="#枚举" class="headerlink" title="枚举"></a>枚举</h3><p>iota，特殊常量，可以认为是一个可以被编译器修改的常量</p>
+<p>在每一个const关键字出现时，被重置为0，然后再下一个const出现之前，每出现一次iota，其所代表的数字会自动增加1</p>
+<p>不提供初始值，则表示使用上一行的表达式</p>
+<p>1.声明：</p>
+<p>iota生成从0开始的自动增长枚举值，意味着，多一个枚举值，iota+=1，无论是否使用</p>
+<p>基本语法<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">const (</span><br><span class="line">    a = 1</span><br><span class="line">    b = 2</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">const (</span><br><span class="line">    a = iota //0</span><br><span class="line">    b  //1</span><br><span class="line">    c  //2</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">const (</span><br><span class="line">    _ = iota</span><br><span class="line">    a    //1</span><br><span class="line">    b    //2</span><br><span class="line">)</span><br></pre></td></tr></table></figure></p>
+<p>iota用法<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">func main() &#123;</span><br><span class="line">    const (</span><br><span class="line">            a = iota  //0</span><br><span class="line">            b   //1</span><br><span class="line">            c   //2</span><br><span class="line">            d = &quot;ha&quot;  //独立值，iota += 1</span><br><span class="line">            e    //&quot;ha&quot;   iota += 1</span><br><span class="line">            f = 100    //iota +=1</span><br><span class="line">            g     //100  iota +=1</span><br><span class="line">            h = iota  //7,恢复计数</span><br><span class="line">            i      //8</span><br><span class="line">    )</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">const (</span><br><span class="line">    x = iota // 0</span><br><span class="line">    y = iota // 1</span><br><span class="line">    z = iota // 2</span><br><span class="line">    w //省略，默认和前面一样字面值   w = iota, 即3</span><br><span class="line">)</span><br><span class="line">const v = iota //遇到const关键字，iota重置</span><br></pre></td></tr></table></figure></p>
+<p>注意: 每行的变量数必须一致 const ( A, B = iota, iota C, D E, F )<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">func main() &#123;</span><br><span class="line">    println(A,B,C,D,E,F)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//结果： 0 0 1 1 2 2   【各自增长】</span><br></pre></td></tr></table></figure></p>
+<h3 id="运算符"><a href="#运算符" class="headerlink" title="运算符"></a>运算符</h3><p>Go运算符全部是从左到右结合的</p>
+<p>不支持运算符重载<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">优先级    运算符                        说明</span><br><span class="line">  高   * / % &lt;&lt; &gt;&gt; &amp; &amp;^(AND NOT)</span><br><span class="line">       + - ! ^</span><br><span class="line">       == != &lt; &lt;= &gt; &gt;=</span><br><span class="line">       &lt;-                             channel运算符</span><br><span class="line">       &amp;&amp;</span><br><span class="line">  低   ||</span><br></pre></td></tr></table></figure></p>
+<p>在go中，<strong>++ –为语句，而非表达式</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">package main</span><br><span class="line"></span><br><span class="line">func main()&#123;</span><br><span class="line">    i := 1</span><br><span class="line">    i ++</span><br><span class="line">    println(i)</span><br><span class="line"></span><br><span class="line">    b := i</span><br><span class="line">    println(b)</span><br><span class="line"></span><br><span class="line">    //syntax error: unexpected ++, expecting semicolon or newline or &#125;</span><br><span class="line">    //c := i++</span><br><span class="line">    //意味着, ++/--不能出现在等号右侧</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>参考资料：<br>谢大的<a href="https://github.com/astaxie/build-web-application-with-golang/blob/master/zh/preface.md" target="_blank" rel="noopener">《Go Web 编程》</a><br>wklken 的 <a href="http://www.wklken.me/category/golang-notes.html" target="_blank" rel="noopener">Golang 笔记</a></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Yibo</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://ideassea.com/2016/01/05/golang-note-3/" title="Golang 学习笔记（三）——变量常量 基础类型">https://ideassea.com/2016/01/05/golang-note-3/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Golang/" rel="tag"># Golang</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/01/04/golang-note-2/" rel="next" title="Golang 学习笔记（二）——命令基础">
+                <i class="fa fa-chevron-left"></i> Golang 学习笔记（二）——命令基础
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/01/06/golang-note-4/" rel="prev" title="Golang 学习笔记（四）——复合类型、函数">
+                Golang 学习笔记（四）——复合类型、函数 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://ws2.sinaimg.cn/large/006tKfTcly1fq0mwrckglj30sg0sg0u8.jpg"
+                alt="Yibo" />
+            
+              <p class="site-author-name" itemprop="name">Yibo</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">41</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">21</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#类型列表"><span class="nav-number">1.</span> <span class="nav-text">类型列表</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#基础类型"><span class="nav-number">1.1.</span> <span class="nav-text">基础类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#关于类型转换"><span class="nav-number">1.2.</span> <span class="nav-text">关于类型转换</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#标识符-amp-关键字"><span class="nav-number">2.</span> <span class="nav-text">标识符 &amp; 关键字</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#变量"><span class="nav-number">3.</span> <span class="nav-text">变量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#常量"><span class="nav-number">4.</span> <span class="nav-text">常量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#bool"><span class="nav-number">5.</span> <span class="nav-text">bool</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数值类型"><span class="nav-number">6.</span> <span class="nav-text">数值类型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#byte-与-rune"><span class="nav-number">6.1.</span> <span class="nav-text">byte 与 rune</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#字符串类型"><span class="nav-number">7.</span> <span class="nav-text">字符串类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#错误类型"><span class="nav-number">8.</span> <span class="nav-text">错误类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#一些技巧"><span class="nav-number">9.</span> <span class="nav-text">一些技巧</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#分组声明"><span class="nav-number">9.1.</span> <span class="nav-text">分组声明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#枚举"><span class="nav-number">9.2.</span> <span class="nav-text">枚举</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#运算符"><span class="nav-number">9.3.</span> <span class="nav-text">运算符</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate"> 
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yibo</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/theme-next/hexo-theme-next">NexT.Gemini</a> v6.1.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/reading_progress/reading_progress.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.1.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.1.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.1.0"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+  
+  <script src="/lib/pangu/dist/pangu.min.js?v=3.3"></script>
+  <script type="text/javascript">pangu.spacingPage();</script>
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

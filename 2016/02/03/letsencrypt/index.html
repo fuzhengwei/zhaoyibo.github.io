@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.1.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.1.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.1.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.1.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Let’s Encrypt 简介Let’s Encrypt 是一个新的数字证书认证机构，它通过自动化的过程消除创建和安装证书的复杂性，为网站提供免费的 SSL/TLS 证书。Let’s Encrypt 项目获得了 Mozilla、思科、Akamai、IdenTrust 和 EFF 等组织的支持，由 Linux 基金会托管。它在9月中旬颁发了第一个证书，已经从12月3日起开放了 Beta 测试，它已">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Let&#39;s Encrypt 试用手记">
+<meta property="og:url" content="https://ideassea.com/2016/02/03/letsencrypt/index.html">
+<meta property="og:site_name" content="Ideas Sea">
+<meta property="og:description" content="Let’s Encrypt 简介Let’s Encrypt 是一个新的数字证书认证机构，它通过自动化的过程消除创建和安装证书的复杂性，为网站提供免费的 SSL/TLS 证书。Let’s Encrypt 项目获得了 Mozilla、思科、Akamai、IdenTrust 和 EFF 等组织的支持，由 Linux 基金会托管。它在9月中旬颁发了第一个证书，已经从12月3日起开放了 Beta 测试，它已">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://ws1.sinaimg.cn/large/6e3b2269ly1fq0faxrnb4j20fj0d2tap">
+<meta property="og:image" content="https://ws1.sinaimg.cn/large/6e3b2269ly1fq0faxuslfj20dy03hmxc">
+<meta property="og:image" content="https://ws1.sinaimg.cn/large/6e3b2269ly1fq0faxxtf7j20e308umxt">
+<meta property="og:image" content="https://ws1.sinaimg.cn/large/6e3b2269ly1fq0fay0kkgj20dx04dt94">
+<meta property="og:image" content="https://ws1.sinaimg.cn/large/6e3b2269ly1fq0fay6d3bj20m00ijjuv">
+<meta property="og:updated_time" content="2017-07-17T22:11:15.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Let&#39;s Encrypt 试用手记">
+<meta name="twitter:description" content="Let’s Encrypt 简介Let’s Encrypt 是一个新的数字证书认证机构，它通过自动化的过程消除创建和安装证书的复杂性，为网站提供免费的 SSL/TLS 证书。Let’s Encrypt 项目获得了 Mozilla、思科、Akamai、IdenTrust 和 EFF 等组织的支持，由 Linux 基金会托管。它在9月中旬颁发了第一个证书，已经从12月3日起开放了 Beta 测试，它已">
+<meta name="twitter:image" content="https://ws1.sinaimg.cn/large/6e3b2269ly1fq0faxrnb4j20fj0d2tap">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Ideas Sea" type="application/atom+xml" />
+
+
+
+
+  <link rel="canonical" href="https://ideassea.com/2016/02/03/letsencrypt/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Let's Encrypt 试用手记 | Ideas Sea</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> 
+
+<div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ideas Sea</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+          
+  <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />标签</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+</li>
+
+      
+
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+  
+
+
+
+ </div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+    <div class="reading-progress-bar"></div>
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://ideassea.com/2016/02/03/letsencrypt/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yibo">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://ws2.sinaimg.cn/large/006tKfTcly1fq0mwrckglj30sg0sg0u8.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ideas Sea">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Let's Encrypt 试用手记</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-02-03T05:58:00+08:00">2016-02-03</time>
+            
+
+            
+            
+              
+                
+              
+            
+
+            
+              
+              <span class="post-meta-divider">|</span>
+              
+
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">更新于：</span>
+              
+              <time title="更新于" itemprop="dateModified" datetime="2017-07-18T06:11:15+08:00">2017-07-18</time>
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="Let’s-Encrypt-简介"><a href="#Let’s-Encrypt-简介" class="headerlink" title="Let’s Encrypt 简介"></a>Let’s Encrypt 简介</h2><p><a href="https://letsencrypt.org/" target="_blank" rel="noopener">Let’s Encrypt</a> 是一个新的数字证书认证机构，它通过自动化的过程消除创建和安装证书的复杂性，为网站提供免费的 SSL/TLS 证书。Let’s Encrypt 项目获得了 Mozilla、思科、Akamai、IdenTrust 和 EFF 等组织的支持，由 Linux 基金会托管。它在9月中旬颁发了第一个证书，已经从12月3日起开放了 Beta 测试，它已经得了 <a href="https://identrustssl.com/" target="_blank" rel="noopener">IdenTrust</a> 的交叉签名，这意味着其证书现在已经可以被所有主流的浏览器所信任。<br>你现在可以<a href="https://helloworld.letsencrypt.org/" target="_blank" rel="noopener">在此</a>体验一下使用新的交叉签名的中级证书所签发证书的服务器。</p>
+<p><img src="https://ws1.sinaimg.cn/large/6e3b2269ly1fq0faxrnb4j20fj0d2tap" alt="letsencrypt-helloworld"></p>
+<a id="more"></a>
+<h2 id="获取-Let’s-Encrypt-的-SSL-证书"><a href="#获取-Let’s-Encrypt-的-SSL-证书" class="headerlink" title="获取 Let’s Encrypt 的 SSL 证书"></a>获取 Let’s Encrypt 的 SSL 证书</h2><p><strong>更新：</strong> <a href="https://github.com/xdtianyu/scripts/tree/master/lets-encrypt" target="_blank" rel="noopener">这个脚本</a>通过调用 acme_tiny.py 认证、获取、更新证书，无需以下步骤（感谢 xdtianyu）。</p>
+<h3 id="安装-letsencrypt-客户端"><a href="#安装-letsencrypt-客户端" class="headerlink" title="安装 letsencrypt 客户端"></a>安装 letsencrypt 客户端</h3><p>获取 Let’s Encrypt 客户端并执行，官网提供的安装方式如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ git clone https://github.com/letsencrypt/letsencrypt</span><br><span class="line">$ cd letsencrypt</span><br><span class="line">$ ./letsencrypt-auto --help</span><br></pre></td></tr></table></figure>
+<p>这些命令会自动安装所需依赖，安装完后会打印出 letsencrypt 的帮助信息，或者自动手动执行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/root/.local/share/letsencrypt/bin/letsencrypt --help</span><br></pre></td></tr></table></figure>
+<h3 id="五种验证方式简介"><a href="#五种验证方式简介" class="headerlink" title="五种验证方式简介"></a>五种验证方式简介</h3><p>之后就可以用 Let’s Encrypt 的客户端验证并签发证书了。<br>如果是在 Debian 下使用的 Apache，可以直接使用官方的插件来签发（并会自动配置？我环境既不是 Debian 用的也不是 Apache，没有试）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./letsencrypt-auto --apache</span><br></pre></td></tr></table></figure>
+<p>帮助信息中说有个<code>--nginx</code>选项，但是目前官方还没对应的 nginx 的插件提供，用这个的话会报错</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@coder letsencrypt]# ./letsencrypt-auto certonly --nginx -d ideassea.com -d www.ideassea.com</span><br><span class="line">Updating letsencrypt and virtual environment dependencies.......</span><br><span class="line">Running with virtualenv: /root/.local/share/letsencrypt/bin/letsencrypt certonly --nginx -d ideassea.com -d www.ideassea.com</span><br><span class="line">The requested nginx plugin does not appear to be installed</span><br></pre></td></tr></table></figure>
+<p>除了以上两种，还有三种方式来验证并签发证书：</p>
+<ul>
+<li>standalone</li>
+<li>webroot</li>
+<li>manual</li>
+</ul>
+<p>这里先试一下最方便的 standalone 的方式（个人博客可以这么搞，生产可不能用这个搞，这里也就试试看）：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ./letsencrypt-auto certonly --standalone -d ideassea.com -d www.ideassea.com</span><br></pre></td></tr></table></figure>
+<p>输入 email（文档上说 email 是用来找回证书的，没有试过）<br><img src="https://ws1.sinaimg.cn/large/6e3b2269ly1fq0faxuslfj20dy03hmxc" alt="letsencrypt-email"></p>
+<p>同意就行了<br><img src="https://ws1.sinaimg.cn/large/6e3b2269ly1fq0faxxtf7j20e308umxt" alt="letsencrypt-agree"></p>
+<p>提示我 80 端口已经被 nginx 占用了<br><img src="https://ws1.sinaimg.cn/large/6e3b2269ly1fq0fay0kkgj20dx04dt94" alt="letsencrypt-port"></p>
+<p>选 OK 并退出 TUI 后提示如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">At least one of the (possibly) required ports is already taken.</span><br><span class="line"></span><br><span class="line">IMPORTANT NOTES:</span><br><span class="line"> - If you lose your account credentials, you can recover through</span><br><span class="line">   e-mails sent to your@email.com.</span><br><span class="line"> - Your account credentials have been saved in your Let&apos;s Encrypt</span><br><span class="line">   configuration directory at /etc/letsencrypt. You should make a</span><br><span class="line">   secure backup of this folder now. This configuration directory will</span><br><span class="line">   also contain certificates and private keys obtained by Let&apos;s</span><br><span class="line">   Encrypt so making regular backups of this folder is ideal.</span><br></pre></td></tr></table></figure>
+<p>用 standalone 的方式，它会自己开一个 SimpleHTTPServer 并占用 80 端口做验证，需要先把服务停一下，如果你不介意短暂的暂停你的服务，这种方式当然是最方便最快的。</p>
+<h3 id="使用-Webroot-的方式验证"><a href="#使用-Webroot-的方式验证" class="headerlink" title="使用 Webroot 的方式验证"></a>使用 Webroot 的方式验证</h3><p>不过相信大家还是不希望为了签发证书而中断服务的。这就要用 webroot 或 manual 的方式了。我用的 nginx，也懒得自己造文件了，这里使用 webroot 的方式来验证并签发（manual 的方式和 webroot 的相似，需要自己建一个 json 文件放在 web 服务器下做验证）。</p>
+<p>首先在 nginx 的 80 端口的服务中配置上<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">location /.well-known &#123;</span><br><span class="line">    alias /srv/http/letsencrypt/.well-known;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>然后运行以下命令：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ./letsencrypt-auto certonly --webroot -w /srv/http/letsencrypt -d ideassea.com -d www.ideassea.com</span><br></pre></td></tr></table></figure></p>
+<p><strong>注意！</strong><br>对于使用 DNSPod 的用户（比如像我ಥ_ಥ），此时会看到类似下边的报错。这个目前貌似无解，只能弃用 DNSPod。<a href="https://github.com/letsencrypt/letsencrypt/issues/1610" target="_blank" rel="noopener">https://github.com/letsencrypt/letsencrypt/issues/1610</a><br><strong>2015-12-25 更新</strong>：DNSPod 貌似好了，详见<a href="https://www.v2ex.com/t/241819" target="_blank" rel="noopener">这里</a>的26楼。因为 letsencrypt 的验证规则一直在调整，所以如果 timeout 什么的就多尝试几次吧。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Failed authorization procedure. www.ideassea.com (http-01): urn:acme:error:connection :: The server could not connect to the client for DV :: DNS query timed out</span><br><span class="line"></span><br><span class="line">IMPORTANT NOTES:</span><br><span class="line"> - The following &apos;urn:acme:error:connection&apos; errors were reported by</span><br><span class="line">   the server:</span><br><span class="line"></span><br><span class="line">   Domains: www.ideassea.com</span><br><span class="line">   Error: The server could not connect to the client for DV</span><br></pre></td></tr></table></figure>
+<p>我目前已切换至万网，等待 DNS 解析生效ing…</p>
+<p>一个小时过去了，再试</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">IMPORTANT NOTES:</span><br><span class="line"> - Congratulations! Your certificate and chain have been saved at</span><br><span class="line">   /etc/letsencrypt/live/ideassea.com/fullchain.pem. Your cert will</span><br><span class="line">   expire on 2016-03-07. To obtain a new version of the certificate in</span><br><span class="line">   the future, simply run Let&apos;s Encrypt again.</span><br><span class="line"> - If like Let&apos;s Encrypt, please consider supporting our work by:</span><br><span class="line"></span><br><span class="line">   Donating to ISRG / Let&apos;s Encrypt:   https://letsencrypt.org/donate</span><br><span class="line">   Donating to EFF:                    https://eff.org/donate-le</span><br></pre></td></tr></table></figure>
+<p>看到这个就说明证书已经签发成功了。</p>
+<p>Let’s Encrypt 将认证的信息保存于 <code>/etc/letsencrypt</code> 目录</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[root@coder letsencrypt]# ll /etc/letsencrypt/live/ideassea.com/</span><br><span class="line">total 0</span><br><span class="line">lrwxrwxrwx 1 root root 36 Dec  8 19:41 cert.pem -&gt; ../../archive/ideassea.com/cert1.pem</span><br><span class="line">lrwxrwxrwx 1 root root 37 Dec  8 19:41 chain.pem -&gt; ../../archive/ideassea.com/chain1.pem</span><br><span class="line">lrwxrwxrwx 1 root root 41 Dec  8 19:41 fullchain.pem -&gt; ../../archive/ideassea.com/fullchain1.pem</span><br><span class="line">lrwxrwxrwx 1 root root 39 Dec  8 19:41 privkey.pem -&gt; ../../archive/ideassea.com/privkey1.pem</span><br></pre></td></tr></table></figure>
+<p>然后，在 nginx 的配置文件中将下面两行设置成 Let’s Encrypt 的实际路径即可：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ssl_certificate /etc/letsencrypt/live/linuxtoy.org/fullchain.pem;</span><br><span class="line">ssl_certificate_key /etc/letsencrypt/live/linuxtoy.org/privkey.pem;</span><br></pre></td></tr></table></figure>
+<p>附图一张：<br><img src="https://ws1.sinaimg.cn/large/6e3b2269ly1fq0fay6d3bj20m00ijjuv" alt="letsencrypt-result"></p>
+<p>值得注意的是，目前 Let’s Encrypt 的证书有效期为 90 天（应该是因为目前还在测试阶段，正式之后应该是1年），之后需要手动续期。另外，在请求证书认证时会有频率限制。总的来说，证书的认证过程还是非常容易的，而且又是免费，所以对此有需要的朋友不妨一试。</p>
+<p>官方目前建议通过 Let’s Encrypt 的配置配合 crontab 来实现自动续期，可以参考：<a href="https://community.letsencrypt.org/t/maximum-and-minimum-certificate-lifetimes/264" target="_blank" rel="noopener">https://community.letsencrypt.org/t/maximum-and-minimum-certificate-lifetimes/264</a></p>
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><p><a href="https://letsencrypt.org/" target="_blank" rel="noopener">https://letsencrypt.org/</a><br><a href="https://linuxtoy.org/archives/lets-encrypt.html" target="_blank" rel="noopener">https://linuxtoy.org/archives/lets-encrypt.html</a><br><a href="http://v2ex.com/t/233860" target="_blank" rel="noopener">http://v2ex.com/t/233860</a><br><a href="https://github.com/letsencrypt/letsencrypt/issues/1610" target="_blank" rel="noopener">https://github.com/letsencrypt/letsencrypt/issues/1610</a><br><a href="https://community.letsencrypt.org/t/maximum-and-minimum-certificate-lifetimes/264" target="_blank" rel="noopener">https://community.letsencrypt.org/t/maximum-and-minimum-certificate-lifetimes/264</a></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Yibo</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://ideassea.com/2016/02/03/letsencrypt/" title="Let's Encrypt 试用手记">https://ideassea.com/2016/02/03/letsencrypt/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/02/03/json-ultimate/" rel="next" title="JSON库之性能比较：JSON.simple VS GSON VS Jackson VS JSONP">
+                <i class="fa fa-chevron-left"></i> JSON库之性能比较：JSON.simple VS GSON VS Jackson VS JSONP
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/02/04/echarts-quickstart/" rel="prev" title="在 Java 项目中使用 ECharts">
+                在 Java 项目中使用 ECharts <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://ws2.sinaimg.cn/large/006tKfTcly1fq0mwrckglj30sg0sg0u8.jpg"
+                alt="Yibo" />
+            
+              <p class="site-author-name" itemprop="name">Yibo</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">41</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">21</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Let’s-Encrypt-简介"><span class="nav-number">1.</span> <span class="nav-text">Let’s Encrypt 简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#获取-Let’s-Encrypt-的-SSL-证书"><span class="nav-number">2.</span> <span class="nav-text">获取 Let’s Encrypt 的 SSL 证书</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装-letsencrypt-客户端"><span class="nav-number">2.1.</span> <span class="nav-text">安装 letsencrypt 客户端</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#五种验证方式简介"><span class="nav-number">2.2.</span> <span class="nav-text">五种验证方式简介</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用-Webroot-的方式验证"><span class="nav-number">2.3.</span> <span class="nav-text">使用 Webroot 的方式验证</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Reference"><span class="nav-number">3.</span> <span class="nav-text">Reference</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate"> 
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yibo</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/theme-next/hexo-theme-next">NexT.Gemini</a> v6.1.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/reading_progress/reading_progress.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.1.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.1.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.1.0"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+  
+  <script src="/lib/pangu/dist/pangu.min.js?v=3.3"></script>
+  <script type="text/javascript">pangu.spacingPage();</script>
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

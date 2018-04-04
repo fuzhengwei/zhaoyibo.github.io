@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.1.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.1.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.1.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.1.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="用 LiteIDE 可以方便调试 Go 程序，它是用的 GDB 调试的，如果没有安装 GDB 的话，运行“调试”就会提示：1211:21:45 GdbDebugger: /usr/local/bin/gdb was not found on system PATH (hint: is GDB installed?)11:21:45 LiteDebug: Failed to start debugg">
+<meta name="keywords" content="Golang">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Mac OS X 下安装 GDB">
+<meta property="og:url" content="https://ideassea.com/2016/01/07/install-gdb-on-macos/index.html">
+<meta property="og:site_name" content="Ideas Sea">
+<meta property="og:description" content="用 LiteIDE 可以方便调试 Go 程序，它是用的 GDB 调试的，如果没有安装 GDB 的话，运行“调试”就会提示：1211:21:45 GdbDebugger: /usr/local/bin/gdb was not found on system PATH (hint: is GDB installed?)11:21:45 LiteDebug: Failed to start debugg">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://ws3.sinaimg.cn/large/006tKfTcly1fq0ntytw2nj30y80o8die.jpg">
+<meta property="og:image" content="https://ws4.sinaimg.cn/large/006tKfTcly1fq0ntxw9y4j30y80o8mz1.jpg">
+<meta property="og:image" content="https://ws3.sinaimg.cn/large/006tKfTcly1fq0ntxouwnj30si0o0ad2.jpg">
+<meta property="og:updated_time" content="2017-07-17T19:23:52.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Mac OS X 下安装 GDB">
+<meta name="twitter:description" content="用 LiteIDE 可以方便调试 Go 程序，它是用的 GDB 调试的，如果没有安装 GDB 的话，运行“调试”就会提示：1211:21:45 GdbDebugger: /usr/local/bin/gdb was not found on system PATH (hint: is GDB installed?)11:21:45 LiteDebug: Failed to start debugg">
+<meta name="twitter:image" content="https://ws3.sinaimg.cn/large/006tKfTcly1fq0ntytw2nj30y80o8die.jpg">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Ideas Sea" type="application/atom+xml" />
+
+
+
+
+  <link rel="canonical" href="https://ideassea.com/2016/01/07/install-gdb-on-macos/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Mac OS X 下安装 GDB | Ideas Sea</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> 
+
+<div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ideas Sea</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+          
+  <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />标签</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+</li>
+
+      
+
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+  
+
+
+
+ </div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+    <div class="reading-progress-bar"></div>
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://ideassea.com/2016/01/07/install-gdb-on-macos/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yibo">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://ws2.sinaimg.cn/large/006tKfTcly1fq0mwrckglj30sg0sg0u8.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ideas Sea">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Mac OS X 下安装 GDB</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-01-07T15:37:00+08:00">2016-01-07</time>
+            
+
+            
+            
+              
+                
+              
+            
+
+            
+              
+              <span class="post-meta-divider">|</span>
+              
+
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">更新于：</span>
+              
+              <time title="更新于" itemprop="dateModified" datetime="2017-07-18T03:23:52+08:00">2017-07-18</time>
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>用 <a href="https://github.com/visualfc/liteide" target="_blank" rel="noopener">LiteIDE</a> 可以方便调试 Go 程序，它是用的 GDB 调试的，如果没有安装 GDB 的话，运行“调试”就会提示：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">11:21:45 GdbDebugger: /usr/local/bin/gdb was not found on system PATH (hint: is GDB installed?)</span><br><span class="line">11:21:45 LiteDebug: Failed to start debugger</span><br></pre></td></tr></table></figure></p>
+<p>下边就说说怎么在 OS X 平台在安装 GDB。</p>
+<h2 id="Homebrew"><a href="#Homebrew" class="headerlink" title="Homebrew"></a>Homebrew</h2><p>用 Mac 的想必都知道这个了， 如果你还没有安装，去<a href="http://brew.sh/" target="_blank" rel="noopener">http://brew.sh/</a> 看看吧，或者直接用下边的命令安装</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ruby -e &quot;$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)&quot;</span><br></pre></td></tr></table></figure>
+<h2 id="GDB"><a href="#GDB" class="headerlink" title="GDB"></a>GDB</h2><p>有了 brew 就方便了，直接执行下边的命令安装 gdb<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ brew install homebrew/dupes/gdb</span><br></pre></td></tr></table></figure></p>
+<p>如果上边的命令不行的试试下边的这个：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ brew install https://raw.github.com/Homebrew/homebrew-dupes/master/gdb.rb</span><br></pre></td></tr></table></figure></p>
+<p>之后运行 <code>gdb --version</code> 看看是否安装成功</p>
+<h2 id="证书-amp-授权"><a href="#证书-amp-授权" class="headerlink" title="证书 &amp; 授权"></a>证书 &amp; 授权</h2><p>有了 brew 后，安装 so easy。不过先别高兴的太早，在 LiteIDE 中随便找一个程序“调试”一下，会发现“控制台”中报错：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">10000012^error,msg=&quot;Unable to find Mach task port for process-id 42864: (os/kern) failure (0x5).</span><br><span class="line">(please check gdb is codesigned - see taskgated(8))&quot;</span><br><span class="line">(gdb)</span><br></pre></td></tr></table></figure></p>
+<p>这是由于 OS X 的安全机制阻止了我们的 GDB 对要调试的程序进行完全控制，所以我们要对 GDB 赋予合适的权限。</p>
+<p>首先创建一个系统代码签名信任证书：</p>
+<ol>
+<li>启动“钥匙串访问”应用（/Applications/Utilities/Keychain Access.app）</li>
+<li><p>打开菜单：钥匙串访问 -&gt; 证书助理 -&gt; 创建证书<br>输入证书名称，如：gdb-cert；<br>选择身份类型：自签名根证书 （Identity Type to Self Signed Root）<br>选择证书类型：代码签名 （Certificate Type to Code Signing）<br>勾选：让我覆盖这些默认签名 （select the Let me override defaults）<br><img src="https://ws3.sinaimg.cn/large/006tKfTcly1fq0ntytw2nj30y80o8die.jpg" alt=""></p>
+</li>
+<li><p>一路next，直到选择存放证书地址，选择：系统。这样证书就创建好了<br><img src="https://ws4.sinaimg.cn/large/006tKfTcly1fq0ntxw9y4j30y80o8mz1.jpg" alt=""></p>
+</li>
+<li>设置证书自定义信任<br>右键刚才创建的 gdb-cert 证书，选择“显示简介” （Get Info）<br>点击“信任”，会显示可以自定义的信任选项，“代码签名”选择“总是信任” （Code Signing to Always Trust）<br><img src="https://ws3.sinaimg.cn/large/006tKfTcly1fq0ntxouwnj30si0o0ad2.jpg" alt=""></li>
+</ol>
+<p>其次，将证书授予gdb，执行命令</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ which go</span><br><span class="line">/usr/local/go/bin/go</span><br><span class="line">$ codesign -s gdb-cert /usr/local/bin/gdb</span><br></pre></td></tr></table></figure>
+<p>如果你创建的证书名不是 <code>gdb-cert</code> 的话注意自行替换</p>
+<p>这样授权后，在 LiteIDE 中运行“调试”的话还是会提示错误<code>please check gdb is codesigned</code>，只要重启一下就好了。</p>
+<p>之后我们便可以用 gdb 调试 go 了，但是每次使用的时候都会提示输入管理员密码。这是由于之前制作的证书是在系统下面的，所以每次执行 gdb 都会提示管理员密码。<br>解决方法也很简单，打开钥匙串访问，将“系统”下面的 gdb-cert 拷贝一份放到“登录”下面就行了。</p>
+<p>参考：<br><a href="http://blog.csdn.net/powerlly/article/details/30323015" target="_blank" rel="noopener">解决Mac下GDB提示签名错误</a><br><a href="http://logic0.blog.163.com/blog/static/1889281462014183271283/" target="_blank" rel="noopener">Mac OS X10.9安装gdb</a></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Yibo</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://ideassea.com/2016/01/07/install-gdb-on-macos/" title="Mac OS X 下安装 GDB">https://ideassea.com/2016/01/07/install-gdb-on-macos/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Golang/" rel="tag"># Golang</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/01/06/golang-note-4/" rel="next" title="Golang 学习笔记（四）——复合类型、函数">
+                <i class="fa fa-chevron-left"></i> Golang 学习笔记（四）——复合类型、函数
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/01/10/docker-quickstart/" rel="prev" title="Docker 1.9 初体验">
+                Docker 1.9 初体验 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://ws2.sinaimg.cn/large/006tKfTcly1fq0mwrckglj30sg0sg0u8.jpg"
+                alt="Yibo" />
+            
+              <p class="site-author-name" itemprop="name">Yibo</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">41</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">21</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Homebrew"><span class="nav-number">1.</span> <span class="nav-text">Homebrew</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GDB"><span class="nav-number">2.</span> <span class="nav-text">GDB</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#证书-amp-授权"><span class="nav-number">3.</span> <span class="nav-text">证书 &amp; 授权</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate"> 
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yibo</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/theme-next/hexo-theme-next">NexT.Gemini</a> v6.1.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/reading_progress/reading_progress.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.1.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.1.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.1.0"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+  
+  <script src="/lib/pangu/dist/pangu.min.js?v=3.3"></script>
+  <script type="text/javascript">pangu.spacingPage();</script>
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

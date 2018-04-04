@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.1.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.1.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.1.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.1.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="为什么学习 Go？我目前的主要开发语言是 Java。其实在 Java7 以后，使用 Java 开始起来已经是比较顺手的，特别是现在我使用的 Java8 中引入的 Lambda 表达式，更是让其开发效率有了明显的提升。 我也了解过 Python 一段时间，不过主要用它就是做 spider 或为了替代一部分 shell 脚本。用 Python 的时候深深的被它的效率所吸引，并曾准备了解一下 Flask">
+<meta name="keywords" content="Golang">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Golang 学习笔记（一）——安装、环境">
+<meta property="og:url" content="https://ideassea.com/2016/01/03/golang-note-1/index.html">
+<meta property="og:site_name" content="Ideas Sea">
+<meta property="og:description" content="为什么学习 Go？我目前的主要开发语言是 Java。其实在 Java7 以后，使用 Java 开始起来已经是比较顺手的，特别是现在我使用的 Java8 中引入的 Lambda 表达式，更是让其开发效率有了明显的提升。 我也了解过 Python 一段时间，不过主要用它就是做 spider 或为了替代一部分 shell 脚本。用 Python 的时候深深的被它的效率所吸引，并曾准备了解一下 Flask">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2017-07-17T19:27:45.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Golang 学习笔记（一）——安装、环境">
+<meta name="twitter:description" content="为什么学习 Go？我目前的主要开发语言是 Java。其实在 Java7 以后，使用 Java 开始起来已经是比较顺手的，特别是现在我使用的 Java8 中引入的 Lambda 表达式，更是让其开发效率有了明显的提升。 我也了解过 Python 一段时间，不过主要用它就是做 spider 或为了替代一部分 shell 脚本。用 Python 的时候深深的被它的效率所吸引，并曾准备了解一下 Flask">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Ideas Sea" type="application/atom+xml" />
+
+
+
+
+  <link rel="canonical" href="https://ideassea.com/2016/01/03/golang-note-1/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Golang 学习笔记（一）——安装、环境 | Ideas Sea</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> 
+
+<div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ideas Sea</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+          
+  <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />标签</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+</li>
+
+      
+
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+  
+
+
+
+ </div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+    <div class="reading-progress-bar"></div>
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://ideassea.com/2016/01/03/golang-note-1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yibo">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://ws2.sinaimg.cn/large/006tKfTcly1fq0mwrckglj30sg0sg0u8.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ideas Sea">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Golang 学习笔记（一）——安装、环境</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-01-03T15:28:00+08:00">2016-01-03</time>
+            
+
+            
+            
+              
+                
+              
+            
+
+            
+              
+              <span class="post-meta-divider">|</span>
+              
+
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">更新于：</span>
+              
+              <time title="更新于" itemprop="dateModified" datetime="2017-07-18T03:27:45+08:00">2017-07-18</time>
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="为什么学习-Go？"><a href="#为什么学习-Go？" class="headerlink" title="为什么学习 Go？"></a>为什么学习 Go？</h2><p>我目前的主要开发语言是 Java。其实在 Java7 以后，使用 Java 开始起来已经是比较顺手的，特别是现在我使用的 Java8 中引入的 Lambda 表达式，更是让其开发效率有了明显的提升。</p>
+<p>我也了解过 Python 一段时间，不过主要用它就是做 spider 或为了替代一部分 shell 脚本。用 Python 的时候深深的被它的效率所吸引，并曾准备了解一下 Flask 或 Django 以做 Web 开发。不过后来因为别的原因还是放弃了（并行、性能、语法糖等等）。</p>
+<p>那为什么学习 Go 呢？<br>首先 Go 的背景很“硬”——一帮子大牛设计者、Google 出品。其设计理念很明确，就是将动态类型语言的编程容易度和静态类型语言的安全效率结合起来。<br>其次已经有很多公司和项目开始 Go 进行开发了（国外如 Google、AWS、CloudFlare、CoreOS、Docker 等，国内如七牛、阿里等），跟着世界级巨人的脚步应该不至于走错方向。</p>
+<p>在这几天简单的学习了一下 Golang 后，我对其有以下几点浅薄理解：</p>
+<ul>
+<li>关键词少（25个）、语法简单，有其他<a href="https://en.wikipedia.org/wiki/List_of_C-family_programming_languages" target="_blank" rel="noopener">类 C 语言</a>基础的，入门很快</li>
+<li>语言层面支持并发</li>
+<li>性能强劲的同时，开发效率又不差</li>
+<li>代码简洁，风格统一(再也不用为代码风格而争论了)</li>
+<li>部署简单</li>
+<li>多返回值</li>
+<li>非侵入式的 interface 设计</li>
+<li>OO</li>
+</ul>
+<a id="more"></a>
+<p>当然，Go 也有缺点，毕竟相比与 C/C++、Java、Python等来讲，Go 还只是一个“新生儿”，相信它会成长起来的。</p>
+<p>最后，可能有人又会扯到“这个语言比那个语言好”或“XXX 是最好的语言，没有之一”。<br>没有什么 X 语言比 Y 语言好，如果你是某种语言老手，你就是那门语言的“传道者”，下意识地会保护它。无论承认与否，你都已被困在一个隧道里，你看到的完全是局限的。《肖申克的救赎》对此有很好的注脚：</p>
+<blockquote>
+<p>These walls are funny. First you hate ‘em, then you get used to ‘em. After long enough, you get so you depend on ‘em. That’s “institutionalized.”<br>这些墙很有趣。起初你痛恨它们；慢慢地，你习惯了生活在其中；最终你会发现自己不得不依赖它们。这就是体制化。</p>
+</blockquote>
+<p>在你还没有被完全“体制化”时，为何不多学些语言，哪怕只是浅尝辄止，潜移默化中也许你的思维壁垒就松动了。不管是 Golang 、Python 或 Ruby 还是其他语言，当看到一些语法习惯与之前熟悉的 C 和 Java 不同时，的确潜意识里就会产生抵触情绪，觉得这不好，还是自己习惯的那套好。长此以往，如果不能冲破自己的心理，“坐以待毙”，被时间淘汰恐怕只是早晚的事儿。所以这里的关键——不是非要学习 Golang，而是要不断地学！</p>
+<h2 id="安装-Go-tools"><a href="#安装-Go-tools" class="headerlink" title="安装 Go tools"></a>安装 Go tools</h2><p>首先在<a href="https://golang.org/dl/" target="_blank" rel="noopener">官网</a>下载对应平台的安装包。（墙内下载：<a href="http://www.golangtc.com/download" target="_blank" rel="noopener">http://www.golangtc.com/download</a> ）</p>
+<p>这里以 OS X 为例：<br>下载后直接运行 pkg 文件，一路 next，安装完成后 Go 的发行版会被安装到 <code>/usr/local/go</code> 中。</p>
+<p>p.s. Mac 上也可以直接用 Homebrew 安装 Go</p>
+<p>然后将 <code>/usr/local/go/bin</code> 目录添加到 <code>PATH</code> 环境变量中。</p>
+<h2 id="测试是否安装成功"><a href="#测试是否安装成功" class="headerlink" title="测试是否安装成功"></a>测试是否安装成功</h2><p>先直接试试再说：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ go</span><br></pre></td></tr></table></figure>
+<p>只要没报 <code>command not found: go</code> 话应该就是没啥问题的。</p>
+<p>再来个简单的 go 程序来试试：<br>首先创建一个 workspace（我这里就以 gowork 命名了）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ mkdir $HOME/gowork</span><br><span class="line">$ export GOPATH=$HOME/gowork</span><br></pre></td></tr></table></figure>
+<p>（GOPATH这个环境变量下边还会细说）<br>然后在这个 workspace 下创建一个存放源码的目录：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ src/codingon.com/hello</span><br></pre></td></tr></table></figure>
+<p>在 <code>hello</code> 目录下创建一个名为 <code>hello.go</code> 的文件，内容如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">package main</span><br><span class="line"></span><br><span class="line">import &quot;fmt&quot;</span><br><span class="line"></span><br><span class="line">func main() &#123;</span><br><span class="line">    fmt.Printf(&quot;hello, world\n&quot;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>通过下边的命令编译安装并运行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ go install codingon.com/hello</span><br><span class="line">$ $GOPATH/bin/hello</span><br></pre></td></tr></table></figure>
+<p>也可以直接用下边的命令“解释”运行。区别是上边的会在 <code>$GOPATH</code> 下生成 <code>bin</code> 目录，而下边的不会（其实是生成了一个临时目录，在运行结束后自动删除掉了）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ go run $GOPATH/src/codingon.com/hello/hello.go</span><br></pre></td></tr></table></figure>
+<p>如果看到打印出 <code>hello, world</code>，就说明 Go tools 安装的没有问题。</p>
+<h2 id="关于-GOPATH"><a href="#关于-GOPATH" class="headerlink" title="关于 GOPATH"></a>关于 GOPATH</h2><p>go 命令依赖一个很重要的环境变量：GOPATH<br>我们在第二步的时候已经通过以下命令设置了这个环境变量。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ export GOPATH=$HOME/gowork</span><br></pre></td></tr></table></figure></p>
+<p>GOPATH 支持设置多个目录，因为平时要用<code>go get</code>获取一些第三方的代码，而<code>go get</code>默认会把这些代码下载到第一个工作区，所以我们一般会设置两个或以上的工作区目录（将自己的代码和第三方的代码分离），例如：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ export GOPATH=$HOME/golang/lib:$HOME/golang/work</span><br></pre></td></tr></table></figure></p>
+<p>GOPATH 目录下约定有三个子目录：</p>
+<ul>
+<li>src 存放源码</li>
+<li>pkg 编译后生产的文件</li>
+<li>bin 编译后生产的可执行文件</li>
+</ul>
+<p>其中 src 目录是需要你手动新建的，pkg、bin 目录都可以在运行 <code>go build</code>或<code>go install</code>等命令时自动生成。</p>
+<h2 id="IDE"><a href="#IDE" class="headerlink" title="IDE"></a>IDE</h2><p>Go 目前还没有官方的 IDE，有一个国人开发的 <a href="https://github.com/visualfc/liteide" target="_blank" rel="noopener">LiteIDE</a> 还不错，就是有时候不是太稳定，容易崩溃。也可以使用 IntelliJ IDEA、Eclipse 或 Sublime Text 安装对应的 GO 插件，使其支持 GO 语言。<br>如果只是为了学习 Go，可以使用官方的 <a href="https://play.golang.org/" target="_blank" rel="noopener">Playground</a> 在线运行 Go 程序。</p>
+<p>调试：Go 用 GDB 调试。有关 GDB 的安装请看 <a href="http://codingon.com/2015/11/07/install-gdb-osx/" target="_blank" rel="noopener">Mac OS X 下安装 GDB</a></p>
+<h2 id="学习-Go"><a href="#学习-Go" class="headerlink" title="学习 Go"></a>学习 Go</h2><p>Go 从 1.0 到 1.5 语法感觉没什么变化，网上关于其语法的文章也很多，官网也有语法讲解和训练（ <a href="https://tour.golang.org" target="_blank" rel="noopener">https://tour.golang.org</a> ）。</p>
+<p>以下是一些 Golang 的学习资源：</p>
+<ol>
+<li><p>Go 指南：官网链接：<a href="https://go-tour-zh.appspot.com/welcome/1（需要梯子），如果无法打开请用国内链接：http://tour.studygolang.com/" target="_blank" rel="noopener">https://go-tour-zh.appspot.com/welcome/1（需要梯子），如果无法打开请用国内链接：http://tour.studygolang.com/</a></p>
+</li>
+<li><p>《The Way to Go》,如果看英文感觉吃力，github上无闻大牛已经做了中文译本：<a href="https://github.com/Unknwon/the-way-to-go_ZH_CN" target="_blank" rel="noopener">https://github.com/Unknwon/the-way-to-go_ZH_CN</a></p>
+</li>
+<li><p>《Go 学习笔记 第四版》雨痕写的，该电子书在 github 开源：<a href="https://github.com/qyuhen/book" target="_blank" rel="noopener">https://github.com/qyuhen/book</a></p>
+</li>
+<li><p>《Go Web编程》，是谢大（beego的作者）写的书，github中文目录链接：<a href="https://github.com/astaxie/build-web-application-with-golang/blob/master/zh/preface.md" target="_blank" rel="noopener">https://github.com/astaxie/build-web-application-with-golang/blob/master/zh/preface.md</a></p>
+</li>
+<li><p>《Go 编程基础》视频教程，此教程是无闻大牛讲解的，github视频链接：<a href="https://github.com/Unknwon/go-fundamental-programming" target="_blank" rel="noopener">https://github.com/Unknwon/go-fundamental-programming</a></p>
+</li>
+</ol>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Yibo</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://ideassea.com/2016/01/03/golang-note-1/" title="Golang 学习笔记（一）——安装、环境">https://ideassea.com/2016/01/03/golang-note-1/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Golang/" rel="tag"># Golang</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/01/02/configure-a-kerberos-kdc-on-centos7/" rel="next" title="在 CentOS 7 上安装、配置 Kerberos">
+                <i class="fa fa-chevron-left"></i> 在 CentOS 7 上安装、配置 Kerberos
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/01/04/golang-note-2/" rel="prev" title="Golang 学习笔记（二）——命令基础">
+                Golang 学习笔记（二）——命令基础 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://ws2.sinaimg.cn/large/006tKfTcly1fq0mwrckglj30sg0sg0u8.jpg"
+                alt="Yibo" />
+            
+              <p class="site-author-name" itemprop="name">Yibo</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">41</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">21</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#为什么学习-Go？"><span class="nav-number">1.</span> <span class="nav-text">为什么学习 Go？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装-Go-tools"><span class="nav-number">2.</span> <span class="nav-text">安装 Go tools</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#测试是否安装成功"><span class="nav-number">3.</span> <span class="nav-text">测试是否安装成功</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#关于-GOPATH"><span class="nav-number">4.</span> <span class="nav-text">关于 GOPATH</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#IDE"><span class="nav-number">5.</span> <span class="nav-text">IDE</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#学习-Go"><span class="nav-number">6.</span> <span class="nav-text">学习 Go</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate"> 
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yibo</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/theme-next/hexo-theme-next">NexT.Gemini</a> v6.1.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/reading_progress/reading_progress.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.1.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.1.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.1.0"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+  
+  <script src="/lib/pangu/dist/pangu.min.js?v=3.3"></script>
+  <script type="text/javascript">pangu.spacingPage();</script>
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

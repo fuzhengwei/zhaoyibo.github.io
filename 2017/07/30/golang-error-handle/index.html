@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.1.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.1.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.1.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.1.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Go 语言有很多优秀的特性，比如 Goroutine、非侵入性接口等等。但是大家对 Go 也有很多争议，其中争议最大的可能就是它的错误处理机制了，知乎上也有相关的讨论「Go 语言的错误处理机制是一个优秀的设计吗？」 有人认为冗长重复的错误处理格式像是回到了上世纪七十年代，有人也提出这是 Go 语言非常出色的设计之一，那么到底是怎样的呢？">
+<meta name="keywords" content="Golang">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Golang 错误处理">
+<meta property="og:url" content="https://ideassea.com/2017/07/30/golang-error-handle/index.html">
+<meta property="og:site_name" content="Ideas Sea">
+<meta property="og:description" content="Go 语言有很多优秀的特性，比如 Goroutine、非侵入性接口等等。但是大家对 Go 也有很多争议，其中争议最大的可能就是它的错误处理机制了，知乎上也有相关的讨论「Go 语言的错误处理机制是一个优秀的设计吗？」 有人认为冗长重复的错误处理格式像是回到了上世纪七十年代，有人也提出这是 Go 语言非常出色的设计之一，那么到底是怎样的呢？">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://ws1.sinaimg.cn/large/6e3b2269ly1fi2bo7ltu4j20id0hzk08.jpg">
+<meta property="og:updated_time" content="2017-08-02T00:54:56.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Golang 错误处理">
+<meta name="twitter:description" content="Go 语言有很多优秀的特性，比如 Goroutine、非侵入性接口等等。但是大家对 Go 也有很多争议，其中争议最大的可能就是它的错误处理机制了，知乎上也有相关的讨论「Go 语言的错误处理机制是一个优秀的设计吗？」 有人认为冗长重复的错误处理格式像是回到了上世纪七十年代，有人也提出这是 Go 语言非常出色的设计之一，那么到底是怎样的呢？">
+<meta name="twitter:image" content="https://ws1.sinaimg.cn/large/6e3b2269ly1fi2bo7ltu4j20id0hzk08.jpg">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Ideas Sea" type="application/atom+xml" />
+
+
+
+
+  <link rel="canonical" href="https://ideassea.com/2017/07/30/golang-error-handle/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Golang 错误处理 | Ideas Sea</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> 
+
+<div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ideas Sea</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+          
+  <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />标签</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+</li>
+
+      
+
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+  
+
+
+
+ </div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+    <div class="reading-progress-bar"></div>
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://ideassea.com/2017/07/30/golang-error-handle/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yibo">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://ws2.sinaimg.cn/large/006tKfTcly1fq0mwrckglj30sg0sg0u8.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ideas Sea">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Golang 错误处理</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-07-30T15:49:25+08:00">2017-07-30</time>
+            
+
+            
+            
+              
+                
+              
+            
+
+            
+              
+              <span class="post-meta-divider">|</span>
+              
+
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">更新于：</span>
+              
+              <time title="更新于" itemprop="dateModified" datetime="2017-08-02T08:54:56+08:00">2017-08-02</time>
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Go 语言有很多优秀的特性，比如 Goroutine、非侵入性接口等等。但是大家对 Go 也有很多争议，其中争议最大的可能就是它的错误处理机制了，知乎上也有相关的讨论<a href="https://www.zhihu.com/question/27158146" target="_blank" rel="noopener">「Go 语言的错误处理机制是一个优秀的设计吗？」</a></p>
+<p>有人认为冗长重复的错误处理格式像是回到了上世纪七十年代，有人也提出这是 Go 语言非常出色的设计之一，那么到底是怎样的呢？<br><a id="more"></a></p>
+<p>在 Java 中，使用了 try-catch-finally 的处理方式来统一应对错误和异常。所以对我来说（对大部分主要使用 Java 或 Python 的人来说应该是也如此吧），常常因分不清楚到底哪些是错误、哪些是异常而滥用该机制。<br>所以在我刚刚接触 Go 语言的时候，错误和异常我就傻傻分不清，导致后来用 Go 写了一些东西，过于冗余的错误处理方式让我甚至想放弃这门语言了。但是 Go 又有很多相较于 Java 更方便更显得现代化的优良特性，割舍不下。就在这相爱相杀的过程中，我痛定思痛，决心好好学习一下 Go 中错误处理。</p>
+<p><img src="https://ws1.sinaimg.cn/large/6e3b2269ly1fi2bo7ltu4j20id0hzk08.jpg" alt=""></p>
+<h1 id="error-类型"><a href="#error-类型" class="headerlink" title="error 类型"></a>error 类型</h1><p>Go 继承了 C，以返回值为错误处理的主要方式。但与 C 不同的是，在 Go 的惯用法中，返回值不是整型等常用返回值类型（errno），而是用了一个 error（<a href="https://github.com/golang/go/blob/master/src/builtin/builtin.go#L254" target="_blank" rel="noopener">interface</a>类型）。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> <span class="keyword">interface</span> error &#123;</span><br><span class="line">    Error() <span class="keyword">string</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这也体现了Go哲学中的“正交”理念：error context 与 error 类型的分离。无论 error context 是 int、float 还是 string 或是其他，统统用 error 作为返回值类型即可。</p>
+<p>在 Andrew Gerrand 的 <a href="https://blog.golang.org/error-handling-and-go" target="_blank" rel="noopener">Error handling and Go</a> 一文中，这位 Go authors 之一明确了 error context 是由 error 接口实现者 supply 的。在 Go 标准库中，Go 提供了两种创建一个实现了 error interface 的类型的变量实例的方法：errors.New 和 fmt.Errorf</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">errors.New(<span class="string">"your first error code"</span>)</span><br><span class="line">fmt.Errorf(<span class="string">"error value is %d\n"</span>, errcode)</span><br></pre></td></tr></table></figure>
+<p>这两个方法实际上返回的是同一个实现了 error interface 的类型实例，这个 unexported 类型就是 errorString。顾名思义，这个 error type 仅提供了一个 string 的 context！</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//$GOROOT/srcerrors/errors.go</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> errorString <span class="keyword">struct</span> &#123;</span><br><span class="line">    s <span class="keyword">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(e *errorString)</span> <span class="title">Error</span><span class="params">()</span> <span class="title">string</span></span> &#123;</span><br><span class="line">    <span class="keyword">return</span> e.s</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这两个方法也基本满足了大部分日常学习和开发中代码中的错误处理需求。</p>
+<h1 id="错误还是异常（error-or-panic）"><a href="#错误还是异常（error-or-panic）" class="headerlink" title="错误还是异常（error or panic）"></a>错误还是异常（error or panic）</h1><p>在 Java 和 Python 中，try-catch 的模式我用的是不亦乐乎，在没有接触 Go 之前，在我的印象里“错误==异常”，即它俩是同一个概念。<br>但其实，Go 中错误和异常是两个不同的概念。知乎里的一段<a href="https://www.zhihu.com/question/27158146/answer/44676012" target="_blank" rel="noopener">回答</a>很好，不仅指出了错误和异常的区别，还提到了如何对它们进行管理。</p>
+<p>首先我们要理清：什么是错误、什么是异常、为什么需要管理。然后才是怎样管理。</p>
+<p>错误和异常从语言机制上面讲，就是 error 和 panic 的区别，放到别的语言也一样，别的语言没有 error 类型，但是有错误码之类的，没有 panic，但是有 throw 之类的。</p>
+<p>在语言层面它们是两种概念，导致的是两种不同的结果。如果程序遇到错误不处理，那么可能进一步的产生业务上的错误，比如给用户多扣钱了，或者进一步产生了异常；如果程序遇到异常不处理，那么结果就是进程异常退出。</p>
+<p>在项目里面是不是应该处理所有的错误情况和捕捉所有的异常呢？我只能说，你可以这么做，但是估计效果不会太好。我的理由是：</p>
+<ol>
+<li>如果所有东西都处理和记录，那么重要信息可能被淹没在信息的海洋里。</li>
+<li>不应该处理的错误被处理了，很容易导出 BUG 暴露不出来，直到出现更严重错误的时候才暴露出问题，到时候排查就很困难了，因为已经不是错误的第一现场。</li>
+</ol>
+<p>所以错误和异常最好能按一定的规则进行分类和管理，在第一时间能暴露错误和还原现场。</p>
+<p>对于错误处理，Erlang 有一个很好的概念叫速错，就是有错误第一时间暴露它。我们的项目从 Erlang 到 Go 一直是沿用这一设计原则。但是应用这个原则的前提是先得区分错误和异常这两个概念。</p>
+<p>错误和异常上面已经提到了，从语言机制层面比较容易区分它们，但是语言取决于人为，什么情况下用错误表达，什么情况下用异常表达，就得有一套规则，否则很容易出现全部靠异常来做错误处理的情况，似乎 Java 项目特别容易出现这样的设计。</p>
+<p>这里我先假想有这样一个业务：游戏玩家通过购买按钮，用铜钱购买宝石。</p>
+<p>在实现这个业务的时候，程序逻辑会进一步分化成客户端逻辑和服务端逻辑，客户端逻辑又进一步因为设计方式的不同分化成两种结构：胖客户端结构、瘦客户端结构。</p>
+<p>胖客户端结构，有更多的本地数据和懂得更多的业务逻辑，所以在胖客户端结构的应用中，以上的业务会实现成这样：客户端检查缓存中的铜钱数量，铜钱数量足够的时候购买按钮为可用的亮起状态，用户点击购买按钮后客户端发送购买请求到服务端；服务端收到请求后校验用户的铜钱数量，如果铜钱数量不足就抛出异常，终止请求过程并断开客户端的连接，如果铜钱数量足够就进一步完成宝石购买过程，这里不继续描述正常过程。</p>
+<p>因为正常的客户端是有一步数据校验的过程的，所以当服务端收到不合理的请求（铜钱不足以购买宝石）时，抛出异常比返回错误更为合理，因为这个请求只可能来自两种客户端：外挂或者有 BUG 的客户端。如果不通过抛出异常来终止业务过程和断开客户端连接，那么程序的错误就很难被第一时间发现，攻击行为也很难被发现。</p>
+<p>我们再回头看瘦客户端结构的设计，瘦客户端不会存有太多状态数据和用户数据也不清楚业务逻辑，所以客户端的设计会是这样：用户点击购买按钮，客户端发送购买请求；服务端收到请求后检查铜钱数量，数量不足就返回数量不足的错误码，数量足够就继续完成业务并返回成功信息；客户端收到服务端的处理结果后，在界面上做出反映。</p>
+<p>在这种结构下，铜钱不足就变成了业务逻辑范围内的一种失败情况，但不能提升为异常，否则铜钱不足的用户一点购买按钮都会出错掉线。</p>
+<p>所以，异常和错误在不同程序结构下是互相转换的，我们没办法一句话的给所有类型所有结构的程序一个统一的异常和错误分类规则。</p>
+<p>但是，异常和错误的分类是有迹可循的。比如上面提到的痩客户端结构，铜钱不足是业务逻辑范围内的一种失败情况，它属于业务错误，再比如程序逻辑上尝试请求某个URL，最多三次，重试三次的过程中请求失败是错误，重试到第三次，失败就被提升为异常了。</p>
+<p>所以我们可以这样来归类异常和错误：不会终止程序逻辑运行的归类为错误，会终止程序逻辑运行的归类为异常。</p>
+<p>因为错误不会终止逻辑运行，所以错误是逻辑的一部分，比如上面提到的瘦客户端结构，铜钱不足的错误就是业务逻辑处理过程中需要考虑和处理的一个逻辑分支。而异常就是那些不应该出现在业务逻辑中的东西，比如上面提到的胖客户端结构，铜钱不足已经不是业务逻辑需要考虑的一部分了，所以它应该是一个异常。</p>
+<p>错误和异常的分类需要通过一定的思维训练来强化分类能力，就类似于面向对象的设计方式一样的，技术实现就摆在那边，但是要用好需要不断的思维训练不断的归类和总结，以上提到的归类方式希望可以作为一个参考，期待大家能发现更多更有效的归类方式。</p>
+<p>接下来我们讲一下速错和 Go 语言里面怎么做到速错。</p>
+<p>速错我最早接触是在做 ASP.NET 的时候就体验到的，当然跟 Erlang 的速错不完全一致，那时候也没有那么高大上的一个名字，但是对待异常的理念是一样的。</p>
+<p>在 .NET 项目开发的时候，有经验的程序员都应该知道，不能随便 re-throw，就是 catch 错误再抛出，原因是异常的第一现场会被破坏，堆栈跟踪信息会丢失，因为外部最后拿到异常的堆栈跟踪信息，是最后那次 throw 的异常的堆栈跟踪信息；其次，不能随便 try catch，随便 catch 很容易导出异常暴露不出来，升级为更严重的业务漏洞。</p>
+<p>到了 Erlang 时期，大家学到了速错概念，简单来讲就是：让它挂。只有挂了你才会第一时间知道错误，但是 Erlang 的挂，只是 Erlang 进程的异常退出，不会导致整个 Erlang 节点退出，所以它挂的影响层面比较低。</p>
+<p>在 Go 语言项目中，虽然有类似 Erlang 进程的 Goroutine，但是 Goroutine 如果 panic 了，并且没有 recover，那么整个 Go 进程就会异常退出。所以我们在 Go 语言项目中要应用速错的设计理念，就要对 Goroutine 做一定的管理。</p>
+<p>在我们的游戏服务端项目中，我把 Goroutine 按挂掉后的结果分为两类：</p>
+<ol>
+<li>挂掉后不影响其他业务或功能的；</li>
+<li>挂掉后业务就无法正常进行的。</li>
+</ol>
+<p>第一类 Goroutine 典型的有：处理各个玩家请求的 Goroutine，因为每个玩家连接各自有一个 Goroutine，所以挂掉了只会影响单个玩家，不会影响整体业务进行。</p>
+<p>第二类 Goroutine 典型的有：数据库同步用的 Goroutine，如果它挂了，数据就无法同步到数据库，游戏如果继续运行下去只会导致数据回档，还不如让整个游戏都异常退出。</p>
+<p>这样一分类，就可以比较清楚哪些 Goroutine 该做 recover 处理，哪些不该做 recover 处理了。</p>
+<p>那么在做 recover 处理时，要怎样才能尽量保留第一现场来帮组开发者排查问题原因呢？我们项目中通常是会在最外层的 recover 中把错误和堆栈跟踪信息记进日志，同时把关键的业务信息，比如：用户ID、来源IP、请求数据等也一起记录进去。</p>
+<p>归纳总结：</p>
+<ol>
+<li>错误和异常需要分类和管理，不能一概而论</li>
+<li>错误和异常的分类可以以是否终止业务过程作为标准</li>
+<li>错误是业务过程的一部分，异常不是</li>
+<li>不要随便捕获异常，更不要随便捕获再重新抛出异常</li>
+<li>Go 语言项目需要把 Goroutine 分为两类，区别处理异常</li>
+<li>在捕获到异常时，需要尽可能的保留第一现场的关键数据</li>
+</ol>
+<h1 id="error-的正确处理方法"><a href="#error-的正确处理方法" class="headerlink" title="error 的正确处理方法"></a>error 的正确处理方法</h1><h2 id="基本用法"><a href="#基本用法" class="headerlink" title="基本用法"></a>基本用法</h2><p>在每个返回 error 的函数中都进行了判断与返回，这样就导致了代码都长下面这样</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">d, err := F()</span><br><span class="line"><span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">	fmt.Println(err)</span><br><span class="line">	<span class="keyword">return</span> err</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>本来就一行就解决的代码，一下多了4行与错误处理相关的代码。即使是采用官方的所谓最小化代码量的错误处理示例来处理，还是显得很冗余：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> d <span class="keyword">int</span></span><br><span class="line"><span class="keyword">if</span> d, err := F(); err != <span class="literal">nil</span> &#123;</span><br><span class="line">	fmt.Println(err)</span><br><span class="line">	<span class="keyword">return</span> err</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// do something with d</span></span><br></pre></td></tr></table></figure>
+<p>这就是在 Go 语言中调用函数的正确处理方式，甚至连 Println 的调用都要这样做（不过实际中，包括标准库在内的 Go 代码很少去判断 fmt.Println 或 Printf 系列函数的返回值）。<br>如果不这么做会怎样呢？Go 语言并没有坚持要采用这种冗长的错误机制。它也允许忽略这些函数调用错误。<strong>但是这样做很危险。</strong> 在下面的例子中，如果第一个 Get 函数错误，那么程序继续调用第二个函数！这是非常恐怖的事情。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    http.Get(<span class="string">"http://www.nuke.gov/seal_presidential_bunker"</span>)</span><br><span class="line">    http.Get(<span class="string">"http://www.nuke.gov/trigger_doomsday_device"</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="破解之道"><a href="#破解之道" class="headerlink" title="破解之道"></a>破解之道</h2><p>Go的错误处理的确冗长，但使用一些tips，还是可以将代码缩减至可以忍受的范围的，这里列举三种：</p>
+<h3 id="checkError"><a href="#checkError" class="headerlink" title="checkError"></a>checkError</h3><p>对于一些在 error handle 时可以选择goroutine exit（注意：如果仅存 main goroutine 一个 goroutine，调用 runtime.Goexit 会导致程序以 crash 形式退出）或 os.Exit 的情形，我们可以选择类似常见的 checkError 方式简化错误处理，例如：<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">checkError</span><span class="params">(err error)</span></span> &#123;</span><br><span class="line">    <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">        fmt.Println(<span class="string">"Error is "</span>, err)</span><br><span class="line">        os.Exit(<span class="number">-1</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">foo</span><span class="params">()</span></span> &#123;</span><br><span class="line">    err := doStuff1()</span><br><span class="line">    checkError(err)</span><br><span class="line"></span><br><span class="line">    err = doStuff2()</span><br><span class="line">    checkError(err)</span><br><span class="line"></span><br><span class="line">    err = doStuff3()</span><br><span class="line">    checkError(err)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这种方式的应用范围比较有限。</p>
+<h3 id="聚合-error"><a href="#聚合-error" class="headerlink" title="聚合 error"></a>聚合 error</h3><p>有些时候，我们会遇到这样的情况：<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> err := doStuff1(); err != <span class="literal">nil</span> &#123;</span><br><span class="line">    <span class="comment">// handle A</span></span><br><span class="line">    <span class="comment">// handle B</span></span><br><span class="line">    <span class="comment">// ... ...</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> err := doStuff2(); err != <span class="literal">nil</span> &#123;</span><br><span class="line">    <span class="comment">// handle A</span></span><br><span class="line">    <span class="comment">// handle B</span></span><br><span class="line">    <span class="comment">// ... ...</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> err := doStuff3();  err != <span class="literal">nil</span> &#123;</span><br><span class="line">    <span class="comment">// handle A</span></span><br><span class="line">    <span class="comment">// handle B</span></span><br><span class="line">    <span class="comment">// ... ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>在每个错误处理过程，处理过程相似，都是 handle A、handle B 等，我们可以通过 Go 提供的==defer+闭包==的方式，将 handle A、handle B 等等聚合到一个延后执行的匿名辅助闭包中去：<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">handleA</span><span class="params">()</span></span> &#123;</span><br><span class="line">    fmt.Println(<span class="string">"handle A"</span>)</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">handleB</span><span class="params">()</span></span> &#123;</span><br><span class="line">    fmt.Println(<span class="string">"handle B"</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">foo</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">var</span> err error</span><br><span class="line">    <span class="keyword">defer</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">        <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">            handleA()</span><br><span class="line">            handleB()</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> err = doStuff1(); err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> err = doStuff2(); err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> err = doStuff3(); err != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="将-doStuff-和-error-处理绑定"><a href="#将-doStuff-和-error-处理绑定" class="headerlink" title="将 doStuff 和 error 处理绑定"></a>将 doStuff 和 error 处理绑定</h3><p>在 Rob Pike 的 <a href="https://blog.golang.org/errors-are-values" target="_blank" rel="noopener">Errors are values</a> 一文中，Rob Pike 告诉我们标准库中使用了一种简化错误处理代码的技巧，bufio 中的 Writer 就使用了这个技巧：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">b := bufio.NewWriter(fd)</span><br><span class="line">b.Write(p0[a:b])</span><br><span class="line">b.Write(p1[c:d])</span><br><span class="line">b.Write(p2[e:f])</span><br><span class="line"><span class="comment">// and so on</span></span><br><span class="line"><span class="keyword">if</span> b.Flush() != <span class="literal">nil</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> b.Flush()</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>我们看到代码中并没有判断三个 b.Write 的返回错误值，错误处理放在哪里了呢？我们打开一下$GOROOT/src/</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">type Writer struct &#123;</span><br><span class="line">    err error</span><br><span class="line">    buf []byte</span><br><span class="line">    n   int</span><br><span class="line">    wr  io.Writer</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">func (b *Writer) Write(p []byte) (nn int, err error) &#123;</span><br><span class="line">    for len(p) &gt; b.Available() &amp;&amp; b.err == nil &#123;</span><br><span class="line">        // ... ...</span><br><span class="line">    &#125;</span><br><span class="line">    if b.err != nil &#123;</span><br><span class="line">        return nn, b.err</span><br><span class="line">    &#125;</span><br><span class="line">    // ......</span><br><span class="line">    return nn, nil</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>我们可以看到，错误处理被绑定在 Write 的内部了，Writer 中定义了一个 err 作为错误状态值，与Writer 的实例绑定在了一起，并且在每次 Write 入口处都会 err 判断是否为 nil。一旦不为 nil，Write 其实什么都没做就直接 return 了。</p>
+<h3 id="让-error-携带更多的线索"><a href="#让-error-携带更多的线索" class="headerlink" title="让 error 携带更多的线索"></a>让 error 携带更多的线索</h3><p>参考 <a href="https://gocn.io/article/348" target="_blank" rel="noopener">GOLANG错误处理最佳方案</a></p>
+<p>以上三种破解之法，各有各的适用场景，同样你也可以看出各有各的不足，没有普适之法。优化 Go 错误处理之法也不会局限在上述三种情况，肯定会有更多的破解方法，比如代码生成，比如其他还待发掘。</p>
+<h1 id="解调用者之惑"><a href="#解调用者之惑" class="headerlink" title="解调用者之惑"></a>解调用者之惑</h1><p>前面举的例子对于调用者来讲都是较为简单的情况了。但实际编码中，调用者不仅要面对的是：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">if err != nil &#123;</span><br><span class="line">    //handle error</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>还要面对：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">if err 是 ErrXXX</span><br><span class="line">    //handle errorXXX</span><br><span class="line"></span><br><span class="line">if err 是 ErrYYY</span><br><span class="line">    //handle errorYYY</span><br><span class="line"></span><br><span class="line">if err 是ErrZZZ</span><br><span class="line">    //handle errorZZZ</span><br></pre></td></tr></table></figure>
+<p>我们分三种情况来说明调用者该如何处理不同类型的error实现：</p>
+<h2 id="由-errors-New-或-fmt-Errorf-返回的错误变量"><a href="#由-errors-New-或-fmt-Errorf-返回的错误变量" class="headerlink" title="由 errors.New 或 fmt.Errorf 返回的错误变量"></a>由 errors.New 或 fmt.Errorf 返回的错误变量</h2><p>如果你调用的函数或方法返回的错误变量是调用errors.New或fmt.Errorf而创建的，由于errorString类型是unexported的，因此我们无法通过“相当判定”或type assertion、type switch来区分不同错误变量的值或类型，唯一的方法就是判断err.String()是否与某个错误context string相等，示意代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">func openFile(name string) error &#123;</span><br><span class="line">    if file not exist &#123;</span><br><span class="line">        return errors.New(&quot;file does not exist&quot;)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    if have no priviledge &#123;</span><br><span class="line">        return errors.New(&quot;no priviledge&quot;)</span><br><span class="line">    &#125;</span><br><span class="line">    return nil</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">func main() &#123;</span><br><span class="line">    err := openFile(&quot;example.go&quot;)</span><br><span class="line">    if err.Error() == &quot;file does not exist&quot; &#123;</span><br><span class="line">        // handle &quot;file does not exist&quot; error</span><br><span class="line">        return</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    if err.Error() == &quot;no priviledge&quot; &#123;</span><br><span class="line">        // handle &quot;no priviledge&quot; error</span><br><span class="line">        return</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>但这种情况太low了，不建议这么做！一旦遇到类似情况，就要考虑通过下面方法对上述情况进行重构。</p>
+<h2 id="exported-Error-变量"><a href="#exported-Error-变量" class="headerlink" title="exported Error 变量"></a>exported Error 变量</h2><p>打开$GOROOT/src/os/error.go，你会在文件开始处发现如下代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">var (</span><br><span class="line">    ErrInvalid    = errors.New(&quot;invalid argument&quot;)</span><br><span class="line">    ErrPermission = errors.New(&quot;permission denied&quot;)</span><br><span class="line">    ErrExist      = errors.New(&quot;file already exists&quot;)</span><br><span class="line">    ErrNotExist   = errors.New(&quot;file does not exist&quot;)</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<p>这些就是os包export的错误码变量，由于是exported的，我们在调用os包函数返回后判断错误码时可以直接使用等于判定，比如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">err := os.XXX</span><br><span class="line">if err == os.ErrInvalid &#123;</span><br><span class="line">    //handle invalid</span><br><span class="line">&#125;</span><br><span class="line">... ...</span><br></pre></td></tr></table></figure>
+<p>也可以使用switch case：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">switch err := os.XXX &#123;</span><br><span class="line">    case ErrInvalid:</span><br><span class="line">        // handle invalid</span><br><span class="line">    case ErrPermission:</span><br><span class="line">        // handle no permission</span><br><span class="line">        // ... ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>至于 error 类型变量与 os.ErrInvalid 的可比较性可参考<a href="http://golang.org/ref/spec#Comparison_operators" target="_blank" rel="noopener">go specs</a>。</p>
+<p>一般对于库的设计和实现者而言，在库的设计时就要考虑好export出哪些错误变量。</p>
+<h2 id="定义自己的error接口实现类型"><a href="#定义自己的error接口实现类型" class="headerlink" title="定义自己的error接口实现类型"></a>定义自己的error接口实现类型</h2><p>如果要提供额外的error context，我们可以定义自己的实现error接口的类型；如果这些类型还是exported的，我们就可以用type assertion or type switch来判断返回的错误码类型并予以对应处理。</p>
+<p>比如$GOROOT/src/net/net.go：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">type OpError struct &#123;</span><br><span class="line">    Op string</span><br><span class="line">    Net string</span><br><span class="line">    Source Addr</span><br><span class="line">    Addr Addr</span><br><span class="line">    Err error</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">func (e *OpError) Error() string &#123;</span><br><span class="line">    if e == nil &#123;</span><br><span class="line">        return &quot;&lt;nil&gt;&quot;</span><br><span class="line">    &#125;</span><br><span class="line">    s := e.Op</span><br><span class="line">    if e.Net != &quot;&quot; &#123;</span><br><span class="line">        s += &quot; &quot; + e.Net</span><br><span class="line">    &#125;</span><br><span class="line">    if e.Source != nil &#123;</span><br><span class="line">        s += &quot; &quot; + e.Source.String()</span><br><span class="line">    &#125;</span><br><span class="line">    if e.Addr != nil &#123;</span><br><span class="line">        if e.Source != nil &#123;</span><br><span class="line">            s += &quot;-&gt;&quot;</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            s += &quot; &quot;</span><br><span class="line">        &#125;</span><br><span class="line">        s += e.Addr.String()</span><br><span class="line">    &#125;</span><br><span class="line">    s += &quot;: &quot; + e.Err.Error()</span><br><span class="line">    return s</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>net.OpError提供了丰富的error Context，不仅如此，它还实现了除Error以外的其他method，比如：Timeout（实现net.timeout interface） 和Temporary（实现net.temporary interface）。这样我们在处理error时，可通过type assertion或type switch将error转换为*net.OpError，并调用到Timeout或Temporary方法来实现一些特殊的判定。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">err := net.XXX</span><br><span class="line">if oe, ok := err.(*OpError); ok &#123;</span><br><span class="line">    if oe.Timeout() &#123;</span><br><span class="line">        //handle timeout...</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="错误处理的那些坑"><a href="#错误处理的那些坑" class="headerlink" title="错误处理的那些坑"></a>错误处理的那些坑</h1><p>每种编程语言都有自己的专属坑，Go虽出身名门，但毕竟年轻，坑也不少，在error处理这块也可以列出几个。</p>
+<h2 id="Go-FAQ：Why-is-my-nil-error-value-not-equal-to-nil"><a href="#Go-FAQ：Why-is-my-nil-error-value-not-equal-to-nil" class="headerlink" title="Go FAQ：Why is my nil error value not equal to nil?"></a>Go FAQ：<a href="http://golang.org/doc/faq#nil_error" target="_blank" rel="noopener">Why is my nil error value not equal to nil?</a></h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">type MyError string</span><br><span class="line"></span><br><span class="line">func (e *MyError) Error() string &#123;</span><br><span class="line">    return string(*e)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">var ErrBad = MyError(&quot;ErrBad&quot;)</span><br><span class="line"></span><br><span class="line">func bad() bool &#123;</span><br><span class="line">    return false</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">func returnsError() error &#123;</span><br><span class="line">    var p *MyError = nil</span><br><span class="line">    if bad() &#123;</span><br><span class="line">        p = &amp;ErrBad</span><br><span class="line">    &#125;</span><br><span class="line">    return p // Will always return a non-nil error.</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">func main() &#123;</span><br><span class="line">    err := returnsError()</span><br><span class="line">    if err != nil &#123;</span><br><span class="line">        fmt.Println(&quot;return non-nil error&quot;)</span><br><span class="line">        return</span><br><span class="line">    &#125;</span><br><span class="line">    fmt.Println(&quot;return nil&quot;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上面的输出结果是”return non-nil error”，也就是说returnsError返回后，err != nil。err是一个interface类型变量，其underlying有两部分组成：类型和值。只有这两部分都为nil时，err才为nil。但returnsError返回时将一个值为nil，但类型为*MyError的变量赋值为err，这样err就不为nil。解决方法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">func returnsError() error &#123;</span><br><span class="line">    var p *MyError = nil</span><br><span class="line">    if bad() &#123;</span><br><span class="line">        p = &amp;ErrBad</span><br><span class="line">        return p</span><br><span class="line">    &#125;</span><br><span class="line">    return nil</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="switch-err-type-的匹配次序"><a href="#switch-err-type-的匹配次序" class="headerlink" title="switch err.(type)的匹配次序"></a>switch err.(type)的匹配次序</h2><p>试想一下下面代码的输出结果：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">type MyError string</span><br><span class="line"></span><br><span class="line">func (e MyError) Error() string &#123;</span><br><span class="line">    return string(e)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">func Foo() error &#123;</span><br><span class="line">    return MyError(&quot;foo error&quot;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">func main() &#123;</span><br><span class="line">    err := Foo()</span><br><span class="line">    switch e := err.(type) &#123;</span><br><span class="line">    default:</span><br><span class="line">        fmt.Println(&quot;default&quot;)</span><br><span class="line">    case error:</span><br><span class="line">        fmt.Println(&quot;found an error:&quot;, e)</span><br><span class="line">    case MyError:</span><br><span class="line">        fmt.Println(&quot;found MyError:&quot;, e)</span><br><span class="line">    &#125;</span><br><span class="line">    return</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>你可能会以为会输出：”found MyError: foo error”，但实际输出却是：”found an error: foo error”，也就是说e先匹配到了error！如果我们调换一下次序呢：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">func main() &#123;</span><br><span class="line">    err := Foo()</span><br><span class="line">    switch e := err.(type) &#123;</span><br><span class="line">    default:</span><br><span class="line">        fmt.Println(&quot;default&quot;)</span><br><span class="line">    case MyError:</span><br><span class="line">        fmt.Println(&quot;found MyError:&quot;, e)</span><br><span class="line">    case error:</span><br><span class="line">        fmt.Println(&quot;found an error:&quot;, e)</span><br><span class="line">    &#125;</span><br><span class="line">    return</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这回输出结果变成了：“found MyError: foo error”。</p>
+<p>也许你会认为这不全是错误处理的坑，和switch case的匹配顺序有关，但不可否认的是有些人会这么去写代码，一旦这么写，坑就踩到了。因此对于通过switch case来判定error type的情况，将error这个“通用”类型放在后面或去掉。</p>
+<h1 id="第三方库"><a href="#第三方库" class="headerlink" title="第三方库"></a>第三方库</h1><p>如果觉得 Go 内置的错误机制不能很好的满足你的需求，本着“do not reinvent the wheel”的精神，建议使用一些第三方库来满足，比如：<a href="https://github.com/pkg/errors" target="_blank" rel="noopener">errors</a>。</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p><a href="http://blog.golang.org/errors-are-values" target="_blank" rel="noopener">The Go Blog - Errors are values</a><br><a href="https://plus.google.com/+RussCox-rsc/posts/iqAiKAwP6Ce" target="_blank" rel="noopener">Russ Cox replied to the article “Why I’m not leaving Python for Go”</a><br><a href="https://gocn.io/article/348" target="_blank" rel="noopener">GOLANG错误处理最佳方案</a><br><a href="https://gocn.io/article/367" target="_blank" rel="noopener">GOLANG测试必须用带堆栈的errors</a><br><a href="http://tonybai.com/2014/11/14/effective-error-handling-in-go/" target="_blank" rel="noopener">Go语言的有效错误处理</a><br><a href="http://www.jianshu.com/p/f30da01eea97" target="_blank" rel="noopener">Golang错误和异常处理的正确姿势</a></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Yibo</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://ideassea.com/2017/07/30/golang-error-handle/" title="Golang 错误处理">https://ideassea.com/2017/07/30/golang-error-handle/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Golang/" rel="tag"># Golang</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/07/28/high-performance-mysql-schema/" rel="next" title="MySQL高性能表设计规范">
+                <i class="fa fa-chevron-left"></i> MySQL高性能表设计规范
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/10/23/shell-script-for-swap/" rel="prev" title="使用 shell 脚本自动创建/移除并挂载交换文件">
+                使用 shell 脚本自动创建/移除并挂载交换文件 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://ws2.sinaimg.cn/large/006tKfTcly1fq0mwrckglj30sg0sg0u8.jpg"
+                alt="Yibo" />
+            
+              <p class="site-author-name" itemprop="name">Yibo</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">41</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">21</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#error-类型"><span class="nav-number">1.</span> <span class="nav-text">error 类型</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#错误还是异常（error-or-panic）"><span class="nav-number">2.</span> <span class="nav-text">错误还是异常（error or panic）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#error-的正确处理方法"><span class="nav-number">3.</span> <span class="nav-text">error 的正确处理方法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#基本用法"><span class="nav-number">3.1.</span> <span class="nav-text">基本用法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#破解之道"><span class="nav-number">3.2.</span> <span class="nav-text">破解之道</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#checkError"><span class="nav-number">3.2.1.</span> <span class="nav-text">checkError</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#聚合-error"><span class="nav-number">3.2.2.</span> <span class="nav-text">聚合 error</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#将-doStuff-和-error-处理绑定"><span class="nav-number">3.2.3.</span> <span class="nav-text">将 doStuff 和 error 处理绑定</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#让-error-携带更多的线索"><span class="nav-number">3.2.4.</span> <span class="nav-text">让 error 携带更多的线索</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#解调用者之惑"><span class="nav-number">4.</span> <span class="nav-text">解调用者之惑</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#由-errors-New-或-fmt-Errorf-返回的错误变量"><span class="nav-number">4.1.</span> <span class="nav-text">由 errors.New 或 fmt.Errorf 返回的错误变量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#exported-Error-变量"><span class="nav-number">4.2.</span> <span class="nav-text">exported Error 变量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#定义自己的error接口实现类型"><span class="nav-number">4.3.</span> <span class="nav-text">定义自己的error接口实现类型</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#错误处理的那些坑"><span class="nav-number">5.</span> <span class="nav-text">错误处理的那些坑</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Go-FAQ：Why-is-my-nil-error-value-not-equal-to-nil"><span class="nav-number">5.1.</span> <span class="nav-text">Go FAQ：Why is my nil error value not equal to nil?</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#switch-err-type-的匹配次序"><span class="nav-number">5.2.</span> <span class="nav-text">switch err.(type)的匹配次序</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#第三方库"><span class="nav-number">6.</span> <span class="nav-text">第三方库</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考"><span class="nav-number">7.</span> <span class="nav-text">参考</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate"> 
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yibo</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/theme-next/hexo-theme-next">NexT.Gemini</a> v6.1.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/reading_progress/reading_progress.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.1.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.1.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.1.0"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+  
+  <script src="/lib/pangu/dist/pangu.min.js?v=3.3"></script>
+  <script type="text/javascript">pangu.spacingPage();</script>
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

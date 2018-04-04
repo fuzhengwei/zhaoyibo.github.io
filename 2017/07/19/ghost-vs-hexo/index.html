@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.1.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.1.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.1.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.1.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="最近把博客从 Hexo 迁移到了 Ghost 上，简单聊一下用了两年的 Hexo 和只用了两天的 Ghost。 我对博客系统的要求，只有一个：能用 Markdown 渲染。其实能满足我要求的博客系统的还是蛮多，除了 Hexo 和 Ghost 这两个，还有比如 FarBox、Jekyll、Octopress 这些都是可以的，甚至还有直接注册个账号就能用的简书。">
+<meta name="keywords" content="Ghost,Blog,Hexo">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Ghost vs Hexo">
+<meta property="og:url" content="https://ideassea.com/2017/07/19/ghost-vs-hexo/index.html">
+<meta property="og:site_name" content="Ideas Sea">
+<meta property="og:description" content="最近把博客从 Hexo 迁移到了 Ghost 上，简单聊一下用了两年的 Hexo 和只用了两天的 Ghost。 我对博客系统的要求，只有一个：能用 Markdown 渲染。其实能满足我要求的博客系统的还是蛮多，除了 Hexo 和 Ghost 这两个，还有比如 FarBox、Jekyll、Octopress 这些都是可以的，甚至还有直接注册个账号就能用的简书。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2017-07-19T21:45:19.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Ghost vs Hexo">
+<meta name="twitter:description" content="最近把博客从 Hexo 迁移到了 Ghost 上，简单聊一下用了两年的 Hexo 和只用了两天的 Ghost。 我对博客系统的要求，只有一个：能用 Markdown 渲染。其实能满足我要求的博客系统的还是蛮多，除了 Hexo 和 Ghost 这两个，还有比如 FarBox、Jekyll、Octopress 这些都是可以的，甚至还有直接注册个账号就能用的简书。">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Ideas Sea" type="application/atom+xml" />
+
+
+
+
+  <link rel="canonical" href="https://ideassea.com/2017/07/19/ghost-vs-hexo/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Ghost vs Hexo | Ideas Sea</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> 
+
+<div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ideas Sea</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+          
+  <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />标签</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+</li>
+
+      
+
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+  
+
+
+
+ </div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+    <div class="reading-progress-bar"></div>
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://ideassea.com/2017/07/19/ghost-vs-hexo/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yibo">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://ws2.sinaimg.cn/large/006tKfTcly1fq0mwrckglj30sg0sg0u8.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ideas Sea">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Ghost vs Hexo</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-07-19T16:06:43+08:00">2017-07-19</time>
+            
+
+            
+            
+              
+                
+              
+            
+
+            
+              
+              <span class="post-meta-divider">|</span>
+              
+
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">更新于：</span>
+              
+              <time title="更新于" itemprop="dateModified" datetime="2017-07-20T05:45:19+08:00">2017-07-20</time>
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>最近把博客从 Hexo 迁移到了 Ghost 上，简单聊一下用了两年的 Hexo 和只用了两天的 Ghost。</p>
+<p>我对博客系统的要求，只有一个：能用 Markdown 渲染。<br>其实能满足我要求的博客系统的还是蛮多，除了 Hexo 和 Ghost 这两个，还有比如 FarBox、Jekyll、Octopress 这些都是可以的，甚至还有直接注册个账号就能用的简书。</p>
+<a id="more"></a>
+<p>FarBox 当初我看到它的时候，它已经开始收费了，简单体验了一下，感觉不好。<br>Jekyll 相当于技术版的 WP 的地位，文档、插件都挺多的，自定义程度也高，就是比较繁琐，所以一上来我就把它 pass 掉了。<br>Octopress 也是像 Jekyll 一样能用 Github Pages 托管的静态博客，相当于 Jekyll 的简化版，上手也相对容易些。<br>后来看到了 Hexo，台湾产的，上手容易，有官方的中文文档（虽然比英文文档还是差那么一点，聊胜于无嘛），用的人也挺多的。并且也是纯静态的，可以直接放到 GitHub Pages 来托管（可参看我之前写的「<a href="/hexo-a-blog">使用 Hexo 和 Github Pages 搭建一个独立博客</a>」），那就它了。</p>
+<p>其实 Hexo 还是蛮好用的，优缺点如下</p>
+<ul>
+<li>优点<ul>
+<li>作者是台湾人，语言没啥障碍</li>
+<li>免费，可以托管到 GitHub 上</li>
+<li>速度快</li>
+<li>简单，命令少</li>
+<li>插件多，主题多</li>
+</ul>
+</li>
+<li>缺点<ul>
+<li>没有管理后台（有插件提供，但比较简陋）</li>
+<li>贴图片不是很方便</li>
+</ul>
+</li>
+</ul>
+<p>我用 Hexo 的时候还有个问题是 Node.js，我对它基本没啥了解，node 的版本还挺混乱的，有时在安装插件或者渲染 Markdown 时会莫名其妙的出错，错误信息也看不懂。最终只能在别处重新 <code>hexo init</code> 出一个新的目录再把以前的东西都拷进去。</p>
+<p>另外，用 GitHub Pages 来做博客是否恰当？<br>其实 GitHub 是鼓励用户用 Pages 来做博客的，在 Pages 刚推出的时候，GitHub 就说</p>
+<blockquote>
+<p>Create a blog and spread your ideas.</p>
+</blockquote>
+<p>不过毕竟是 GitHub 提供的，一个程序猿&amp;媛的社区，如果博客的内容是偏向编程或者计算机方面，我感觉还好；如果只是生活叨叨，总是感觉有些奇怪。</p>
+<p>今年再去看大家讨论 Hexo 的时候，突然发现了一个熟悉的词 Ghost。<br>我有些疑惑了，ghost 不是用来给 PC 装系统用的吗？怎么来和 Hexo 相提并论了？</p>
+<p>后来才算明白，原来是一个新的博客平台，发起者是 WP 的前员工。更多的资料也没找到啥，因为不管百度还是 Google，我一搜 ghost 相关的，给我的最多的就是装 xp 系统那个 ghost (⊙﹏⊙)b<br>不过看 Ghost 的样子，有点像年轻时的 WP？哎，管它呢，好用不好用试试就知道了。</p>
+<p>刚好我看到 Ghost 的时候，它快要出1.0版本了，当时最新的版本是1.0.0-beta.2，虽然官方说不建议在生产环境使用，但是我测试是够用咯。<br>插一句，2017-07-13 发布了 Ghost 1.0 RC1，可以用于生产环境，目前我正在使用此版本。看来最终版本指日可待。（突然想到 Hexo 好久没有更新了吧。。。）</p>
+<p>Ghost 1.0 之后，官方为了让大家方便部署，发布了一个 <a href="https://docs.ghost.org/docs/installing-ghost-via-the-cli" target="_blank" rel="noopener">ghost-cli</a> 的工具，我是两个命令就部署好了。（不清楚国内会不会有 npm 安装某些依赖时提示被墙的问题）</p>
+<p>Ghost 有一个比较简单的后台，进行日常的管理还是不成问题的。也可以在后台直接码字，我要给它这个 Markdown 的编辑器给个好评。<br>以前我码字都是在单独的一个 Markdown 软件里——<a href="https://www.typora.io/" target="_blank" rel="noopener">Typora</a>，这次终于找到了一个能让我用的顺手的在线 Markdown 编辑器了。并且，Ghost 的编辑器里，可以直接拖图片进来，它会自动给你上传并改成上传后的链接（默认是传到你服务器的 GHOST_HOME/content 目录下）。</p>
+<p>另外我发现 Ghost 1.0 自带的这个主题我还是蛮喜欢的，就决定继续试用。</p>
+<p>目前发现的 Ghost 的优缺点</p>
+<ul>
+<li>优点<ul>
+<li>Markdown 编辑器好评</li>
+<li>图片可以直接上传</li>
+<li>主题很多</li>
+<li>部署简单，最起码 1.0 版本是酱紫的</li>
+<li>更新挺快的</li>
+</ul>
+</li>
+<li>缺点<ul>
+<li>目前1.0版本 bug 还是比较多的</li>
+<li>资源占用略多</li>
+<li>放不到 GitHub 上边</li>
+<li>目前还没找到相关插件</li>
+<li>中文文档较少，多半得看官方的英文文档</li>
+</ul>
+</li>
+</ul>
+<p>目前我的 Ghost 1.0 的 bug 还是比较多的，比如我现在正在用的它的在线编辑器码字，突然上边给我来了一个提示说我的草稿保存失败啦(￣△￣；)<br>Saving failed! Someone else is editing this post.<br>不过还好，还算可以忍受，不是直接丢失什么的。</p>
+<p>新的 Casper 主题的 bug 其实也少，不过基本都是样式上的，自己也可以修复 XD 像我这个不怎么懂前端的后端程序猿都能搞定，你也可以的~(≧▽≦)/~</p>
+<p>等有时间了再来说说怎么调教 Ghost 吧</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Yibo</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://ideassea.com/2017/07/19/ghost-vs-hexo/" title="Ghost vs Hexo">https://ideassea.com/2017/07/19/ghost-vs-hexo/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Ghost/" rel="tag"># Ghost</a>
+          
+            <a href="/tags/Blog/" rel="tag"># Blog</a>
+          
+            <a href="/tags/Hexo/" rel="tag"># Hexo</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/07/18/hbase-fully-distributed/" rel="next" title="HBase 1.2.6 完全分布式部署">
+                <i class="fa fa-chevron-left"></i> HBase 1.2.6 完全分布式部署
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/07/20/improve-ghost/" rel="prev" title="Ghost 1.0.0 调教指南">
+                Ghost 1.0.0 调教指南 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://ws2.sinaimg.cn/large/006tKfTcly1fq0mwrckglj30sg0sg0u8.jpg"
+                alt="Yibo" />
+            
+              <p class="site-author-name" itemprop="name">Yibo</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">41</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">21</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate"> 
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yibo</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/theme-next/hexo-theme-next">NexT.Gemini</a> v6.1.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/reading_progress/reading_progress.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.1.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.1.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.1.0"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+  
+  <script src="/lib/pangu/dist/pangu.min.js?v=3.3"></script>
+  <script type="text/javascript">pangu.spacingPage();</script>
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

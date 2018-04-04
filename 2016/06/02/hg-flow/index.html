@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.1.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.1.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.1.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.1.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Introductionhg flow 是一种开发模式，采用生产（Production）、发布（Release）、开发（Develop）完全分离的分支模型支撑多人团队的开发模式。hg flow 的开发模型借鉴自 git flow。 git flow 的流程图如下：（hg flow 的流程同理，只不过大家习惯的分支名略有不同而已）">
+<meta name="keywords" content="CVS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="hg flow">
+<meta property="og:url" content="https://ideassea.com/2016/06/02/hg-flow/index.html">
+<meta property="og:site_name" content="Ideas Sea">
+<meta property="og:description" content="Introductionhg flow 是一种开发模式，采用生产（Production）、发布（Release）、开发（Develop）完全分离的分支模型支撑多人团队的开发模式。hg flow 的开发模型借鉴自 git flow。 git flow 的流程图如下：（hg flow 的流程同理，只不过大家习惯的分支名略有不同而已）">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://ws1.sinaimg.cn/large/6e3b2269ly1fq0fasz90cj21fl1xgk1b">
+<meta property="og:updated_time" content="2017-07-17T23:36:54.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="hg flow">
+<meta name="twitter:description" content="Introductionhg flow 是一种开发模式，采用生产（Production）、发布（Release）、开发（Develop）完全分离的分支模型支撑多人团队的开发模式。hg flow 的开发模型借鉴自 git flow。 git flow 的流程图如下：（hg flow 的流程同理，只不过大家习惯的分支名略有不同而已）">
+<meta name="twitter:image" content="https://ws1.sinaimg.cn/large/6e3b2269ly1fq0fasz90cj21fl1xgk1b">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Ideas Sea" type="application/atom+xml" />
+
+
+
+
+  <link rel="canonical" href="https://ideassea.com/2016/06/02/hg-flow/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>hg flow | Ideas Sea</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> 
+
+<div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ideas Sea</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+          
+  <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />标签</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+</li>
+
+      
+
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+  
+
+
+
+ </div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+    <div class="reading-progress-bar"></div>
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://ideassea.com/2016/06/02/hg-flow/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yibo">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://ws2.sinaimg.cn/large/006tKfTcly1fq0mwrckglj30sg0sg0u8.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ideas Sea">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">hg flow</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-06-02T07:18:00+08:00">2016-06-02</time>
+            
+
+            
+            
+              
+                
+              
+            
+
+            
+              
+              <span class="post-meta-divider">|</span>
+              
+
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">更新于：</span>
+              
+              <time title="更新于" itemprop="dateModified" datetime="2017-07-18T07:36:54+08:00">2017-07-18</time>
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h1><p><strong><a href="https://bitbucket.org/yujiewu/hgflow/overview" target="_blank" rel="noopener">hg flow</a></strong> 是一种开发模式，采用生产（Production）、发布（Release）、开发（Develop）完全分离的分支模型支撑多人团队的开发模式。hg flow 的开发模型借鉴自 <a href="https://github.com/nvie/gitflow" target="_blank" rel="noopener">git flow</a>。</p>
+<p>git flow 的流程图如下：（hg flow 的流程同理，只不过大家习惯的分支名略有不同而已）</p>
+<p><img src="https://ws1.sinaimg.cn/large/6e3b2269ly1fq0fasz90cj21fl1xgk1b" alt="git-flow"></p>
+<a id="more"></a>
+<h1 id="Installation"><a href="#Installation" class="headerlink" title="Installation"></a>Installation</h1><p>其核心是一个 python 文件，以插件的形式加入到 hg 中。</p>
+<ol>
+<li><p><a href="https://bitbucket.org/yujiewu/hgflow/downloads" target="_blank" rel="noopener">下载</a>并解压得到<code>hgflow.py</code>，随便放到一个你喜欢的目录下</p>
+</li>
+<li><p>编辑 <code>$HOME/.hgrc</code>（Windows 下是 <code>%USERPROFILE%/Mercurial.ini</code>），添加以下内容：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[extensions]</span><br><span class="line">mq =</span><br><span class="line">flow = /PATH/TO/hgflow.py</span><br><span class="line"></span><br><span class="line">[flow]</span><br><span class="line">autoshelve = true</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h1 id="Branches"><a href="#Branches" class="headerlink" title="Branches"></a>Branches</h1><ul>
+<li>Production</li>
+</ul>
+<p>也就是我们经常使用的 Default 分支，这个分支包含最近发布到生产环境的代码，最近发布的 Release， 这个分支只能从其他分支合并，不能在这个分支直接修改</p>
+<ul>
+<li>Develop</li>
+</ul>
+<p>这个分支是我们是我们的主开发分支，包含所有要发布到下一个 Release 的代码，这个主要合并与其他分支，比如 Feature 分支</p>
+<ul>
+<li>Feature</li>
+</ul>
+<p>这个分支主要是用来开发一个新的功能，一旦开发完成，我们合并回 Develop 分支进入下一个 Release</p>
+<ul>
+<li>Release</li>
+</ul>
+<p>当你需要一个发布一个新 Release 的时候，我们基于 Develop 分支创建一个 Release 分支，完成 Release 后，我们合并到 Default 和 Develop 分支</p>
+<ul>
+<li>Hotfix</li>
+</ul>
+<p>当我们在 Production 发现新的 Bug 时候，我们需要创建一个 Hotfix, 完成 Hotfix 后，我们合并回 Default 和 Develop 分支，所以 Hotfix 的改动会进入下一个 Release</p>
+<h1 id="Commands"><a href="#Commands" class="headerlink" title="Commands"></a>Commands</h1><h2 id="初始化工作区"><a href="#初始化工作区" class="headerlink" title="初始化工作区"></a>初始化工作区</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd &lt;my_repository_dir&gt;</span><br><span class="line">$ hg flow init</span><br></pre></td></tr></table></figure>
+<p>会提示你</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">flow: Global configuration:</span><br><span class="line">flow:   autoshelve: on</span><br><span class="line"></span><br><span class="line">flow: warning: You have the following open branches. Will initialize flow for all of them.</span><br><span class="line">flow: warning:   default</span><br><span class="line">flow: warning:   develop (active)</span><br><span class="line"></span><br><span class="line">Branch name for master stream: [default]</span><br><span class="line">Branch name for develop stream: [develop]</span><br><span class="line">Branch name for feature stream: [feature/]</span><br><span class="line">Branch name for release stream: [release/]</span><br><span class="line">Branch name for hotfix stream: [hotfix/]</span><br><span class="line">Branch name for support stream: [support/]</span><br><span class="line">2 files updated, 0 files merged, 1 files removed, 0 files unresolved</span><br><span class="line">2 files updated, 0 files merged, 0 files removed, 0 files unresolved</span><br></pre></td></tr></table></figure>
+<p>一路回车保持默认就行了</p>
+<h2 id="功能开发-BUG-修复"><a href="#功能开发-BUG-修复" class="headerlink" title="功能开发/BUG 修复"></a>功能开发/BUG 修复</h2><p>在开发阶段，让每个人、小组进行功能开发或者是Bug修复。目的是大家相互不干扰。</p>
+<h4 id="开始一个功能-Bug修复"><a href="#开始一个功能-Bug修复" class="headerlink" title="开始一个功能/Bug修复"></a>开始一个功能/Bug修复</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hg flow feature start &lt;name&gt;</span><br></pre></td></tr></table></figure>
+<p>这个命令会基于开发分支（develop）新建一个功能开发分支 feature/&lt;name&gt;，并自动切换到此分支。</p>
+<h4 id="完成一个功能-Bug修复"><a href="#完成一个功能-Bug修复" class="headerlink" title="完成一个功能/Bug修复"></a>完成一个功能/Bug修复</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hg flow feature finish &lt;name&gt;</span><br></pre></td></tr></table></figure>
+<p>这个命令会 <strong>关闭</strong> 功能开发分支feature/&lt;name&gt;，并把内容合并到开发分支。</p>
+<h4 id="在功能开发分支中切换"><a href="#在功能开发分支中切换" class="headerlink" title="在功能开发分支中切换"></a>在功能开发分支中切换</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hg flow feature change &lt;name&gt;</span><br></pre></td></tr></table></figure>
+<p>这个命令会在不同的功能开发分支中进行切换，切换到 feature/&lt;name&gt; 分支中。</p>
+<h4 id="关闭功能开发分支（未完成）"><a href="#关闭功能开发分支（未完成）" class="headerlink" title="关闭功能开发分支（未完成）"></a>关闭功能开发分支（未完成）</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hg flow feature close &lt;name&gt;</span><br></pre></td></tr></table></figure>
+<p>放弃这次功能开发，关闭分支 feature/&lt;name&gt;</p>
+<h3 id="准备发布新版本"><a href="#准备发布新版本" class="headerlink" title="准备发布新版本"></a>准备发布新版本</h3><p>当功能开发完成，全面进入测试阶段时候，则采用发布分支。发布分支的目的是使得测试阶段的代码和其他与本次发布无关的功能性代码隔离开，相互不干扰。</p>
+<h4 id="开始准备发布"><a href="#开始准备发布" class="headerlink" title="开始准备发布"></a>开始准备发布</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hg flow release start &lt;name&gt;</span><br></pre></td></tr></table></figure>
+<p>这个命令会基于开发分支（develop）新建一个发布分支 release/&lt;name&gt;，并自动切换到此分支。</p>
+<p>当有这个分支的时候，开发阶段应该进入全面测试期，这个分支上只负责修改测试出现的bug等问题。理论上此时不再进行新功能开发，也就是需求冻结阶段。</p>
+<h4 id="完成一个发布"><a href="#完成一个发布" class="headerlink" title="完成一个发布"></a>完成一个发布</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hg flow release finish &lt;name&gt; [tag_name]</span><br></pre></td></tr></table></figure>
+<p>这个命令会 <strong>关闭</strong> 发布分支release/&lt;name&gt;，然后执行如下操作：</p>
+<ul>
+<li>合并到生产分支 (default)<ul>
+<li>如果指定 tag_name，则合并标记 tag_name 到生产分支</li>
+<li>如果未指定 tag_name，则合并分支 release/&lt;name&gt; 到生产分支</li>
+</ul>
+</li>
+<li>打这次发布的tag &lt;version_tag_prefix&gt;&lt;name&gt; 如 v1.0</li>
+<li>合并 release/&lt;name&gt; 到开发分支 (develop)</li>
+</ul>
+<h4 id="关闭待发布分支（未完成）"><a href="#关闭待发布分支（未完成）" class="headerlink" title="关闭待发布分支（未完成）"></a>关闭待发布分支（未完成）</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hg flow release close &lt;name&gt;</span><br></pre></td></tr></table></figure>
+<p>放弃这次功能开发，关闭分支 release/&lt;name&gt;</p>
+<h3 id="热修补"><a href="#热修补" class="headerlink" title="热修补"></a>热修补</h3><p>当生产环境出现了一些急于修补的问题，则是用热修补分支。热修补分支是以生产环境的代码作为基础，进行小规模的快速的修补。</p>
+<h4 id="开始准备发布-1"><a href="#开始准备发布-1" class="headerlink" title="开始准备发布"></a>开始准备发布</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hg flow hotfix start &lt;name&gt;</span><br></pre></td></tr></table></figure>
+<p>这个命令会基于生产分支（develop）新建一个热修补分支 hotfix/&lt;name&gt;，并自动切换到此分支。</p>
+<p>当生产环境出现了一些急需修补的问题，或者一些需求的增加，则可以使用热修补分支进行快速的小型迭代。</p>
+<h4 id="完成一个热修补"><a href="#完成一个热修补" class="headerlink" title="完成一个热修补"></a>完成一个热修补</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hg flow hotfix finish &lt;name&gt; [tag_name]</span><br></pre></td></tr></table></figure>
+<p>这个命令会 <strong>关闭</strong> 热修补分支 hotfix/&lt;name&gt;，然后执行如下操作：</p>
+<ul>
+<li>合并到生产分支 (default)<ul>
+<li>如果指定 tag_name，则合并标记 tag_name 到生产分支</li>
+<li>如果未指定 tag_name，则合并分支 hotfix/&lt;name&gt; 到生产分支</li>
+</ul>
+</li>
+<li>打这次发布的tag &lt;version_tag_prefix&gt;&lt;name&gt; 如 v1.1</li>
+<li>合并 hotfix/&lt;name&gt; 到开发分支 (develop)</li>
+</ul>
+<h4 id="关闭热修补分支（未完成）"><a href="#关闭热修补分支（未完成）" class="headerlink" title="关闭热修补分支（未完成）"></a>关闭热修补分支（未完成）</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hg flow hotfix close &lt;name&gt;</span><br></pre></td></tr></table></figure>
+<p>放弃这次热修补，关闭热修补分支 hotfix/&lt;name&gt;</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Yibo</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://ideassea.com/2016/06/02/hg-flow/" title="hg flow">https://ideassea.com/2016/06/02/hg-flow/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/CVS/" rel="tag"># CVS</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/04/14/syncing-a-fork/" rel="next" title="同步一个 fork">
+                <i class="fa fa-chevron-left"></i> 同步一个 fork
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/08/01/jvm-monitoring/" rel="prev" title="JVM 监控以及内存分析">
+                JVM 监控以及内存分析 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://ws2.sinaimg.cn/large/006tKfTcly1fq0mwrckglj30sg0sg0u8.jpg"
+                alt="Yibo" />
+            
+              <p class="site-author-name" itemprop="name">Yibo</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">41</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">21</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Introduction"><span class="nav-number">1.</span> <span class="nav-text">Introduction</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Installation"><span class="nav-number">2.</span> <span class="nav-text">Installation</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Branches"><span class="nav-number">3.</span> <span class="nav-text">Branches</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Commands"><span class="nav-number">4.</span> <span class="nav-text">Commands</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#初始化工作区"><span class="nav-number">4.1.</span> <span class="nav-text">初始化工作区</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#功能开发-BUG-修复"><span class="nav-number">4.2.</span> <span class="nav-text">功能开发/BUG 修复</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#开始一个功能-Bug修复"><span class="nav-number">4.2.0.1.</span> <span class="nav-text">开始一个功能/Bug修复</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#完成一个功能-Bug修复"><span class="nav-number">4.2.0.2.</span> <span class="nav-text">完成一个功能/Bug修复</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#在功能开发分支中切换"><span class="nav-number">4.2.0.3.</span> <span class="nav-text">在功能开发分支中切换</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#关闭功能开发分支（未完成）"><span class="nav-number">4.2.0.4.</span> <span class="nav-text">关闭功能开发分支（未完成）</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#准备发布新版本"><span class="nav-number">4.2.1.</span> <span class="nav-text">准备发布新版本</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#开始准备发布"><span class="nav-number">4.2.1.1.</span> <span class="nav-text">开始准备发布</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#完成一个发布"><span class="nav-number">4.2.1.2.</span> <span class="nav-text">完成一个发布</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#关闭待发布分支（未完成）"><span class="nav-number">4.2.1.3.</span> <span class="nav-text">关闭待发布分支（未完成）</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#热修补"><span class="nav-number">4.2.2.</span> <span class="nav-text">热修补</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#开始准备发布-1"><span class="nav-number">4.2.2.1.</span> <span class="nav-text">开始准备发布</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#完成一个热修补"><span class="nav-number">4.2.2.2.</span> <span class="nav-text">完成一个热修补</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#关闭热修补分支（未完成）"><span class="nav-number">4.2.2.3.</span> <span class="nav-text">关闭热修补分支（未完成）</span></a></li></ol></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate"> 
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yibo</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/theme-next/hexo-theme-next">NexT.Gemini</a> v6.1.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/reading_progress/reading_progress.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.1.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.1.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.1.0"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+  
+  <script src="/lib/pangu/dist/pangu.min.js?v=3.3"></script>
+  <script type="text/javascript">pangu.spacingPage();</script>
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

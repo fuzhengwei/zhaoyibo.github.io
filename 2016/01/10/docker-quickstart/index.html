@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.1.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.1.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.1.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.1.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Docker 颠覆了容器技术，也将容器技术带到了新的高度。对于开发和运维人员（特别是运维），Docker 真是省了不少事儿。就我做开发的来说，比如前几天 mysql 5.7 GA 了，我想体验一下的其 Json 类型的支持，大可不必去下载安装包再在本机上安装（可能之前已经安装了较早版本的 mysql，还得考虑升级），用 docker 两个命令就可以愉快地玩耍了——这只是一个我个人使用中的小例子。D">
+<meta name="keywords" content="Docker">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Docker 1.9 初体验">
+<meta property="og:url" content="https://ideassea.com/2016/01/10/docker-quickstart/index.html">
+<meta property="og:site_name" content="Ideas Sea">
+<meta property="og:description" content="Docker 颠覆了容器技术，也将容器技术带到了新的高度。对于开发和运维人员（特别是运维），Docker 真是省了不少事儿。就我做开发的来说，比如前几天 mysql 5.7 GA 了，我想体验一下的其 Json 类型的支持，大可不必去下载安装包再在本机上安装（可能之前已经安装了较早版本的 mysql，还得考虑升级），用 docker 两个命令就可以愉快地玩耍了——这只是一个我个人使用中的小例子。D">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://ws3.sinaimg.cn/large/006tKfTcly1fq0nqhnsmij30go0l6gmo.jpg">
+<meta property="og:updated_time" content="2017-07-17T19:25:46.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Docker 1.9 初体验">
+<meta name="twitter:description" content="Docker 颠覆了容器技术，也将容器技术带到了新的高度。对于开发和运维人员（特别是运维），Docker 真是省了不少事儿。就我做开发的来说，比如前几天 mysql 5.7 GA 了，我想体验一下的其 Json 类型的支持，大可不必去下载安装包再在本机上安装（可能之前已经安装了较早版本的 mysql，还得考虑升级），用 docker 两个命令就可以愉快地玩耍了——这只是一个我个人使用中的小例子。D">
+<meta name="twitter:image" content="https://ws3.sinaimg.cn/large/006tKfTcly1fq0nqhnsmij30go0l6gmo.jpg">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Ideas Sea" type="application/atom+xml" />
+
+
+
+
+  <link rel="canonical" href="https://ideassea.com/2016/01/10/docker-quickstart/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Docker 1.9 初体验 | Ideas Sea</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> 
+
+<div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ideas Sea</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+          
+  <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />标签</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+</li>
+
+      
+
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+  
+
+
+
+ </div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+    <div class="reading-progress-bar"></div>
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://ideassea.com/2016/01/10/docker-quickstart/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yibo">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://ws2.sinaimg.cn/large/006tKfTcly1fq0mwrckglj30sg0sg0u8.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ideas Sea">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Docker 1.9 初体验</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-01-10T15:38:00+08:00">2016-01-10</time>
+            
+
+            
+            
+              
+                
+              
+            
+
+            
+              
+              <span class="post-meta-divider">|</span>
+              
+
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">更新于：</span>
+              
+              <time title="更新于" itemprop="dateModified" datetime="2017-07-18T03:25:46+08:00">2017-07-18</time>
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Docker 颠覆了容器技术，也将容器技术带到了新的高度。对于开发和运维人员（特别是运维），Docker 真是省了不少事儿。就我做开发的来说，比如前几天 mysql 5.7 GA 了，我想体验一下的其 Json 类型的支持，大可不必去下载安装包再在本机上安装（可能之前已经安装了较早版本的 mysql，还得考虑升级），用 docker 两个命令就可以愉快地玩耍了——这只是一个我个人使用中的小例子。Docker 对于部署、对于应用服务的横向扩展开说，都有很大的优势。</p>
+<p>Docker 1.9（好像是从1.8的就开始了）没了 Boot2Docker，取而代之的是 Docker Machine。有一段时间没玩 Docker 了，更新个新版试试。不过也没感觉到什么区别，除了命令变了，能创建多个 VM，本质还是需要安装一个 VirtualBox 从而将 Docker 运行于 Linux 虚拟机内——毕竟 docker 还是得通过 linux 内核的 namespace 和 cgroups 机制实现资源隔离及限制。</p>
+<p>本文系个人笔记，只做记录，不做详解。Docker 学习可以参考<a href="https://docs.docker.com/" target="_blank" rel="noopener">官方文档</a>，或<a href="http://docker.widuu.com/" target="_blank" rel="noopener">Docker 中文指南</a></p>
+<a id="more"></a>
+<h2 id="Install"><a href="#Install" class="headerlink" title="Install"></a>Install</h2><p>官网下载安装包 <a href="https://www.docker.com/docker-toolbox" target="_blank" rel="noopener">Docker Toolbox</a> （也能用 brew 安装）</p>
+<p>安装 <code>DockerToolbox-1.9.0b.pkg</code>，无脑 next</p>
+<p>p.s. 我之前有安装 Docker 1.7，直接安装 1.9 的话，会遗留 <code>boot2docker</code> 命令，那个 <code>boot2docker-vm</code> 也在，为了干净一点（轻微洁癖，哈哈），我先用 <a href="http://www.corecode.at/uninstallpkg/" target="_blank" rel="noopener">UninstallPKG</a> 把之前跟 docker 相关的全删除了。</p>
+<h2 id="Environment"><a href="#Environment" class="headerlink" title="Environment"></a>Environment</h2><p>尝试了一下新的图形化管理界面 Kitematic(Beta)，它会自动创建一个名为 <code>default</code> 的 VM（之前用 Boot2Docker 时创建的 VM 叫 <code>boot2docker-vm</code>）。</p>
+<p>在 Kitematic 里可以直接创建 container 和管理自己的 repository，不过有些局限。如果用它创建的 mysql 的 container 就启动不了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">atabase is uninitialized and MYSQL_ROOT_PASSWORD not set</span><br><span class="line">  Did you forget to add -e MYSQL_ROOT_PASSWORD=... ?</span><br></pre></td></tr></table></figure>
+<p>在 Kitematic 找了半天也没找到能在哪设置 <code>MYSQL_ROOT_PASSWORD</code>，看来 Kitematic 还年轻啊~</p>
+<p>还是用命令行吧。新版 Docker 安装完，发现命令多了不少， <code>docker</code> 往终端里一敲，<code>tab</code> 了一下出来这么多：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">DOCKER_CERT_PATH                       docker-machine-driver-amazonec2        docker-machine-driver-hyperv           docker-machine-driver-vmwarefusion</span><br><span class="line">DOCKER_HOST                            docker-machine-driver-azure            docker-machine-driver-none             docker-machine-driver-vmwarevcloudair</span><br><span class="line">DOCKER_TLS_VERIFY                      docker-machine-driver-digitalocean     docker-machine-driver-openstack        docker-machine-driver-vmwarevsphere</span><br><span class="line">docker                                 docker-machine-driver-exoscale         docker-machine-driver-rackspace</span><br><span class="line">docker-compose                         docker-machine-driver-generic          docker-machine-driver-softlayer</span><br><span class="line">docker-machine                         docker-machine-driver-google           docker-machine-driver-virtualbox</span><br></pre></td></tr></table></figure>
+<p>执行熟悉的 <code>docker ps</code>, 结果报错</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ docker ps</span><br><span class="line">Cannot connect to the Docker daemon. Is the docker daemon running on this host?</span><br></pre></td></tr></table></figure>
+<p>但是实际上我的 dokcer 是运行了的：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ docker-machine ls</span><br><span class="line">NAME      ACTIVE   DRIVER       STATE     URL                         SWARM</span><br><span class="line">default   -        virtualbox   Running   tcp://192.168.99.100:2376</span><br></pre></td></tr></table></figure>
+<p>因为之前玩 docker 的时候遇到过类似问题（提示是不一样的的，具体的也忘了是什么了），猜测是环境变量的问题，那就看看新的 <code>docker-machine</code> 命令都有什么。发现有一个 <code>env</code> 是看环境变量的，执行之</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$ docker-machine env default</span><br><span class="line">export DOCKER_TLS_VERIFY=&quot;1&quot;</span><br><span class="line">export DOCKER_HOST=&quot;tcp://192.168.99.100:2376&quot;</span><br><span class="line">export DOCKER_CERT_PATH=&quot;/Users/yibo/.docker/machine/machines/default&quot;</span><br><span class="line">export DOCKER_MACHINE_NAME=&quot;default&quot;</span><br><span class="line"># Run this command to configure your shell:</span><br><span class="line"># eval &quot;$(docker-machine env default)&quot;</span><br></pre></td></tr></table></figure>
+<p>p.s. 如果是用 <code>docker-machine create</code> 命令从 terminal 创建 VM 的话，是会提示你设置环境变量的</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">$ docker-machine create --driver virtualbox test</span><br><span class="line">Running pre-create checks...</span><br><span class="line">Creating machine...</span><br><span class="line">Waiting for machine to be running, this may take a few minutes...</span><br><span class="line">Machine is running, waiting for SSH to be available...</span><br><span class="line">Detecting operating system of created instance...</span><br><span class="line">Provisioning created instance...</span><br><span class="line">Copying certs to the local machine directory...</span><br><span class="line">Copying certs to the remote machine...</span><br><span class="line">Setting Docker configuration on the remote daemon...</span><br><span class="line">To see how to connect Docker to this machine, run: docker-machine env test</span><br></pre></td></tr></table></figure>
+<p>提示很友好嘛，那就设置一下环境变量</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ eval &quot;$(docker-machine env default)&quot;</span><br></pre></td></tr></table></figure>
+<p>这样再 <code>docker ps</code> 就 OK 了，创建个 mysql 的 container</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run --name some-mysql -v /home/docker/datadir:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=root -p 3306:3306 -d mysql:latest</span><br></pre></td></tr></table></figure>
+<p>注：这里的 <code>/home/docker/datadir</code> 是 VM 中的文件目录，删除 container 的不会自动删除该文件目录，需要进入 VM 以 ROOT 权限手动删除。曾经在 Windows 上刚开始使用 Docker 的时候，在这个问题上边纠结了好久，就因为我只顾 docker 玩的嗨，忘了中间这个虚拟机。附图一张：</p>
+<p><img src="https://ws3.sinaimg.cn/large/006tKfTcly1fq0nqhnsmij30go0l6gmo.jpg" alt=""></p>
+<h2 id="Other"><a href="#Other" class="headerlink" title="Other"></a>Other</h2><p>docker 所在的那个的虚拟机的 username/password: docker/tcuser<br>可以通过 <code>ssh docker@192.168.99.100</code> 登录上去，不过还有更优雅的方式：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker-machine ssh default</span><br></pre></td></tr></table></figure>
+<p>如果需要 root 权限怎么办？</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ sudo su  // -&gt; root</span><br><span class="line"># exit     // -&gt; docker</span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Yibo</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://ideassea.com/2016/01/10/docker-quickstart/" title="Docker 1.9 初体验">https://ideassea.com/2016/01/10/docker-quickstart/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Docker/" rel="tag"># Docker</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/01/07/install-gdb-on-macos/" rel="next" title="Mac OS X 下安装 GDB">
+                <i class="fa fa-chevron-left"></i> Mac OS X 下安装 GDB
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/01/12/golang-cross-compilation/" rel="prev" title="Golang 学习笔记——交叉编译 & 部署">
+                Golang 学习笔记——交叉编译 & 部署 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://ws2.sinaimg.cn/large/006tKfTcly1fq0mwrckglj30sg0sg0u8.jpg"
+                alt="Yibo" />
+            
+              <p class="site-author-name" itemprop="name">Yibo</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">41</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">21</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Install"><span class="nav-number">1.</span> <span class="nav-text">Install</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Environment"><span class="nav-number">2.</span> <span class="nav-text">Environment</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Other"><span class="nav-number">3.</span> <span class="nav-text">Other</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate"> 
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yibo</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/theme-next/hexo-theme-next">NexT.Gemini</a> v6.1.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/reading_progress/reading_progress.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.1.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.1.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.1.0"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+  
+  <script src="/lib/pangu/dist/pangu.min.js?v=3.3"></script>
+  <script type="text/javascript">pangu.spacingPage();</script>
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

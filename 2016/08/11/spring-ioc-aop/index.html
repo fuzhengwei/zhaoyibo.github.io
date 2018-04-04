@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.1.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.1.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.1.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.1.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="前言众所周知， 现在的Spring框架已经成为构建企业级Java应用事实上的标准了，众多的企业项目都构建在Spring项目及其子项目之上，特别是Java Web项目。 Spring的两个核心概念是IoC（控制反转）和AOP（面向切面编程）。想了解Spring的工作原理，毫无疑问，首先要从这两个概念的Spring实现入手。但是Spring源码浩如烟海，里面掺杂了太多的实现细节，入门可谓极其困难。当我">
+<meta name="keywords" content="Java,Spring">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring原理初探——IoC、AOP">
+<meta property="og:url" content="https://ideassea.com/2016/08/11/spring-ioc-aop/index.html">
+<meta property="og:site_name" content="Ideas Sea">
+<meta property="og:description" content="前言众所周知， 现在的Spring框架已经成为构建企业级Java应用事实上的标准了，众多的企业项目都构建在Spring项目及其子项目之上，特别是Java Web项目。 Spring的两个核心概念是IoC（控制反转）和AOP（面向切面编程）。想了解Spring的工作原理，毫无疑问，首先要从这两个概念的Spring实现入手。但是Spring源码浩如烟海，里面掺杂了太多的实现细节，入门可谓极其困难。当我">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/749633-fff5838e0bbe4fdd.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/296">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/749633-e707e5a84194d13a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/700">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/749633-6491e873ec6be97f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/535">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/749633-782367afa71cf6e8.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/320">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/749633-3ee76c25c280bbc8.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/700">
+<meta property="og:updated_time" content="2018-03-20T00:38:55.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Spring原理初探——IoC、AOP">
+<meta name="twitter:description" content="前言众所周知， 现在的Spring框架已经成为构建企业级Java应用事实上的标准了，众多的企业项目都构建在Spring项目及其子项目之上，特别是Java Web项目。 Spring的两个核心概念是IoC（控制反转）和AOP（面向切面编程）。想了解Spring的工作原理，毫无疑问，首先要从这两个概念的Spring实现入手。但是Spring源码浩如烟海，里面掺杂了太多的实现细节，入门可谓极其困难。当我">
+<meta name="twitter:image" content="https://upload-images.jianshu.io/upload_images/749633-fff5838e0bbe4fdd.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/296">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Ideas Sea" type="application/atom+xml" />
+
+
+
+
+  <link rel="canonical" href="https://ideassea.com/2016/08/11/spring-ioc-aop/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Spring原理初探——IoC、AOP | Ideas Sea</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> 
+
+<div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ideas Sea</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+          
+  <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />标签</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+</li>
+
+      
+
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+  
+
+
+
+ </div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+    <div class="reading-progress-bar"></div>
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://ideassea.com/2016/08/11/spring-ioc-aop/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yibo">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://ws2.sinaimg.cn/large/006tKfTcly1fq0mwrckglj30sg0sg0u8.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ideas Sea">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Spring原理初探——IoC、AOP</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-08-11T08:23:00+08:00">2016-08-11</time>
+            
+
+            
+            
+              
+                
+              
+            
+
+            
+              
+              <span class="post-meta-divider">|</span>
+              
+
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">更新于：</span>
+              
+              <time title="更新于" itemprop="dateModified" datetime="2018-03-20T08:38:55+08:00">2018-03-20</time>
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>众所周知， 现在的Spring框架已经成为构建企业级Java应用事实上的标准了，众多的企业项目都构建在Spring项目及其子项目之上，特别是Java Web项目。</p>
+<p>Spring的两个核心概念是IoC（控制反转）和AOP（面向切面编程）。想了解Spring的工作原理，毫无疑问，首先要从这两个概念的Spring实现入手。但是Spring源码浩如烟海，里面掺杂了太多的实现细节，入门可谓极其困难。当我正苦于难以入门时，好友介绍了<a href="https://github.com/code4craft/tiny-spring" target="_blank" rel="noopener">tiny-spring</a>这个开源项目，这个项目用了不到千行的代码，就将Spring的IoC、AOP的核心流程实现完毕，真是居家旅行、吹逼面试之必备呀！</p>
+<p>废话少说，我们开始吧！</p>
+<a id="more"></a>
+<h2 id="目录结构"><a href="#目录结构" class="headerlink" title="目录结构"></a>目录结构</h2><p>在github上clone下项目来之后，我们关注src文件夹，其余的是一些爱好者提的注释PR，恰巧被作者merge了，不必理会。目录结构是这样的：</p>
+<p><img src="//upload-images.jianshu.io/upload_images/749633-fff5838e0bbe4fdd.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/296" alt=""></p>
+<ol>
+<li><code>aop</code>包，顾名思义，实现了Spring的AOP功能，可以通过bean的自动AOP切入，文件稍多，暂时先不展开。</li>
+<li><code>bean.factory</code>包，通过<code>BeanFactory</code>、<code>AbstractBeanFactory</code>、<code>AutowireCapableBeanFactory</code>三个类，实现了<code>BeanFactory</code>的核心功能，详情稍后讲解。</li>
+<li><code>bean.io</code>包定义了资源加载相关的抽象概念，这里的资源包括xml配置文件等。</li>
+<li><code>bean.xml</code>包中只包含一个类：<code>XmlBeanDefinitionReader</code>，主要负责在xml配置文件中读取bean定义。</li>
+<li><code>bean</code>包其他类，定义了BeanDefinition等核心概念，详情后讲。</li>
+<li><code>context</code>包定义了<code>ApplicationContext</code>的核心概念。</li>
+<li><code>BeanReference</code>指的是引用类型的Bean，而不是实体类。</li>
+</ol>
+<h2 id="IOC–浮沙筑台之根基"><a href="#IOC–浮沙筑台之根基" class="headerlink" title="IOC–浮沙筑台之根基"></a>IOC–浮沙筑台之根基</h2><p>IOC（控制翻转）是一种编程范式，可以在一定程度上解决复杂系统对象耦合度太高的问题，并不是Spring的专利。IOC最常见的方式是DI（依赖注入），可以通过一个容器，将Bean维护起来，方便在其他地方直接使用，而不是重新new。可以说，IOC是Spring最基本的概念，没有IOC就没有Spring。</p>
+<p>为什么DI可以起到解耦的作用？<br>一个软件系统包含了大量的对象，每个对象之间都有依赖关系，在普通的软件编写过程中，对象的定义分布在各个文件之中，对象之间的依赖，只能通过类的构造器传参，方法传参的形式来完成。当工程变大之后，复杂的逻辑会让对象之间的依赖梳理变得异常困难。<br>在Spring IOC中，一般情况，我们可以在XML文件之中，统一的编写bean的定义，bean与bean之间的依赖关系，从而增加逻辑的清晰度。而且，bean的创建是由Spring来完成的，不需要编程人员关心，编程人员只需要将精力放到业务的逻辑上面，减轻了思维的负担。</p>
+<p>在<code>tiny-spring</code>里面，整个<code>beans</code>和<code>context</code>包都是用来实现<code>IOC</code>的。</p>
+<p><code>beans</code>包实现的核心关注点是<code>BeanFactory</code>，<code>BeanFactory</code>也叫作Bean容器，顾名思义，是用来盛放、管理bean的。<br><code>context</code>包实现的核心关注是<code>ApplicationContext</code>，<code>ApplicationContext</code>也是用来获取Bean的，但是它更高层，它的面向用户是Spring的使用者，而BeanFactory面向的用户更多是Spring开发者。BeanFactory定义了Bean初始化的流程，ApplicationContext定义了从XML读取，到Bean初始化，再到使用的过程。</p>
+<h3 id="Bean在哪定义？"><a href="#Bean在哪定义？" class="headerlink" title="Bean在哪定义？"></a>Bean在哪定义？</h3><p>刚才有说到，Spring通常通过xml文件，来统一的描述bean，bean与bean的依赖关系。所以说，bean的定义表述，发生在xml配置文件之中。这个XML文件就是我们需要读取的资源文件。</p>
+<p>因此，首要任务就是研究与读取XML资源文件相关的类。</p>
+<p><code>bean.io</code>中存放的是读取资源文件的抽象概念。其中包含了三个类或者接口：</p>
+<ol>
+<li><code>Resource</code>接口，这个接口只有一个方法，<code>InputStream getInputStream() throws IOException;</code>。实现这个接口的类就是一个抽象的资源，可以获取这个资源的输入流，从而获取其中的内容。</li>
+<li><code>UrlResource</code>类，这个类实现了<code>Resource</code>接口，通过构造器传入一个url地址，代表的是这个url所对应的文件。</li>
+<li><code>ResourceLoader</code>类，只有一个方法，<code>public Resource getResource(String location)</code>。输入url的文件地址（并不是真正的URL格式地址），来获取Resource。</li>
+</ol>
+<p>通过分析上面三个类、接口，我们知道，这个包完成了一个任务：通过<code>ResourceLoader</code>这个类，获取某一个地址的<code>Resource</code>，从而获取这个文件的输入流。因为使用了Resource概念，可以使用网络文件或者本地文件。</p>
+<h3 id="Bean如何定义？"><a href="#Bean如何定义？" class="headerlink" title="Bean如何定义？"></a>Bean如何定义？</h3><ol>
+<li><code>BeanDefinition</code>是Bean定义的核心概念，<code>BeanDefinition</code>包含了：bean的对象、bean的类类型、bean的名字，bean的所有属性。这个类对bean的基本信息做好一个包装。</li>
+<li><code>BeanDefinitionReader</code>接口，只有一个方法：<code>void loadBeanDefinitions(String location) throws Exception;</code>，实现这个接口的类，具有将某一个文件中的所有bean定义载入的功能。所以<code>BeanDefinitionReader</code>定义了，在哪载入bean定义，至于载入到哪里、如何载入，稍后看具体实现。</li>
+<li><code>AbstractBeanDefinitionReader</code>抽象类，上面刚说了实现了<code>BeanDefinitionReader</code>接口的类，具有将某一个文件中描述的bean定义载入的功能，<code>AbstractBeanDefinitionReader</code>就实现了这样一个抽象功能。它的作用就是定义，载入到哪和如何载入的问题。在这个类里面，有两个属性：<code>Map&lt;String,BeanDefinition&gt; registry;</code>和<code>ResourceLoader resourceLoader;</code>。<code>registry</code>是一个注册表，他保存的就是所有的Bean定义，Map结构，key是bean的名字，value就是BeanDefinition。<code>resourceLoader</code>描述了如何载入。</li>
+<li><code>XmlBeanDefinitionReader</code>这是<code>beans.xml</code>包里面的唯一一个方法，也是最重要的方法之一。它继承了<code>AbstractBeanDefinitionReader</code>，实现了所有方法，解决了bean定义中：在哪载入、如何载入、载入到哪的三个大问题。这个类面向用户的方法有两个，一个是<code>loadBeanDefinitions</code>，毫无疑问，这个是必须的。另一个是<code>getRegistry</code>用来获取bean注册表，得到所有bean的信息，registry是bean们在内存中实际的家。但是这个<code>getRegistry</code>方法并不是面向用户的，而是面向ApplicationContext的。</li>
+<li><code>PropertyValue</code>和<code>PropertyValue</code>代表一种抽象概念，在xml中，bean的属性包括属性名和属性对象，<code>PropertyValue</code>就是这么一个实体。</li>
+<li><code>BeanReference</code>代表的是Bean的属性不是真实对象，而是另一个bean的引用。</li>
+</ol>
+<h3 id="Bean的组装全过程"><a href="#Bean的组装全过程" class="headerlink" title="Bean的组装全过程"></a>Bean的组装全过程</h3><p>上面两部分是铺垫，而BeanFactory才是重点对象。<code>beans.factory</code>包中有三个类用来定义BeanFactory相关的概念。</p>
+<ol>
+<li><code>BeanFactory</code>接口，只有一个方法：<code>Object getBean(String name) throws Exception;</code>，实现这个接口的类，就具有了得到一个bean的能力。</li>
+<li><code>AbstractBeanFactory</code>类，较为复杂。详情后讲。</li>
+<li><code>AutowireCapableBeanFactory</code>继承了<code>AbstractBeanFactory</code>，实现了applyPropertyValues方法，通过反射，将bean的所有属性，通过set方法注入进去。</li>
+</ol>
+<p><code>AbstractBeanFactory</code>有三大属性：</p>
+<ul>
+<li><code>beanDefinitionMap</code>，类似于registry，但是他是BeanFactory里面私有的，代表的是这个BeanFactory里面暂时有哪些bean定义。</li>
+<li><code>beanDefinitionNames</code>代表里面，这个BeanFactory里面有哪些bean（名字）。</li>
+<li><code>beanPostProcessors</code>，代理处理器，AOP会用到，详情后讲。</li>
+</ul>
+<p><code>AbstractBeanFactory</code>实现了几大功能：</p>
+<ul>
+<li><code>getBean</code>，这是主要功能，可以获取一个Bean对象。</li>
+<li><code>registerBeanDefinition</code>，面向ApplicationContext，用来将XML配置文件里面的bean定义注册到BeanFactory里面。</li>
+<li><code>preInstantiateSingletons</code>，面向ApplicationContext，用来在开始的时候，将所有的bean都初始化完毕，避免懒加载。</li>
+<li><code>addBeanPostProcessor</code>添加代理处理器。</li>
+<li><code>getBeansForType</code>，在BeanFactory里面，获取某一个类型的所有bean。</li>
+</ul>
+<p>经过上面的分析，我们可以知道BeanFactory完成了Bean初始化的整个流程。BeanFactory的工作流程如下：</p>
+<ol>
+<li>getBean, 在beanDefinitionMap里面得到bean，如果没有的话，先初始化。（为什么会没有，因为ApplicationContext读取xml文件时候，只是给BeanDefinition服了类类型，并没有赋值对象，这个对象还是需要BeanFactory通过反射生成的）。</li>
+<li>createBeanInstance，通过反射，根据BeanDefinition的类对象新建实体对象-&gt;将得到的bean对象赋值给beandefinition，然后将BeanDefinition里面的属性都注入到Bean里面，这就完成了doCreateBean。</li>
+<li>initializeBean就是调用BeanPostProcessor的postProcessBeforeInitilizztion方法和postProcessAfterIntilizatin方法，获取新的bean，这里会在aop中用到。</li>
+</ol>
+<p>好了，到这BeanFactory就讲完了，下面是更重要的ApplicationContext。</p>
+<h3 id="ApplicationContext-用户与BeanFactory之间的桥梁"><a href="#ApplicationContext-用户与BeanFactory之间的桥梁" class="headerlink" title="ApplicationContext-用户与BeanFactory之间的桥梁"></a>ApplicationContext-用户与BeanFactory之间的桥梁</h3><p><code>beans.context</code>包有三个类、接口，完成了ApplicationContext的基本功能。</p>
+<ol>
+<li>ApplicationContext接口，没有任何方法，只是继承了BeanFactory接口，暗示ApplicationContext与BeanFactory都是获取Bean的地方。</li>
+<li><code>AbstractApplicationContext</code>抽象类，首先，它的构造函数接收入参BeanFactory，所以说ApplicationContext内部具有一个BeanFactory。类似于一种装饰器模式，但不是装饰器模式，类似于代理模式，但也不是代理模式。fresh方法分为三个步骤：1.loadBeanDefinitions，这个是一个模板方法，需要子类实现，它的作用就是从某一个地方读取BeanDefinition，然后写入到ApplicationContext自己的BeanFactory里面，这就是ApplicationContext与BeanFactory之间的联系，也就是ApplicationContext还负责了读取定义。2. registerBeanPostProcessors，这个就是在BeanFactory里面找到BeanPostProcessor，然后将他们放到BeanFactory的beanPostProcessors容器里面，方便BeanFactory初始化使用。3. onRefresh初始化一遍所有的bean。</li>
+<li><code>ClassPathXmlApplicationContext</code>实现了loadBeanDefinitions的方法，将xml文件和BeanFactory结合在一起。</li>
+</ol>
+<h3 id="总结-ApplicationContext初始化流程"><a href="#总结-ApplicationContext初始化流程" class="headerlink" title="总结-ApplicationContext初始化流程"></a>总结-ApplicationContext初始化流程</h3><p><img src="//upload-images.jianshu.io/upload_images/749633-e707e5a84194d13a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/700" alt=""></p>
+<p>ApplicationContext初始化流程</p>
+<h3 id="总结-ApplicationContext获取bean流程"><a href="#总结-ApplicationContext获取bean流程" class="headerlink" title="总结-ApplicationContext获取bean流程"></a>总结-ApplicationContext获取bean流程</h3><p><img src="//upload-images.jianshu.io/upload_images/749633-6491e873ec6be97f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/535" alt=""></p>
+<h2 id="AOP–移花接木之魔法"><a href="#AOP–移花接木之魔法" class="headerlink" title="AOP–移花接木之魔法"></a>AOP–移花接木之魔法</h2><p>上一节，讲完了Spring IOC的整个流程，也就是bean从定义获取，到得到bean之间的整个流程。本节，我们接触一下Spring另一个重要概念，AOP。AOP用途十分广泛，其中Spring内部的声明式事务和拦截器都是利用了AOP的强大威力，才得以优雅的实现。<br>AOP是什么呢，简单来说，它可以让编程人员在不修改对象代码的情况下，为这个对象添加额外的功能或者限制。<br>很熟悉吧，这就是代理模式！</p>
+<p>Java中存在两种代理模式：<br>一种叫静态代理，就是通过接口继承复用的方式来完成的， 代理类与被代理对象实现相同的接口，然后代理类里面会拥有一个被代理对象，代理类与被代理对象相同的方法，活调用被代理对象的方法，不过中间会加以限制，您翻开任何一本设计模式相关的书，翻到代理模式这一节，讲的就是它了。</p>
+<p>另一种叫做动态代理，动态代理就是允许我们在程序运行过程中，为动态生成的对象，动态的生成代理。显然，这比静态代理灵活太多了。<br>Java默认提供了动态代理的实现方式，但是有限制，它要求被代理对象必须实现某一个接口。为了突破这一限制，为普通类也可以提供代理，CGLib这个库横空出世。</p>
+<p>因为AOP涉及的知识较为复杂，所以我先将背景知识介绍一下。</p>
+<ol>
+<li>Java动态代理，就是Java本身提供的代理实现，要求对象必须实现某一个接口。</li>
+<li>CGLib库，为Java提供了，为普通类提供代理的功能。</li>
+<li>aopalliance，aop联盟包，统一类aop编程的一些概念，这个包里没有具体的类实现，而是定义了几个重要的概念接口，具体的aop实现，要遵从这些接口编程，才能达到一定的通用性。</li>
+<li>aspectj包，实现了，通过一种固定的编程语言，通过这种简单的编程语言，我们可以定位到被代理的类，自动完成代理。</li>
+</ol>
+<p>在aopallicance里面，定义了几个核心概念:</p>
+<ol>
+<li><code>Advice</code>增强，说明这是一个，实现这个接口，说明这个类负责某一种形式的增强。</li>
+<li><code>Joinpoint</code>连接点，表示切点与目标方法连接处的信息。</li>
+<li><code>MethodInterceptor</code>继承了Interceptor接口，而Interceptor继承了Advice接口，是一种Advice，但是有一个方法invoke。这个方法需要一个参数MethodInvocation。</li>
+<li><code>MethodInvocation</code>表示的是连接点的信息以及连接点函数的调用。<br>结合上面的信息，我们发现，其实MethodInterceptor的invoke方法，调用的就是MethodInvocation的proceed方法，而这个proceed方法呢，应该调用的肯定是Method.invoke方法。所以，这是一种变相调用method.invoke的方式。为什么这样做呢，猜一猜的话，肯定是为了代码的复用，哈哈哈，这是废话。<br>在Spring中，还定义了几个核心概念：</li>
+<li><code>Pointcut</code>，切点，可以定位类以及方法</li>
+<li><code>Advisor</code>，可以获取一个增强。</li>
+<li><code>PointcutAdvisor</code>，定义了哪些方法，具有什么类型的增强。</li>
+<li><code>MethodMatcher</code>表示某一个方法是否符合条件</li>
+<li><code>ClassFilter</code> 定义了某个类是否符合条件。</li>
+<li><code>TargetSource</code>被代理的对象，包括对象本身，类类型、所有接口</li>
+<li><code>AdvisedSupport</code>代理相关的元数据，包括被代理的对象，增强等。</li>
+<li><code>ProxyFactory</code>，代理工厂，可以获得一个代理对象，同时具有AdvisedSupport的所有特性。</li>
+<li><code>Cglib2AopProxy</code>，使用cglib实现的动态代理类，继承了AbstractAopProxy抽象类，这个类的主要方法就是getProxy，通过什么呢，通过AdvisorSupport。</li>
+<li><code>ReflectiveMethodInvocation</code>可以获取连接点的信息，代理的对象等。</li>
+<li><code>JdkDynamicAopProxy</code>，和Cglib2AopProxy类一个作用，通过AdvisorSupport来getProxy，不过是使用Java自带的动态代理实现的。<br>其中，ProxyFactory是获取一个代理对象的直接工厂，而这个代理对象，可以通过Cglib2AopProxy产生，也可以通过JdkDynamicAopProxy产生。</li>
+</ol>
+<p>Spring AOP之所以能够为动态生成的Bean提供代理，得益于PostProcessor接口。我们会议IOC初始化流程中，最后一部，就是得到BeanFactory之中所有继承了PostProcessor接口的bean，调用它们的postProcessBeforeInitilization、postProcessAfterInitilization方法，来代理bean，生成新的bean。</p>
+<p>基于这个突破口，我们只需要在xml配置文件中，放入PostProcessor对象，Spring就会自动的用这写对象，来代理真正的对象。</p>
+<p><img src="//upload-images.jianshu.io/upload_images/749633-782367afa71cf6e8.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/320" alt=""></p>
+<p>在这里，我们的对象是AspectJAwareAdvisorAutoProxyCreator。<br>在这个对象的方法中，逻辑是这样的，找到xml里面所有切面bean，然后在这些bean里面，找到符合被代理类的切面bean，找到切面bean之后，就可以获得增强，切点等，于是可有构造一个AdvisorSupport，知道了AdvisorSupport，我们就能够通过proxyFactory来获取代理了。</p>
+<p>至于如何这个类切面是用来切入代理类的，这个就要交给PointCut来实现了，pointcut有很多实现方式，这里我们用的是aspectj。具体这个类我就不细讲了。</p>
+<p>到目前位置，我自己已经将整个AOP的流程搞清楚了，下面通过流程图的形式展示出来：</p>
+<p><img src="//upload-images.jianshu.io/upload_images/749633-3ee76c25c280bbc8.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/700" alt=""></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Yibo</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://ideassea.com/2016/08/11/spring-ioc-aop/" title="Spring原理初探——IoC、AOP">https://ideassea.com/2016/08/11/spring-ioc-aop/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"># Java</a>
+          
+            <a href="/tags/Spring/" rel="tag"># Spring</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/08/01/jvm-monitoring/" rel="next" title="JVM 监控以及内存分析">
+                <i class="fa fa-chevron-left"></i> JVM 监控以及内存分析
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/02/22/elasticsearch-issue/" rel="prev" title="ElasticSearch 实践过程中遇到的几个小问题">
+                ElasticSearch 实践过程中遇到的几个小问题 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://ws2.sinaimg.cn/large/006tKfTcly1fq0mwrckglj30sg0sg0u8.jpg"
+                alt="Yibo" />
+            
+              <p class="site-author-name" itemprop="name">Yibo</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">41</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">21</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#目录结构"><span class="nav-number">2.</span> <span class="nav-text">目录结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#IOC–浮沙筑台之根基"><span class="nav-number">3.</span> <span class="nav-text">IOC–浮沙筑台之根基</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Bean在哪定义？"><span class="nav-number">3.1.</span> <span class="nav-text">Bean在哪定义？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Bean如何定义？"><span class="nav-number">3.2.</span> <span class="nav-text">Bean如何定义？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Bean的组装全过程"><span class="nav-number">3.3.</span> <span class="nav-text">Bean的组装全过程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ApplicationContext-用户与BeanFactory之间的桥梁"><span class="nav-number">3.4.</span> <span class="nav-text">ApplicationContext-用户与BeanFactory之间的桥梁</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结-ApplicationContext初始化流程"><span class="nav-number">3.5.</span> <span class="nav-text">总结-ApplicationContext初始化流程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结-ApplicationContext获取bean流程"><span class="nav-number">3.6.</span> <span class="nav-text">总结-ApplicationContext获取bean流程</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AOP–移花接木之魔法"><span class="nav-number">4.</span> <span class="nav-text">AOP–移花接木之魔法</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate"> 
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yibo</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/theme-next/hexo-theme-next">NexT.Gemini</a> v6.1.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/reading_progress/reading_progress.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.1.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.1.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.1.0"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+  
+  <script src="/lib/pangu/dist/pangu.min.js?v=3.3"></script>
+  <script type="text/javascript">pangu.spacingPage();</script>
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

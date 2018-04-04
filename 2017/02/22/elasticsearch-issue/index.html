@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.1.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.1.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.1.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.1.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="公司项目最近要增加一个搜索的模块，虽然之前已经在项目中广泛的使用了 Lucene，但是这次这个模块再直接使用 Lucene 的话还得担心以后的扩展问题，所以就决定尝试用 ElasticSearch 来解决。（为什么不用 Solr 呢？其实 Solr 和 ES 的差别不大，它俩的对比评测网上也是一搜一大把，我主要是之前使用过 ELK 技术栈，所以还是更倾向于 ES） 这篇文章就简单的对我在使用 ES">
+<meta name="keywords" content="ELK,ElasticSearch">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ElasticSearch 实践过程中遇到的几个小问题">
+<meta property="og:url" content="https://ideassea.com/2017/02/22/elasticsearch-issue/index.html">
+<meta property="og:site_name" content="Ideas Sea">
+<meta property="og:description" content="公司项目最近要增加一个搜索的模块，虽然之前已经在项目中广泛的使用了 Lucene，但是这次这个模块再直接使用 Lucene 的话还得担心以后的扩展问题，所以就决定尝试用 ElasticSearch 来解决。（为什么不用 Solr 呢？其实 Solr 和 ES 的差别不大，它俩的对比评测网上也是一搜一大把，我主要是之前使用过 ELK 技术栈，所以还是更倾向于 ES） 这篇文章就简单的对我在使用 ES">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2017-07-18T04:51:44.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ElasticSearch 实践过程中遇到的几个小问题">
+<meta name="twitter:description" content="公司项目最近要增加一个搜索的模块，虽然之前已经在项目中广泛的使用了 Lucene，但是这次这个模块再直接使用 Lucene 的话还得担心以后的扩展问题，所以就决定尝试用 ElasticSearch 来解决。（为什么不用 Solr 呢？其实 Solr 和 ES 的差别不大，它俩的对比评测网上也是一搜一大把，我主要是之前使用过 ELK 技术栈，所以还是更倾向于 ES） 这篇文章就简单的对我在使用 ES">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Ideas Sea" type="application/atom+xml" />
+
+
+
+
+  <link rel="canonical" href="https://ideassea.com/2017/02/22/elasticsearch-issue/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>ElasticSearch 实践过程中遇到的几个小问题 | Ideas Sea</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> 
+
+<div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ideas Sea</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+          
+  <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />标签</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+</li>
+
+      
+
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+  
+
+
+
+ </div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+    <div class="reading-progress-bar"></div>
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://ideassea.com/2017/02/22/elasticsearch-issue/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yibo">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://ws2.sinaimg.cn/large/006tKfTcly1fq0mwrckglj30sg0sg0u8.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ideas Sea">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">ElasticSearch 实践过程中遇到的几个小问题</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-02-22T07:23:00+08:00">2017-02-22</time>
+            
+
+            
+            
+              
+                
+              
+            
+
+            
+              
+              <span class="post-meta-divider">|</span>
+              
+
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">更新于：</span>
+              
+              <time title="更新于" itemprop="dateModified" datetime="2017-07-18T12:51:44+08:00">2017-07-18</time>
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>公司项目最近要增加一个搜索的模块，虽然之前已经在项目中广泛的使用了 Lucene，但是这次这个模块再直接使用 Lucene 的话还得担心以后的扩展问题，所以就决定尝试用 ElasticSearch 来解决。（为什么不用 Solr 呢？其实 Solr 和 ES 的差别不大，它俩的对比评测网上也是一搜一大把，我主要是之前使用过 ELK 技术栈，所以还是更倾向于 ES）</p>
+<p>这篇文章就简单的对我在使用 ES 的过程中遇到的问题做一个记录，权当做笔记吧。</p>
+<a id="more"></a>
+<h2 id="ulimit-“不生效”"><a href="#ulimit-“不生效”" class="headerlink" title="ulimit “不生效”"></a>ulimit “不生效”</h2><p>有一台机器的在启动 ES 的时候始终报错</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">max file descriptors [65000] for elasticsearch process is too low</span><br></pre></td></tr></table></figure>
+<p>但是我已经在 <code>/etc/security/limits.conf</code> 里增加了如下配置，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">elasticsearch soft memlock unlimited</span><br><span class="line">elasticsearch hard memlock unlimited</span><br><span class="line">elasticsearch hard nofile 65536</span><br><span class="line">elasticsearch soft nofile 65536</span><br></pre></td></tr></table></figure>
+<p>按理说 <code>ulimit -n</code> 的时候应该是会到看到 65536 的，但是依旧输出的是 65000。郁闷</p>
+<p>最后受这篇文章<a href="http://blog.ihipop.info/2011/01/2053.html" target="_blank" rel="noopener">ulimit到底谁说了算?</a>的启发，我把排查目标放在了 profile 和 bashrc 文件上面。</p>
+<p>最终发现原来还真是有人在这台机器的 <code>/etc/bashrc</code> 的文末加了一句 <code>ulimit -n 65000</code>，把这行去掉后就正常了。</p>
+<p>如果你也出现了这个问题，建议排查一下以下四个文件：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">/etc/profile</span><br><span class="line">/etc/bashrc</span><br><span class="line">~/.profile</span><br><span class="line">~/.bashrc</span><br></pre></td></tr></table></figure></p>
+<h2 id="由-X-Pack-的认证机制引起的问题"><a href="#由-X-Pack-的认证机制引起的问题" class="headerlink" title="由 X-Pack 的认证机制引起的问题"></a>由 X-Pack 的认证机制引起的问题</h2><p>X-Pack是一个Elastic Stack的扩展，将安全，警报，监视，报告和图形功能包含在一个易于安装的软件包中。在Elasticsearch 5.0.0之前，您必须安装单独的Shield，Watcher和Marvel插件才能获得在X-Pack中所有的功能。</p>
+<p>ES、Kibana 和 X-Pack 的安装很简单，有需要的可以参看：<a href="http://www.cnblogs.com/wxw16/p/6150681.html" target="_blank" rel="noopener">安装Elasticsearch、Kibana和X-Pack</a></p>
+<h3 id="HTTP-REST-API"><a href="#HTTP-REST-API" class="headerlink" title="HTTP REST API"></a>HTTP REST API</h3><p>在终端里访问 REST API 的时候</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -XGET 'localhost:9200/_cat/health?v&amp;pretty'</span><br></pre></td></tr></table></figure>
+<p>会报错</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"error"</span> : &#123;</span><br><span class="line">    <span class="attr">"root_cause"</span> : [</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="attr">"type"</span> : <span class="string">"security_exception"</span>,</span><br><span class="line">        <span class="attr">"reason"</span> : <span class="string">"missing authentication token for REST request [/_cat/health?v&amp;pretty]"</span>,</span><br><span class="line">        <span class="attr">"header"</span> : &#123;</span><br><span class="line">          <span class="attr">"WWW-Authenticate"</span> : <span class="string">"Basic realm=\"security\" charset=\"UTF-8\""</span></span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    ],</span><br><span class="line">    <span class="attr">"type"</span> : <span class="string">"security_exception"</span>,</span><br><span class="line">    <span class="attr">"reason"</span> : <span class="string">"missing authentication token for REST request [/_cat/health?v&amp;pretty]"</span>,</span><br><span class="line">    <span class="attr">"header"</span> : &#123;</span><br><span class="line">      <span class="attr">"WWW-Authenticate"</span> : <span class="string">"Basic realm=\"security\" charset=\"UTF-8\""</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">"status"</span> : <span class="number">401</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>解决办法是添加上账号密码就好了</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl --user elastic:changeme -XGET 'localhost:9200/_cat/health?v&amp;pretty'</span><br></pre></td></tr></table></figure>
+<p>这样就能正常访问了：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">epoch      timestamp cluster  status node.total node.data shards pri relo init unassign pending_tasks max_task_wait_time active_shards_percent</span><br><span class="line">1487747024 15:03:44  myClusterName yellow          1         1     19  19    0    0       19             0                  -                 50.0%</span><br></pre></td></tr></table></figure>
+<p>这个账号密码实际上是 X-Pack 这个插件附带的认证功能</p>
+<h3 id="Java-API"><a href="#Java-API" class="headerlink" title="Java API"></a>Java API</h3><p>使用 X-Pack 后，使用 Java API 获取 Client 的时候会报一个类似这样的错：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line">NoNodeAvailableException[None of the configured nodes are available: [&#123;#transport#-1&#125;&#123;pyXJL2PeTtGejUwbpycDUg&#125;&#123;127.0.0.1&#125;&#123;127.0.0.1:9300&#125;]]</span><br><span class="line">...</span><br><span class="line">Caused by: org.elasticsearch.ElasticsearchSecurityException: missing authentication token for action [cluster:monitor/nodes/liveness]</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+<p>其实看到 <code>Caused by</code> 的时候基本就已经能确定是因为 X-Pack 引入的认证机制而引起的错误。</p>
+<p>既然知道了错误原因，那么就加上用户名和密码呗！但是事情却不是想的那么简单，ES 的官方文档里并没有提到在哪里可以加用户名和密码。</p>
+<p>那么想必 Google 一下就能解决了吧，但是这个解决的过程其实并不顺利。首先 ES 的版本比较多，如果是 ES5 之前的版本是基本没见到这个问题的，其次也不是每个人都会装 X-Pack 的啊！最后 pass 掉了几种过气了的解决方案后，终于在 ES 的社区找到了个<a href="https://discuss.elastic.co/t/authentication-using-java-api-and-transportclient/64196" target="_blank" rel="noopener">类似的问题</a>，最终解决的办法其实 elastic 已经写到了它的<a href="https://www.elastic.co/guide/en/x-pack/current/api-java.html#_obtaining_the_literal_watcherclient_literal" target="_blank" rel="noopener">文档</a>中，只不过不是 ElasticSearch 的文档而是 X-Pack 的文档里（唉，其实我应该早想到的[捂脸]）</p>
+<p>解决的关键是要引入一个 jar 包 x-pack-transport-5.2.1.jar，在构造 TransportClient 时用这个 jar 包里的 PreBuiltXPackTransportClient 替换掉 PreBuiltTransportClient，然后就可以在 Settings 里定义 <code>xpack.security.user</code> 了。</p>
+<p>解决步骤如下（以使用 Maven 来管理依赖为例）：</p>
+<ol>
+<li><p>首先在 pom.xml 文件里添加仓库和依赖</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">project</span> <span class="attr">...</span>&gt;</span></span><br><span class="line"></span><br><span class="line">   <span class="tag">&lt;<span class="name">repositories</span>&gt;</span></span><br><span class="line">      <span class="comment">&lt;!-- add the elasticsearch repo --&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">repository</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">id</span>&gt;</span>elasticsearch-releases<span class="tag">&lt;/<span class="name">id</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">url</span>&gt;</span>https://artifacts.elastic.co/maven<span class="tag">&lt;/<span class="name">url</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">releases</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">enabled</span>&gt;</span>true<span class="tag">&lt;/<span class="name">enabled</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;/<span class="name">releases</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">snapshots</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">enabled</span>&gt;</span>false<span class="tag">&lt;/<span class="name">enabled</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;/<span class="name">snapshots</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">repository</span>&gt;</span></span><br><span class="line">      ...</span><br><span class="line">   <span class="tag">&lt;/<span class="name">repositories</span>&gt;</span></span><br><span class="line">   ...</span><br><span class="line"></span><br><span class="line">   <span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></span><br><span class="line">      <span class="comment">&lt;!-- add the x-pack jar as a dependency --&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.elasticsearch.client<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>x-pack-transport<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">version</span>&gt;</span>&#123;version&#125;<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">      ...</span><br><span class="line">   <span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></span><br><span class="line">   ...</span><br><span class="line"></span><br><span class="line"> <span class="tag">&lt;/<span class="name">project</span>&gt;</span></span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<ol start="2">
+<li><p>然后在配置里加入 <code>xpack.security.user</code> 就好了</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.elasticsearch.xpack.client.PreBuiltXPackTransportClient;</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">TransportClient client = <span class="keyword">new</span> PreBuiltXPackTransportClient(Settings.builder()</span><br><span class="line">        .put(<span class="string">"cluster.name"</span>, <span class="string">"myClusterName"</span>)</span><br><span class="line">        .put(<span class="string">"xpack.security.user"</span>, <span class="string">"elastic:changeme"</span>)</span><br><span class="line">        ...</span><br><span class="line">        .build())</span><br><span class="line">    .addTransportAddress(<span class="keyword">new</span> InetSocketTransportAddress(<span class="string">"localhost"</span>, <span class="number">9300</span>));</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>正常的话做完上边两步后代码就能顺利执行了。不过我因为用的 Maven 库是公司的私服，在第一步添加依赖的时候始终加不上，而 x-pack-transport-5.2.1.jar 这个包直接以及间接依赖的包多达二十多个，一个个手动添加是不现实的，这时候只能开始处理 Maven 的配置问题。由于 Maven 平时我也只是直接使用，settings.xml 配置文件都是从前辈那里传下来的，没有仔细研究过，这次算是补补课了。</p>
+<p>我的  ${HOME}/.m2/settings.xml 里之前 mirrors 节点的配置如下：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">mirrors</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">mirror</span>&gt;</span></span><br><span class="line">    ...</span><br><span class="line">  <span class="tag">&lt;/<span class="name">mirror</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">mirror</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">id</span>&gt;</span>nexus<span class="tag">&lt;/<span class="name">id</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">mirrorOf</span>&gt;</span>*<span class="tag">&lt;/<span class="name">mirrorOf</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">url</span>&gt;</span>http://my.host.com/nexus/groups/public<span class="tag">&lt;/<span class="name">url</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">mirror</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">mirrors</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>问题是由 <code>&lt;mirrorOf&gt;*&lt;/mirrorOf&gt;</code> 这个配置引起的，<code>mirrorOf</code> 的含义如下：</p>
+<p>mirrorOf：用来表示该mirror是关联的哪一个仓库，其值为其关联仓库的id。当要同时关联多个仓库时，这多个仓库之间可以用逗号隔开；当要关联所有的仓库时，可以使用“<em>”表示；当要关联除某一个仓库以外的其他所有仓库时，可以表示为“</em>,!repositoryId”；当要关联不是localhost或用file请求的仓库时，可以表示为“external:*”。</p>
+<p>既然找到了问题所在，那么对应的改之即可，即 id 为 elasticsearch-releases 的这个 repository 不再会关联到 nexus 这个镜像上</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">mirrors</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">mirror</span>&gt;</span></span><br><span class="line">	...</span><br><span class="line">  <span class="tag">&lt;/<span class="name">mirror</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">mirror</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">id</span>&gt;</span>nexus<span class="tag">&lt;/<span class="name">id</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">mirrorOf</span>&gt;</span>*,!elasticsearch-releases<span class="tag">&lt;/<span class="name">mirrorOf</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">url</span>&gt;</span>http://my.host.com/nexus/groups/public<span class="tag">&lt;/<span class="name">url</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">mirror</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">mirrors</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>P.S. </p>
+<p>You can also add an <code>Authorization</code> header to each request. If you’ve configured global authorization credentials, the <code>Authorization</code> header overrides the global authentication credentials. This is useful when an application has multiple users who access Elasticsearch using the same client. You can set the global token to a user that only has the <code>transport_client</code> role, and add the <code>transport_client</code> role to the individual users.</p>
+<p>代码片段如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.elasticsearch.common.settings.Settings;</span><br><span class="line"><span class="keyword">import</span> org.elasticsearch.common.transport.InetSocketTransportAddress;</span><br><span class="line"><span class="keyword">import</span> org.elasticsearch.xpack.security.authc.support.SecuredString;</span><br><span class="line"><span class="keyword">import</span> org.elasticsearch.xpack.client.PreBuiltXPackTransportClient;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="keyword">static</span> org.elasticsearch.xpack.security.authc.support.UsernamePasswordToken.basicAuthHeaderValue;</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">TransportClient client = <span class="keyword">new</span> PreBuiltXPackTransportClient(Settings.builder()</span><br><span class="line">        .put(<span class="string">"cluster.name"</span>, <span class="string">"myClusterName"</span>)</span><br><span class="line">        .put(<span class="string">"xpack.security.user"</span>, <span class="string">"transport_client_user:changeme"</span>)</span><br><span class="line">        ...</span><br><span class="line">        .build())</span><br><span class="line">    .build()</span><br><span class="line">    .addTransportAddress(<span class="keyword">new</span> InetSocketTransportAddress(InetAddress.getByName(<span class="string">"localhost"</span>), <span class="number">9300</span>))</span><br><span class="line">    .addTransportAddress(<span class="keyword">new</span> InetSocketTransportAddress(InetAddress.getByName(<span class="string">"localhost"</span>), <span class="number">9301</span>))</span><br><span class="line"></span><br><span class="line">String token = basicAuthHeaderValue(<span class="string">"elastic"</span>, <span class="keyword">new</span> SecuredString(<span class="string">"changeme"</span>.toCharArray()));</span><br><span class="line"></span><br><span class="line">client.filterWithHeader(Collections.singletonMap(<span class="string">"Authorization"</span>, token))</span><br><span class="line">    .prepareSearch().get();</span><br></pre></td></tr></table></figure>
+<p>关于 SSL 可以参考<a href="https://www.elastic.co/guide/en/x-pack/5.0/java-clients.html#transport-client" target="_blank" rel="noopener">Java Client and Security</a></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Yibo</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://ideassea.com/2017/02/22/elasticsearch-issue/" title="ElasticSearch 实践过程中遇到的几个小问题">https://ideassea.com/2017/02/22/elasticsearch-issue/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/ELK/" rel="tag"># ELK</a>
+          
+            <a href="/tags/ElasticSearch/" rel="tag"># ElasticSearch</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/08/11/spring-ioc-aop/" rel="next" title="Spring原理初探——IoC、AOP">
+                <i class="fa fa-chevron-left"></i> Spring原理初探——IoC、AOP
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/07/18/hbase-fully-distributed/" rel="prev" title="HBase 1.2.6 完全分布式部署">
+                HBase 1.2.6 完全分布式部署 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://ws2.sinaimg.cn/large/006tKfTcly1fq0mwrckglj30sg0sg0u8.jpg"
+                alt="Yibo" />
+            
+              <p class="site-author-name" itemprop="name">Yibo</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">41</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">21</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#ulimit-“不生效”"><span class="nav-number">1.</span> <span class="nav-text">ulimit “不生效”</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#由-X-Pack-的认证机制引起的问题"><span class="nav-number">2.</span> <span class="nav-text">由 X-Pack 的认证机制引起的问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#HTTP-REST-API"><span class="nav-number">2.1.</span> <span class="nav-text">HTTP REST API</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Java-API"><span class="nav-number">2.2.</span> <span class="nav-text">Java API</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate"> 
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yibo</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/theme-next/hexo-theme-next">NexT.Gemini</a> v6.1.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/reading_progress/reading_progress.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.1.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.1.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.1.0"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+  
+  <script src="/lib/pangu/dist/pangu.min.js?v=3.3"></script>
+  <script type="text/javascript">pangu.spacingPage();</script>
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

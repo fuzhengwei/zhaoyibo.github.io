@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.1.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.1.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.1.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.1.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Java 语言，开发者不能直接控制程序运行内存，对象的创建都是由类加载器一步步解析，执行与生成与内存区域中的；并且jvm有自己的垃圾回收器对内存区域管理、回收；但是我们已经可以通过一些工具来在程序运行时查看对应的jvm内存使用情况，帮助更好的分析与优化我们的代码。">
+<meta name="keywords" content="Java,JVM">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JVM 监控以及内存分析">
+<meta property="og:url" content="https://ideassea.com/2016/08/01/jvm-monitoring/index.html">
+<meta property="og:site_name" content="Ideas Sea">
+<meta property="og:description" content="Java 语言，开发者不能直接控制程序运行内存，对象的创建都是由类加载器一步步解析，执行与生成与内存区域中的；并且jvm有自己的垃圾回收器对内存区域管理、回收；但是我们已经可以通过一些工具来在程序运行时查看对应的jvm内存使用情况，帮助更好的分析与优化我们的代码。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-03-20T00:42:20.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="JVM 监控以及内存分析">
+<meta name="twitter:description" content="Java 语言，开发者不能直接控制程序运行内存，对象的创建都是由类加载器一步步解析，执行与生成与内存区域中的；并且jvm有自己的垃圾回收器对内存区域管理、回收；但是我们已经可以通过一些工具来在程序运行时查看对应的jvm内存使用情况，帮助更好的分析与优化我们的代码。">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Ideas Sea" type="application/atom+xml" />
+
+
+
+
+  <link rel="canonical" href="https://ideassea.com/2016/08/01/jvm-monitoring/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>JVM 监控以及内存分析 | Ideas Sea</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> 
+
+<div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ideas Sea</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+          
+  <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />标签</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+</li>
+
+      
+
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+  
+
+
+
+ </div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+    <div class="reading-progress-bar"></div>
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://ideassea.com/2016/08/01/jvm-monitoring/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yibo">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://ws2.sinaimg.cn/large/006tKfTcly1fq0mwrckglj30sg0sg0u8.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ideas Sea">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">JVM 监控以及内存分析</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-08-01T07:21:00+08:00">2016-08-01</time>
+            
+
+            
+            
+              
+                
+              
+            
+
+            
+              
+              <span class="post-meta-divider">|</span>
+              
+
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">更新于：</span>
+              
+              <time title="更新于" itemprop="dateModified" datetime="2018-03-20T08:42:20+08:00">2018-03-20</time>
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Java 语言，开发者不能直接控制程序运行内存，对象的创建都是由类加载器一步步解析，执行与生成与内存区域中的；并且jvm有自己的垃圾回收器对内存区域管理、回收；但是我们已经可以通过一些工具来在程序运行时查看对应的jvm内存使用情况，帮助更好的分析与优化我们的代码。</p>
+<a id="more"></a>
+<h2 id="查看系统里java进程信息"><a href="#查看系统里java进程信息" class="headerlink" title="查看系统里java进程信息"></a>查看系统里java进程信息</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">// 查看当前机器上所有运行的java进程名称与pid(进程编号)</span><br><span class="line">jps -l </span><br><span class="line">// 显示指定的jvm进程所有的属性设置和配置参数</span><br><span class="line">jinfo pid</span><br></pre></td></tr></table></figure>
+<h2 id="jmap-histo"><a href="#jmap-histo" class="headerlink" title="jmap -histo"></a>jmap -histo</h2><p>查看类的内存占用</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">$ pid=\`jps | awk &apos;&#123;if ($2 == &quot;Bootstrap&quot;) print $1&#125;&apos;`</span><br><span class="line">$ jmap -histo $pid &gt;&gt;1.jmap </span><br><span class="line"></span><br><span class="line"> num     #instances         #bytes  class name</span><br><span class="line">----------------------------------------------</span><br><span class="line">   1:         16226      862336904  [Ljava.util.HashMap$Node;</span><br><span class="line">   2:        230727       14940520  [B</span><br><span class="line">   3:          5105       14082960  [I</span><br><span class="line">   4:        205826       12756064  [C</span><br><span class="line">   5:        150472        4815104  java.util.HashMap$Node</span><br><span class="line">   6:        186884        4485216  java.lang.String</span><br><span class="line">   7:        277734        4443744  java.lang.Integer</span><br><span class="line">   8:        108699        4347960  com.jiemo.school.model.impl.SchoolModel</span><br><span class="line">   9:        128405        4108960  java.util.concurrent.ConcurrentHashMap$Node</span><br><span class="line">  10:           114        1512448  [Ljava.util.concurrent.ConcurrentHashMap$Node;</span><br><span class="line">  11:         34496        1511024  [Ljava.lang.Object;</span><br><span class="line">  12:         25702        1233696  java.nio.HeapByteBuffer</span><br><span class="line">  13:         34277        1096864  java.util.concurrent.locks.AbstractQueuedSynchronizer$Node</span><br><span class="line">  14:          7665         856392  java.lang.Class</span><br><span class="line">  15:         18725         749000  java.util.HashMap$KeyIterator</span><br><span class="line">  16:         14489         695472  java.nio.HeapCharBuffer</span><br><span class="line">  17:         28122         674928  java.util.ArrayList</span><br><span class="line">  18:         25272         642776  [Ljava.lang.String;</span><br><span class="line">  19:         15380         615200  java.net.DatagramPacket</span><br></pre></td></tr></table></figure>
+<p>class name 解读<br>B代表byte<br>C代表char<br>D代表double<br>F代表float<br>I代表int<br>J代表long<br>Z代表boolean<br>前边有[代表数组，[I 就相当于int[]<br>对象用[L+类名表示 </p>
+<p>如果某个类的个数特别多， 就得检查是否内存溢出了。</p>
+<!-- more -->
+<h2 id="jmap-heap"><a href="#jmap-heap" class="headerlink" title="jmap -heap"></a>jmap -heap</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line">$ jmap -heap 22792       </span><br><span class="line">Attaching to process ID 19395, please wait...</span><br><span class="line">Debugger attached successfully.</span><br><span class="line">Server compiler detected.</span><br><span class="line">JVM version is 25.45-b02</span><br><span class="line"></span><br><span class="line">using thread-local object allocation.</span><br><span class="line">Parallel GC with 8 thread(s)</span><br><span class="line"></span><br><span class="line">Heap Configuration:</span><br><span class="line">   MinHeapFreeRatio         = 0                            # 对应jvm启动参数 -XX:MinHeapFreeRatio 设置JVM堆最小空闲比率 (默认40)  </span><br><span class="line">   MaxHeapFreeRatio         = 100                          # 对应jvm启动参数 -XX:MaxHeapFreeRatio 设置JVM堆最大空闲比率 (默认70)</span><br><span class="line">   MaxHeapSize              = 8388608000 (8000.0MB)        # 对应jvm启动参数 -XX:MaxHeapSize 设置JVM堆的最大大小  </span><br><span class="line">   NewSize                  = 44564480 (42.5MB)            # 对应jvm启动参数 -XX:NewSize 设置JVM堆的年轻代的默认大小  </span><br><span class="line">   MaxNewSize               = 2796027904 (2666.5MB)        # 对应jvm启动参数 -XX:MaxNewSize 设置JVM堆的年轻带的最大大小 </span><br><span class="line">   OldSize                  = 89653248 (85.5MB)            # 对应jvm启动参数 -XX:OldSize 设置JVM堆的老年代的大小  </span><br><span class="line">   NewRatio                 = 2                            # 对应jvm启动参数 -XX:NewRatio 老年代与年轻代的大小比率</span><br><span class="line">   SurvivorRatio            = 8                            # 对应jvm启动参数 -XX:SurvivorRatio 设置年轻代中Eden区与Survivor区的大小比值</span><br><span class="line">   MetaspaceSize            = 21807104 (20.796875MB)       # -XX:MetaspaceSize</span><br><span class="line">   CompressedClassSpaceSize = 1073741824 (1024.0MB)        # -XX:CompressedClassSpaceSize, 只有当-XX:+UseCompressedClassPointers开启了才有效</span><br><span class="line">   MaxMetaspaceSize         = 536870912 (512.0MB)          # -XX:MaxMetaspaceSize</span><br><span class="line">   G1HeapRegionSize         = 0 (0.0MB)</span><br><span class="line"></span><br><span class="line">Heap Usage:</span><br><span class="line">PS Young Generation</span><br><span class="line">Eden Space:                                         # Eden区内存分布 总量 已使用 空闲 使用比率  </span><br><span class="line">   capacity = 404750336 (386.0MB)</span><br><span class="line">   used     = 376643272 (359.1950149536133MB)</span><br><span class="line">   free     = 28107064 (26.80498504638672MB)</span><br><span class="line">   93.05570335585837% used</span><br><span class="line">From Space:                                         # 其中一个Survivor区内存分布 总量 已使用 空闲 使用比率  </span><br><span class="line">   capacity = 458227712 (437.0MB)</span><br><span class="line">   used     = 383131152 (365.38233947753906MB)</span><br><span class="line">   free     = 75096560 (71.61766052246094MB)</span><br><span class="line">   83.61151933124464% used</span><br><span class="line">To Space:                                           # 另一个Survivor区内存分布 总量 已使用 空闲 使用比率</span><br><span class="line">   capacity = 492830720 (470.0MB)</span><br><span class="line">   used     = 0 (0.0MB)</span><br><span class="line">   free     = 492830720 (470.0MB)</span><br><span class="line">   0.0% used</span><br><span class="line">PS Old Generation                                   # 当前老年代内存分布 总量 已使用 空闲 使用比率  </span><br><span class="line">   capacity = 918552576 (876.0MB)</span><br><span class="line">   used     = 463923192 (442.43163299560547MB)</span><br><span class="line">   free     = 454629384 (433.56836700439453MB)</span><br><span class="line">   50.50589417758053% used</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">16117 interned Strings occupying 1692808 bytes.</span><br></pre></td></tr></table></figure>
+<p>MaxHeapFreeRatio: GC后如果发现空闲堆内存占到整个预估堆内存的N%(百分比)，则收缩堆内存的预估最大值, 预估堆内存是堆大小动态调控的重要选项之一. 堆内存预估最大值一定小于或等于固定最大值(-Xmx指定的数值). 前者会根据使用情况动态调大或缩小, 以提高GC回收的效率<br>MinHeapFreeRatio: GC后如果发现空闲堆内存占到整个预估堆内存的N%(百分比), 则放大堆内存的预估最大值</p>
+<p>MaxHeapSize: 即-Xmx, 堆内存大小的上限<br>InitialHeapSize: 即-Xms, 堆内存大小的初始值</p>
+<p>NewSize: 新生代预估堆内存占用的默认值<br>MaxNewSize: 新生代占整个堆内存的最大值</p>
+<p>OldSize: 老年代的默认大小, default size of the tenured generation<br>NewRatio: 老年代对比新生代的空间大小, 比如2代表老年代空间是新生代的两倍大小. The ratio of old generation to young generation.</p>
+<p>SurvivorRatio: Eden/Survivor的值. 这个值的说明, 很多网上转载的都是错的. 8表示Survivor:Eden=1:8, 因为survivor区有2个, 所以Eden的占比为8/10. Ratio of eden/survivor space size. -XX:SurvivorRatio=6 sets the ratio between each survivor space and eden to be 1:6, each survivor space will be one eighth of the young generation. </p>
+<p>MetaspaceSize: 分配给类元数据空间的初始大小(Oracle逻辑存储上的初始高水位，the initial high-water-mark ). 此值为估计值. MetaspaceSize设置得过大会延长垃圾回收时间. 垃圾回收过后, 引起下一次垃圾回收的类元数据空间的大小可能会变大<br>MaxMetaspaceSize: 是分配给类元数据空间的最大值, 超过此值就会触发Full GC. 此值仅受限于系统内存的大小, JVM会动态地改变此值</p>
+<p>CompressedClassSpaceSize: 类指针压缩空间大小, 默认为1G</p>
+<p>G1HeapRegionSize: G1区块的大小, 取值为1M至32M. 其取值是要根据最小Heap大小划分出2048个区块. With G1 the Java heap is subdivided into uniformly sized regions. This sets the size of the individual sub-divisions. The default value of this parameter is determined ergonomically based upon heap size. The minimum value is 1Mb and the maximum value is 32Mb. Sets the size of a G1 region. The value will be a power of two and can range from 1MB to 32MB. The goal is to have around 2048 regions based on the minimum Java heap size.</p>
+<p>指针压缩</p>
+<ol>
+<li><p>64位平台上默认打开<br>1)使用-XX:+UseCompressedOops压缩对象指针<br> “oops”指的是普通对象指针(“ordinary” object pointers)。<br> Java堆中对象指针会被压缩成32位。<br> 使用堆基地址（如果堆在低26G内存中的话，基地址为0）<br>2)使用-XX:+UseCompressedClassPointers选项来压缩类指针<br> 对象中指向类元数据的指针会被压缩成32位<br> 类指针压缩空间会有一个基地址</p>
+</li>
+<li><p>元空间和类指针压缩空间的区别<br>1)类指针压缩空间只包含类的元数据，比如InstanceKlass, ArrayKlass<br> 仅当打开了UseCompressedClassPointers选项才生效<br> 为了提高性能，Java中的虚方法表也存放到这里<br> 这里到底存放哪些元数据的类型，目前仍在减少<br>2)元空间包含类的其它比较大的元数据，比如方法，字节码，常量池等。</p>
+</li>
+</ol>
+<h2 id="jstat-gcutil-pid-internal"><a href="#jstat-gcutil-pid-internal" class="headerlink" title="jstat -gcutil [pid] [internal]"></a>jstat -gcutil [pid] [internal]</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"> S0     S1     E      O      M     CCS     YGC     YGCT     FGC    FGCT     GCT</span><br><span class="line">83.61   0.00  93.25  50.51  97.92  93.98   32     45.703    10    16.852   62.555</span><br></pre></td></tr></table></figure>
+<p>S0: Survivor 0区的空间使用率 Survivor space 0 utilization as a percentage of the space’s current capacity.<br>S1: Survivor 1区的空间使用率 Survivor space 1 utilization as a percentage of the space’s current capacity.<br>E: Eden区的空间使用率 Eden space utilization as a percentage of the space’s current capacity.<br>O: 老年代的空间使用率 Old space utilization as a percentage of the space’s current capacity.<br>M: 元数据的空间使用率 Metaspace utilization as a percentage of the space’s current capacity.<br>CCS: 类指针压缩空间使用率 Compressed class space utilization as a percentage.<br>YGC: 新生代GC次数 Number of young generation GC events.<br>YGCT: 新生代GC总时长 单位秒 Young generation garbage collection time.<br>FGC: Full GC次数 Number of full GC events.<br>FGCT: Full GC总时长 单位秒 Full garbage collection time.<br>GCT: 总共的GC时长 单位秒 Total garbage collection time.</p>
+<h2 id="查看JVM参数及值的命令行工具"><a href="#查看JVM参数及值的命令行工具" class="headerlink" title="查看JVM参数及值的命令行工具"></a>查看JVM参数及值的命令行工具</h2><ol>
+<li><p>-XX:+PrintFlagsInitial参数<br>显示所有可设置参数及默认值，可结合-XX:+PrintFlagsInitial与-XX:+PrintFlagsFinal对比设置前、设置后的差异，方便知道对那些参数做了调整。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">$ java -XX:+PrintFlagsInitial</span><br><span class="line">[Global flags]</span><br><span class="line">    uintx AdaptiveSizeDecrementScaleFactor          = 4                                   &#123;product&#125;</span><br><span class="line">    uintx AdaptiveSizeMajorGCDecayTimeScale         = 10                                  &#123;product&#125;</span><br><span class="line">    uintx AdaptiveSizePausePolicy                   = 0                                   &#123;product&#125;</span><br><span class="line">    uintx AdaptiveSizePolicyCollectionCostMargin    = 50                                  &#123;product&#125;</span><br><span class="line">    uintx AdaptiveSizePolicyInitializingSteps       = 20                                  &#123;product&#125;</span><br><span class="line">    uintx AdaptiveSizePolicyOutputInterval          = 0                                   &#123;product&#125;</span><br><span class="line">    uintx AdaptiveSizePolicyWeight                  = 10                                  &#123;product&#125;</span><br><span class="line">    uintx AdaptiveSizeThroughPutPolicy              = 0                                   &#123;product&#125;</span><br><span class="line">    uintx AdaptiveTimeWeight                        = 25                                  &#123;product&#125;</span><br><span class="line">     bool AdjustConcurrency                         = false                               &#123;product&#125;</span><br><span class="line">     bool AggressiveOpts                            = false                               &#123;product&#125;</span><br><span class="line">     intx AliasLevel                                = 3                                   &#123;C2 product&#125;</span><br><span class="line">     bool AlignVector                               = true                                &#123;C2 product&#125;</span><br><span class="line">     intx AllocateInstancePrefetchLines             = 1                                   &#123;product&#125;</span><br><span class="line">     intx AllocatePrefetchDistance                  = -1                                  &#123;product&#125;</span><br><span class="line">     intx AllocatePrefetchInstr                     = 0                                   &#123;product&#125;</span><br><span class="line">     intx AllocatePrefetchLines                     = 3                                   &#123;product&#125;</span><br><span class="line">     intx AllocatePrefetchStepSize                  = 16                                  &#123;product&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>-XX:+PrintFlagsFinal参数<br>可以获取到所有可设置参数及值(手动设置之后的值)，这个参数只能使用在Jdk6 update 21以上版本(包括该版本)。-XX:+PrintFlagsFinal参数的使用 与上面-XX:+PrintFlagsInitial 参数使用相同 </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Java -XX:+PrintFlagsFinal</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>使用 jinfo 命令 查看或设置某个参数的值，jinfo命令格式：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jinfo [option] &lt;pid&gt;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<blockquote>
+<p>2017-07-18 更新</p>
+</blockquote>
+<h2 id="jcmd"><a href="#jcmd" class="headerlink" title="jcmd"></a>jcmd</h2><p>在JDK 1.7之后，新增了一个命令行工具jcmd。它是一个多功能工具，可以用来导出堆，查看Java进程，导出线程信息，执行GC等。</p>
+<ul>
+<li>列出当前运行的所有虚拟机<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[root@apple ~]# jcmd -l</span><br><span class="line">30356 com.aliyun.tianji.cloudmonitor.Application</span><br><span class="line">8757 org.jruby.Main /opt/logstash/lib/bootstrap/environment.rb logstash/runner.rb -f /etc/logstash/conf.d/event-operate-post-shipper.yaml</span><br><span class="line">8713 org.jruby.Main /opt/logstash/lib/bootstrap/environment.rb logstash/runner.rb -f /etc/logstash/conf.d/statistics-shipper.yaml</span><br><span class="line">11615 sun.tools.jcmd.JCmd -l</span><br><span class="line">21167 org.apache.catalina.startup.Bootstrap start</span><br><span class="line">[root@apple ~]#</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>参数<code>-l</code>表示列出所有java虚拟机，针对每一个虚拟机，可以使用help命令列出该虚拟机支持的所有命令，如下图所示，以21167这个进程为例：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">[root@apple ~]# jcmd 21167 help</span><br><span class="line">21167:</span><br><span class="line">The following commands are available:</span><br><span class="line">JFR.stop</span><br><span class="line">JFR.start</span><br><span class="line">JFR.dump</span><br><span class="line">JFR.check</span><br><span class="line">VM.native_memory</span><br><span class="line">VM.check_commercial_features</span><br><span class="line">VM.unlock_commercial_features</span><br><span class="line">ManagementAgent.stop</span><br><span class="line">ManagementAgent.start_local</span><br><span class="line">ManagementAgent.start</span><br><span class="line">GC.rotate_log</span><br><span class="line">Thread.print</span><br><span class="line">GC.class_stats</span><br><span class="line">GC.class_histogram</span><br><span class="line">GC.heap_dump</span><br><span class="line">GC.run_finalization</span><br><span class="line">GC.run</span><br><span class="line">VM.uptime</span><br><span class="line">VM.flags</span><br><span class="line">VM.system_properties</span><br><span class="line">VM.command_line</span><br><span class="line">VM.version</span><br><span class="line">help</span><br><span class="line"></span><br><span class="line">For more information about a specific command use &apos;help &lt;command&gt;&apos;.</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li><p>查看虚拟机启动时间VM.uptime</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@apple ~]# jcmd 21167 VM.uptime</span><br><span class="line">21167:</span><br><span class="line">527760.414 s</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>打印线程栈信息Thread.print</p>
+</li>
+</ul>
+<ul>
+<li>查看系统中类统计信息GC.class_histogram</li>
+</ul>
+<ul>
+<li><p>导出堆信息GC.heap_dump<br>这个命令可以导出当前堆栈信息，功能和<code>jmap -dump</code>功能一样</p>
+</li>
+<li><p>获取系统Properties内容VM.system_properties</p>
+</li>
+<li><p>获取启动参数VM.flags</p>
+</li>
+<li>获取所有性能相关数据PerfCounter.print</li>
+</ul>
+<p>总结：jcmd拥有jmap的大部分功能，并且Oracle官方也建议使用jcmd代替jmap。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Yibo</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://ideassea.com/2016/08/01/jvm-monitoring/" title="JVM 监控以及内存分析">https://ideassea.com/2016/08/01/jvm-monitoring/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"># Java</a>
+          
+            <a href="/tags/JVM/" rel="tag"># JVM</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/06/02/hg-flow/" rel="next" title="hg flow">
+                <i class="fa fa-chevron-left"></i> hg flow
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/08/11/spring-ioc-aop/" rel="prev" title="Spring原理初探——IoC、AOP">
+                Spring原理初探——IoC、AOP <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://ws2.sinaimg.cn/large/006tKfTcly1fq0mwrckglj30sg0sg0u8.jpg"
+                alt="Yibo" />
+            
+              <p class="site-author-name" itemprop="name">Yibo</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">41</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">21</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#查看系统里java进程信息"><span class="nav-number">1.</span> <span class="nav-text">查看系统里java进程信息</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#jmap-histo"><span class="nav-number">2.</span> <span class="nav-text">jmap -histo</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#jmap-heap"><span class="nav-number">3.</span> <span class="nav-text">jmap -heap</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#jstat-gcutil-pid-internal"><span class="nav-number">4.</span> <span class="nav-text">jstat -gcutil [pid] [internal]</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#查看JVM参数及值的命令行工具"><span class="nav-number">5.</span> <span class="nav-text">查看JVM参数及值的命令行工具</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#jcmd"><span class="nav-number">6.</span> <span class="nav-text">jcmd</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate"> 
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yibo</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/theme-next/hexo-theme-next">NexT.Gemini</a> v6.1.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/reading_progress/reading_progress.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.1.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.1.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.1.0"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+  
+  <script src="/lib/pangu/dist/pangu.min.js?v=3.3"></script>
+  <script type="text/javascript">pangu.spacingPage();</script>
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

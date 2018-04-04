@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.1.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.1.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.1.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.1.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Java中哪个JSON库的解析速度是最快的？JSON已经成为当前服务器与WEB应用之间数据传输的公认标准，不过正如许多我们所习以为常的事情一样，你会觉得这是理所当然的便不再深入思考了。我们很少会去想用到的这些JSON库到底有什么不同，但事实上它们的确是不太一样的。因此，我们运行了一个基准测试来对常用的几个JSON库进行了测试，看看在解析不同大小的文件时哪个库的速度是最快的。下面我会把结果分享给大家">
+<meta name="keywords" content="Java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JSON库之性能比较：JSON.simple VS GSON VS Jackson VS JSONP">
+<meta property="og:url" content="https://ideassea.com/2016/02/03/json-ultimate/index.html">
+<meta property="og:site_name" content="Ideas Sea">
+<meta property="og:description" content="Java中哪个JSON库的解析速度是最快的？JSON已经成为当前服务器与WEB应用之间数据传输的公认标准，不过正如许多我们所习以为常的事情一样，你会觉得这是理所当然的便不再深入思考了。我们很少会去想用到的这些JSON库到底有什么不同，但事实上它们的确是不太一样的。因此，我们运行了一个基准测试来对常用的几个JSON库进行了测试，看看在解析不同大小的文件时哪个库的速度是最快的。下面我会把结果分享给大家">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://ws1.sinaimg.cn/large/6e3b2269ly1fq0fawj78gj20os0f5jx2">
+<meta property="og:image" content="https://ws1.sinaimg.cn/large/6e3b2269ly1fq0fawvumfj20os0ag770">
+<meta property="og:image" content="https://ws1.sinaimg.cn/large/6e3b2269ly1fq0fax6y1ij20os0pswq9">
+<meta property="og:image" content="https://ws1.sinaimg.cn/large/6e3b2269ly1fq0faxkmdgj20os0agacs">
+<meta property="og:updated_time" content="2017-08-02T08:22:26.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="JSON库之性能比较：JSON.simple VS GSON VS Jackson VS JSONP">
+<meta name="twitter:description" content="Java中哪个JSON库的解析速度是最快的？JSON已经成为当前服务器与WEB应用之间数据传输的公认标准，不过正如许多我们所习以为常的事情一样，你会觉得这是理所当然的便不再深入思考了。我们很少会去想用到的这些JSON库到底有什么不同，但事实上它们的确是不太一样的。因此，我们运行了一个基准测试来对常用的几个JSON库进行了测试，看看在解析不同大小的文件时哪个库的速度是最快的。下面我会把结果分享给大家">
+<meta name="twitter:image" content="https://ws1.sinaimg.cn/large/6e3b2269ly1fq0fawj78gj20os0f5jx2">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Ideas Sea" type="application/atom+xml" />
+
+
+
+
+  <link rel="canonical" href="https://ideassea.com/2016/02/03/json-ultimate/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>JSON库之性能比较：JSON.simple VS GSON VS Jackson VS JSONP | Ideas Sea</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> 
+
+<div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ideas Sea</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+          
+  <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />标签</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+</li>
+
+      
+
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+  
+
+
+
+ </div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+    <div class="reading-progress-bar"></div>
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://ideassea.com/2016/02/03/json-ultimate/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yibo">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://ws2.sinaimg.cn/large/006tKfTcly1fq0mwrckglj30sg0sg0u8.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ideas Sea">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">JSON库之性能比较：JSON.simple VS GSON VS Jackson VS JSONP</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-02-03T05:50:00+08:00">2016-02-03</time>
+            
+
+            
+            
+              
+                
+              
+            
+
+            
+              
+              <span class="post-meta-divider">|</span>
+              
+
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">更新于：</span>
+              
+              <time title="更新于" itemprop="dateModified" datetime="2017-08-02T16:22:26+08:00">2017-08-02</time>
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="Java中哪个JSON库的解析速度是最快的？"><a href="#Java中哪个JSON库的解析速度是最快的？" class="headerlink" title="Java中哪个JSON库的解析速度是最快的？"></a>Java中哪个JSON库的解析速度是最快的？</h2><p>JSON已经成为当前服务器与WEB应用之间数据传输的公认标准，不过正如许多我们所习以为常的事情一样，你会觉得这是理所当然的便不再深入思考了。我们很少会去想用到的这些JSON库到底有什么不同，但事实上它们的确是不太一样的。因此，我们运行了一个基准测试来对常用的几个JSON库进行了测试，看看在解析不同大小的文件时哪个库的速度是最快的。下面我会把结果分享给大家。<a id="more"></a></p>
+<p>JSON通常用于传输及解析大文件。这对运行在Hadoop或者是Spark集群上的数据处理程序而言是个很常见的场景。在给定的文件大小下，你可以看到不同库之间的解析速度存在着明显的差别。</p>
+<p>高吞吐量的情况下，会频繁地传输并解析小文件，因此一开始的时候可能性能的差距并不明显。但如果你需要在非常高负载下频繁地解析大量的小文件，差距就开始增大了。微服务及分布式架构经常会使用JSON来传输此类文件，因为这已经是WEB API的事实标准。</p>
+<p>不是所有的JSON库都叫”特仑苏”。如何根据使用场景才选择正确的库是相当重要的。希望这个基准测试能够对你有所帮助。</p>
+<!--more-->
+<h2 id="JSON库"><a href="#JSON库" class="headerlink" title="JSON库"></a>JSON库</h2><h3 id="JSON-simple-vs-GSON-vs-Jackson-vs-JSONP"><a href="#JSON-simple-vs-GSON-vs-Jackson-vs-JSONP" class="headerlink" title="JSON.simple vs GSON vs Jackson vs JSONP"></a>JSON.simple vs GSON vs Jackson vs JSONP</h3><p>我们选择了四个主流的JSON库来进行基准测试：JSON.simple， GSON, Jackson以及JSONP。在Java中进行JSON解析通常都会用到这几个库，选择它们的原因是它们在Github项目中的亮相频率很高。</p>
+<p>下面便是我们所测试的JSON库：</p>
+<ul>
+<li><p>Yidong Fang的JSON.simple(<a href="https://github.com/fangyidong/json-simple)。JSON.simple是一个JSON编解码的Java工具库。它旨在打造一个轻量简单且高性能的工具库。" target="_blank" rel="noopener">https://github.com/fangyidong/json-simple)。JSON.simple是一个JSON编解码的Java工具库。它旨在打造一个轻量简单且高性能的工具库。</a></p>
+</li>
+<li><p>Google的GSON(<a href="https://github.com/google/gson)。GSON这个Java库能够在Java对象和JSON间进行相互转换。同时它还提供了对Java泛型的完整支持，而且还不需要你在类上面添加注解。无需添加注解使用起来则更为便捷，同时在无法修改源代码的情况下这还是一个必要的先决条件。" target="_blank" rel="noopener">https://github.com/google/gson)。GSON这个Java库能够在Java对象和JSON间进行相互转换。同时它还提供了对Java泛型的完整支持，而且还不需要你在类上面添加注解。无需添加注解使用起来则更为便捷，同时在无法修改源代码的情况下这还是一个必要的先决条件。</a></p>
+</li>
+<li><p>FasterXML的Jackson项目（<a href="https://github.com/FasterXML/jackson）。Jackson是一个数据处理的工具套件，它的亮点是流式的JSON解析器及生成器。它是专为Java设计的，同时也能处理其它非JSON的编码。从我们在Github中的统计来看，它应该是最流行的JSON解析器。" target="_blank" rel="noopener">https://github.com/FasterXML/jackson）。Jackson是一个数据处理的工具套件，它的亮点是流式的JSON解析器及生成器。它是专为Java设计的，同时也能处理其它非JSON的编码。从我们在Github中的统计来看，它应该是最流行的JSON解析器。</a></p>
+</li>
+<li><p>Oracle的JSONP(<a href="https://jsonp.java.net/)。JSONP" target="_blank" rel="noopener">https://jsonp.java.net/)。JSONP</a> (JSON Processing)是JSON处理的一套Java API,从名字来看它就是用来生成及解析JSON串的。这是JSR353规范的一个开源实现。</p>
+</li>
+</ul>
+<h2 id="基准测试"><a href="#基准测试" class="headerlink" title="基准测试"></a>基准测试</h2><p>我们同时使用大文件和小文件对这些库进行了基准测试。随着文件大小的不同，处理这些文本所需要的系统资源也会随之上升。</p>
+<p>这个基准测试主要关注两个关键场景：大文件下(190MB)的解析速度与小文件（1KB）下的解析速度。大文件取自这里：<a href="https://github.com/zeMirco/sf-city-lots-json。小文件是从这里随机生成的：http://www.json-generator.com/。" target="_blank" rel="noopener">https://github.com/zeMirco/sf-city-lots-json。小文件是从这里随机生成的：http://www.json-generator.com/。</a></p>
+<p>不管是大文件还是小文件，我们都会用同一个库重复运行10次。对于每一个大文件，我们都会用同一个库来分别运行10次。而对于小文件，在单个库的单次运行中会重复执行10000次。在小文件测试的各次迭代中，文件内容都不会驻留在内存里，测试所运行的机器是AWS的c3.large实例。</p>
+<p>大文件的完整测试结果如下，我对小文件的结果求了个平均值。想要看完整的结果，请移步这里。如果想看小文件测试的源码，请从这里下载。</p>
+<p><strong>大文件结果</strong><br><img src="https://ws1.sinaimg.cn/large/6e3b2269ly1fq0fawj78gj20os0f5jx2" alt="json-ultimate-1"></p>
+<p>结果相差甚大！Jackson与JSON.simple领跑了这轮测试，整体来看Jackson又要略优于JSON.simple。从测试运行的平均结果来看，Jackson与JSON.simple在大文件上的表现要优秀一些，而JSONP排名第三落后甚远，GSON更是遥遥垫底。</p>
+<p>我们再把结果换算成百分比看下。平均来看Jackson要胜出一筹。下面是结果的百分比数据，可以从两个维度来进行比较：</p>
+<p><img src="https://ws1.sinaimg.cn/large/6e3b2269ly1fq0fawvumfj20os0ag770" alt="json-ultimate-2"></p>
+<p>不同库之间的性能差别着实不小。</p>
+<p>结论：Jackson以略微优势胜出。JSON.simple紧随其后，而剩下两个库则远远落后。</p>
+<p><strong>小文件结果</strong><br><img src="https://ws1.sinaimg.cn/large/6e3b2269ly1fq0fax6y1ij20os0pswq9" alt="json-ultimate-3"></p>
+<p>上表记录的是对每个文件解析10次的平均时间，总的平均时间见下方。各个库在小文件测试中夺冠的次数如下：</p>
+<ul>
+<li>GSON - 14</li>
+<li>JSONP - 5</li>
+<li>Jackson -1</li>
+<li>JSON.simple - 0</li>
+</ul>
+<p>这个结果貌似很有说服力。然而，从所有文件的平均结果来看，GSON这个冠军还是当之无愧的，JSON.simple和JSONP的二三名之争应该没什么悬念。Jackson这轮却是垫底了。尽管JSON.simple没有在任何文件上夺得第一，但总体来看它的解析速度却是排名第二位的。而JSONP尽管在许多文件上都拿到了冠军，但平均来看却只拿到了第三名的成绩。</p>
+<p>还有一个值得注意的是，尽管Jackson是这轮最慢的库，但是它在所有文件中的表现都非常一致，其它三个库虽然偶然会比Jackson快很多，但在另一些文件上的解析速度却是旗鼓相当甚至更差。</p>
+<p>我们再把这些数字转换成百分比看看，还是同样的两个维度：</p>
+<p><img src="https://ws1.sinaimg.cn/large/6e3b2269ly1fq0faxkmdgj20os0agacs" alt="json-ultimate-4"></p>
+<p>和大文件测试相比，这次的差距相对要小一些，但也还是不容忽视的。</p>
+<p>结论：很不幸的是，JSON.simple又以微弱的劣势与冠军失之交臂，这轮GSON胜。JSONP仍是千年老三而这回Jackson则赶了个晚集。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>解析速度并非衡量一个JSON库的唯一指标，但它的确非常重要。通过运行这次基准测试，我们发现没有一个库能在所有文件上击败对手。大文件中表现优秀的却在小文件上栽了根头，反之亦然。</p>
+<p>如果要从解析速度来看选择哪个库的话还得取决于你的使用场景。</p>
+<ul>
+<li>如果你的应用经常会处理大的JSON文件，那么Jackson应该是你的菜。GSON在大文件上表现得相当吃力。</li>
+<li>如果你主要是处理小文件请求，比如某个微服务或者分布式架构的初始化，那么GSON当是首选。Jackson在小文件上的表现则不如人意。</li>
+<li>如果这两种文件你都经常会处理到，那么在两轮表现中都位居第二的JSON.simple对此类场景则更为适合。在不同的文件大小上Jackson和GSON的表现都不太好。</li>
+<li>除非不考虑解析速度，不然JSONP完全没有什么值得称道的。它在大文件和小文件上的表现与其它库相比都很糟糕。所幸的是，Java 9很快便会有原生的JSON实现了，相信JSONP将来的表现仍然值得期待。</li>
+</ul>
+<p>终于讲完了。如果你对JSON库的解析速度比较敏感的话，大文件选Jackson，小文件选GSON，两者则JSON.simple。如果你对这次的基准测试有什么疑问请在下方留言。</p>
+<p><a href="http://it.deepinmind.com/java/2015/06/15/the-ultimate-json-library-json-simple-vs-gson-vs-jackson-vs-json.html" target="_blank" rel="noopener">译文原文出处</a><br><a href="http://blog.takipi.com/the-ultimate-json-library-json-simple-vs-gson-vs-jackson-vs-json/" target="_blank" rel="noopener">英文原文链接</a></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Yibo</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://ideassea.com/2016/02/03/json-ultimate/" title="JSON库之性能比较：JSON.simple VS GSON VS Jackson VS JSONP">https://ideassea.com/2016/02/03/json-ultimate/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"># Java</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/02/02/nodervisor/" rel="next" title="管理多个 Supervisor——集群管理">
+                <i class="fa fa-chevron-left"></i> 管理多个 Supervisor——集群管理
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/02/03/letsencrypt/" rel="prev" title="Let's Encrypt 试用手记">
+                Let's Encrypt 试用手记 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://ws2.sinaimg.cn/large/006tKfTcly1fq0mwrckglj30sg0sg0u8.jpg"
+                alt="Yibo" />
+            
+              <p class="site-author-name" itemprop="name">Yibo</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">41</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">21</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Java中哪个JSON库的解析速度是最快的？"><span class="nav-number">1.</span> <span class="nav-text">Java中哪个JSON库的解析速度是最快的？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JSON库"><span class="nav-number">2.</span> <span class="nav-text">JSON库</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#JSON-simple-vs-GSON-vs-Jackson-vs-JSONP"><span class="nav-number">2.1.</span> <span class="nav-text">JSON.simple vs GSON vs Jackson vs JSONP</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#基准测试"><span class="nav-number">3.</span> <span class="nav-text">基准测试</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate"> 
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yibo</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/theme-next/hexo-theme-next">NexT.Gemini</a> v6.1.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/reading_progress/reading_progress.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.1.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.1.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.1.0"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+  
+  <script src="/lib/pangu/dist/pangu.min.js?v=3.3"></script>
+  <script type="text/javascript">pangu.spacingPage();</script>
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

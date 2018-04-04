@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.1.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.1.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.1.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.1.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="SupervisorSupervisor 的官方标语是  A Process Control System  它是用 Python 实现的，不过它能管理任何非 Daemon 的进程，并会帮你把被管理的进程转成 Daemon 进程（只要你交给 Supervisor 的进程是非 daemon 的，无需在原程序中增加任何用于实现 daemon 的代码，就能实现 daemon）。 是不是感觉很方便？废话不">
+<meta name="keywords" content="Operations,Supervisor">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Supervisor 基础">
+<meta property="og:url" content="https://ideassea.com/2016/02/02/supervisor-basic/index.html">
+<meta property="og:site_name" content="Ideas Sea">
+<meta property="og:description" content="SupervisorSupervisor 的官方标语是  A Process Control System  它是用 Python 实现的，不过它能管理任何非 Daemon 的进程，并会帮你把被管理的进程转成 Daemon 进程（只要你交给 Supervisor 的进程是非 daemon 的，无需在原程序中增加任何用于实现 daemon 的代码，就能实现 daemon）。 是不是感觉很方便？废话不">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2017-07-19T06:07:57.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Supervisor 基础">
+<meta name="twitter:description" content="SupervisorSupervisor 的官方标语是  A Process Control System  它是用 Python 实现的，不过它能管理任何非 Daemon 的进程，并会帮你把被管理的进程转成 Daemon 进程（只要你交给 Supervisor 的进程是非 daemon 的，无需在原程序中增加任何用于实现 daemon 的代码，就能实现 daemon）。 是不是感觉很方便？废话不">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Ideas Sea" type="application/atom+xml" />
+
+
+
+
+  <link rel="canonical" href="https://ideassea.com/2016/02/02/supervisor-basic/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Supervisor 基础 | Ideas Sea</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> 
+
+<div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ideas Sea</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+          
+  <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />标签</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+</li>
+
+      
+
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+  
+
+
+
+ </div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+    <div class="reading-progress-bar"></div>
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://ideassea.com/2016/02/02/supervisor-basic/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yibo">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://ws2.sinaimg.cn/large/006tKfTcly1fq0mwrckglj30sg0sg0u8.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ideas Sea">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Supervisor 基础</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-02-02T03:28:00+08:00">2016-02-02</time>
+            
+
+            
+            
+              
+                
+              
+            
+
+            
+              
+              <span class="post-meta-divider">|</span>
+              
+
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">更新于：</span>
+              
+              <time title="更新于" itemprop="dateModified" datetime="2017-07-19T14:07:57+08:00">2017-07-19</time>
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="Supervisor"><a href="#Supervisor" class="headerlink" title="Supervisor"></a>Supervisor</h2><p><a href="https://github.com/Supervisor/supervisor" title="Supervisord" target="_blank" rel="noopener">Supervisor</a> 的官方标语是</p>
+<blockquote>
+<p>A Process Control System</p>
+</blockquote>
+<p>它是用 Python 实现的，不过它能管理任何非 Daemon 的进程，并会帮你把被管理的进程转成 Daemon 进程（只要你交给 Supervisor 的进程是非 daemon 的，无需在原程序中增加任何用于实现 daemon 的代码，就能实现 daemon）。</p>
+<p>是不是感觉很方便？废话不多说，直接动手搞起来。</p>
+<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><p>安装 Supervisor 的方式多种多样，选择自己喜欢的方式吧<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># easy_install supervisor        // yum install python-setuptools</span><br><span class="line"># apt-cache show supervisor      // ubuntu</span><br><span class="line"># yum info supervisor            // redhat centos</span><br><span class="line"># pip install supervisor --pre   // pip &gt;= 1.4</span><br><span class="line"># pip install supervisor         // pip &lt; 1.4</span><br></pre></td></tr></table></figure></p>
+<p>还可以直接去<a href="https://pypi.python.org/pypi/supervisor" target="_blank" rel="noopener">官网下载</a>后，<code>python setup.py install</code></p>
+<a id="more"></a>
+<h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><p>安装完成后执行如下命令生成默认的配置文件<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># echo_supervisord_conf &gt; /etc/supervisord.conf</span><br></pre></td></tr></table></figure></p>
+<p>如果没有 root 权限的话，可以随便放一个能放的位置，只不过启动的时候需要加 <code>-c</code> 指定配置文件的路径<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ echo_supervisord_conf &gt; $HOME/supervisord.conf</span><br><span class="line">$ supervisord -c $HOME/supervisord.conf</span><br></pre></td></tr></table></figure></p>
+<p>以下启动顺序，由上到下优先级依次递减<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ supervisord                             #默认去找$CWD/supervisord.conf，也就是当前目录</span><br><span class="line">$ supervisord                             #默认$CWD/etc/supervisord.conf，也就当前目录下的etc目录</span><br><span class="line">$ supervisord                             #默认去找/etc/supervisord.conf的配置文件</span><br><span class="line">$ supervisord -c $HOME/supervisord.conf   #到指定路径下去找配置文件</span><br></pre></td></tr></table></figure></p>
+<p>我的配置文件如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br></pre></td><td class="code"><pre><span class="line">#vim /etc/supervisord.conf</span><br><span class="line"></span><br><span class="line">[unix_http_server]             ; supervisord的unix socket服务配置</span><br><span class="line">file=/var/tmp/supervisor.sock  ; socket文件的保存目录</span><br><span class="line">chmod=0777                     ; socket的文件权限 (default 0700)</span><br><span class="line">chown=root:root                ; socket的拥有者和组名</span><br><span class="line">;username=user                 ; 使用supervisorctl连接的时候认证的用户，非必须</span><br><span class="line">;password=123                  ; 可以直接使用明码，也可以使用SHA加密，如：&#123;SHA&#125;82ab876d1387bfafe46cc1c8a2ef074eae50cb1d</span><br><span class="line">[inet_http_server]             ; supervisord的tcp服务配置 Web管理界面设定</span><br><span class="line">port=*:9001                    ; tcp端口，ip_address:port specifier, *:port for all iface</span><br><span class="line">username=user                  ; tcp登陆用户</span><br><span class="line">password=123                   ; tcp登陆密码</span><br><span class="line"></span><br><span class="line">[supervisord]                  ; supervisord的主进程配置</span><br><span class="line">logfile=/data/log/supervisor/main.log ; 主进程日志</span><br><span class="line">logfile_maxbytes=50MB          ; 最大日志体积，默认50MB，当超过50M的时候，会生成一个新的日志文件。当设置为0时，表示不限制文件大小</span><br><span class="line">logfile_backups=10             ; 日志文件备份数目，默认10。当设置为0时，表示不限制文件的数量</span><br><span class="line">loglevel=info                  ; 日志级别，默认info; 还有:critical, error, warn, debug, trace, blather</span><br><span class="line">pidfile=/var/run/supervisord.pid ; supervisord的pidfile文件</span><br><span class="line">nodaemon=false                 ; false: 以守护进程的方式启动 superviser</span><br><span class="line">minfds=1024                    ; 最少系统空闲的文件描述符，低于这个值supervisor将不会启动</span><br><span class="line">minprocs=200                   ; 最最小可用的进程描述符，低于这个值supervisor也将不会正常启动</span><br><span class="line">;umask=022                     ; 进程文件的umask，默认200</span><br><span class="line">user=root                      ; 默认为当前用户，如果为root则必填。这个参数可以设置一个非root用户，</span><br><span class="line">                               ; 当我们以root用户启动supervisor之后，这里设置的这个用户，也可以对supervisor进行管理</span><br><span class="line">;identifier=supervisor         ; supervisord的表示符, 默认是&apos;supervisor&apos;。主要是给XML_RPC用的。</span><br><span class="line">                               ; 当有多个supervisor的时候，而且想调用XML_RPC统一管理，就需要为每个supervisor设置不同的标识符了</span><br><span class="line">;directory=/tmp                ; 当supervisor作为守护进程运行的时候，设置这个参数的话，启动主进程之前，会先切换到这个目录</span><br><span class="line">nocleanup=true                 ; 当为false的时候，会在supervisord进程启动的时候，把以前子进程</span><br><span class="line">                               ; 产生的日志文件(路径为AUTO的情况下)清除掉。有时候咱们想要看历史日志，当</span><br><span class="line">                               ; 然不想日志被清除了。所以可以设置为true</span><br><span class="line">childlogdir=/data/log/supervisor  ; 当子进程日志路径为AUTO的时候，子进程日志文件的存放路径。</span><br><span class="line">;environment=A=&quot;1&quot;,B=&quot;2&quot;       ; 可在这里可以设置supervisord进程特有的其他环境变量</span><br><span class="line">                               ; supervisord启动子进程时，子进程会拷贝父进程的内存空间内容。 所以设置的这些环境变量也会被子进程继承。</span><br><span class="line">;strip_ansi=false              ; 如果设置为true，会清除子进程日志中的所有 ANSI 序列</span><br><span class="line"></span><br><span class="line">[supervisorctl]                ; 针对supervisorctl的一些配置</span><br><span class="line">serverurl=unix:///tmp/supervisor.sock   ; 注意这个是和前面的[unix_http_server]对应的</span><br><span class="line">serverurl=http://127.0.0.1:9001         ; 注意这个和前面的[inet_http_server]对应</span><br><span class="line">username=user                  ; 如果设置应该与http_username相同</span><br><span class="line">password=123                   ; 如果设置应该与http_password相同</span><br><span class="line">;prompt=mysupervisor           ; 命令行提示符，默认&quot;mysupervisor&quot;</span><br><span class="line">;history_file=~/.sc_history    ; 命令行历史纪录，和shell中的history类似</span><br><span class="line"></span><br><span class="line">; the below section must remain in the config file for RPC</span><br><span class="line">; (supervisorctl/web interface) to work, additional interfaces may be</span><br><span class="line">; added by defining them in separate rpcinterface: sections</span><br><span class="line">[rpcinterface:supervisor]      ; 这个选项是给XML_RPC用的</span><br><span class="line">supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">;[program:example]             ; 管理的单个进程的配置，可以添加多个program</span><br><span class="line">command=/bin/sh ~/example.sh   ; 被监控程序指定的运行脚本</span><br><span class="line">                               ; 如果command的栏运行的是shell脚本，那么在shell脚本启动被监控程序时要用exec修饰</span><br><span class="line">                               ; 例如： echo $RUN_CMD</span><br><span class="line">                               ;       eval exec $RUN_CMD</span><br><span class="line">                               ; 否则，supervisord停止不了启动的进程.此外，shell脚本里不能出现&amp;之类的后台运行符号</span><br><span class="line">;process_name=%(program_name)s ; 进程名表达式，默认为%(program_name)s，如果下面的numprocs参数为1的话，就不用管这个参数</span><br><span class="line">;numprocs=1                    ; 默认启动的进程数目，默认为1</span><br><span class="line">;directory=/opt                ; 进程运行前，会前切换到这个目录</span><br><span class="line">;umask=022                     ; 进程umask，默认None</span><br><span class="line">priority=999                   ; 程序运行的优先级，默认999</span><br><span class="line">autostart=true                 ; 默认随supervisord自动启动，默认true</span><br><span class="line">autorestart=true               ; 被监控程序异常中断是否自动重启，有三个选项，false,unexpected和true。</span><br><span class="line">                               ; 为false时，无论什么情况下，都不会被重新启动，</span><br><span class="line">                               ; 为unexpected时，只有当进程的退出码不在下面的exitcodes里面定义的退出码的时候，才会被自动重启。</span><br><span class="line">                               ; 为true时，只要子进程挂掉，将会被无条件的重启</span><br><span class="line">startsecs=5                    ; 进程持续运行多久才认为是启动成功</span><br><span class="line">startretries=3                 ; 被监控程序启动失败重试的次数，默认3次，当超过3次后，supervisor将把此进程的状态置为FAIL</span><br><span class="line">;exitcodes=0,2                 ; 期望的退出码，默认0,2，即当退出码不为0或2时，认为是unexpected的。</span><br><span class="line">;stopsignal=QUIT               ; 进程停止信号，可以为TERM, HUP, INT, QUIT, KILL, USR1, USR2等，默认TERM</span><br><span class="line">                               ; 当用设定的信号去干掉进程，退出码会被认为是expected</span><br><span class="line">;stopwaitsecs=10               ; 最长结束等待时间,否则使用 SIGKILL，默认10</span><br><span class="line">;stopasgroup=false             ; 向unix进程组发送停止信号，默认false，适用于supervisord管理的子进程本身还有子进程的情况</span><br><span class="line">;killasgroup=false             ; 向unix进程组发送SIGKILL信号，默认false，适用于supervisord管理的子进程本身还有子进程的情况</span><br><span class="line">;user=root                     ; 为运行程序的unix帐号设置setuid</span><br><span class="line">;redirect_stderr=true          ; 重定向程序的标准错误到标准输出，默认false</span><br><span class="line">;stdout_logfile=/a/path        ; 标准输出的日志路径。可以指定路径，AUTO，none等三个选项。</span><br><span class="line">                               ; 建议指定路径，使用AUTO选项的话，每次reload的时候都会在childlogdir下生成一个&quot;process_name-随机字符串.log&quot;文件</span><br><span class="line">;stdout_logfile_maxbytes=1MB   ; 日志文件最大值，否则循环写入 (default 50MB)</span><br><span class="line">;stdout_logfile_backups=10     ; 标准输出日志备份数目 (default 10)</span><br><span class="line">;stdout_capture_maxbytes=1MB   ; 定capture管道的大小，当值不为0的时候，子进程可以从stdout发送信息，而supervisor可以根据信息，发送相应的event。</span><br><span class="line">                               ; 默认为0，为0的时候表示关闭管道</span><br><span class="line">;stdout_events_enabled=false   ; 当设置为ture的时候，当子进程由stdout向文件描述符中写日志的时候，将</span><br><span class="line">                               ; 触发supervisord发送PROCESS_LOG_STDOUT类型的event，默认为false</span><br><span class="line">;stderr_logfile=/a/path        ; 标准错误输出日志路径, 和stdout_logfile选项类似</span><br><span class="line">;stderr_logfile_maxbytes=1MB   ; 日志文件最大值，否则循环写入 (default 50MB)</span><br><span class="line">;stderr_logfile_backups=10     ; 标准错误日志备份数目 (default 10)</span><br><span class="line">;stderr_capture_maxbytes=1MB   ; 和stdout_capture_maxbytes一样</span><br><span class="line">;stderr_events_enabled=false   ; 和stdout_events_enabled一样</span><br><span class="line">;environment=A=1,B=2           ; 进程附加环境，这个是该子进程的环境变量，和别的子进程是不共享的</span><br><span class="line">;serverurl=AUTO                ; override serverurl computation (childutils)</span><br><span class="line"></span><br><span class="line">; The below sample eventlistener section shows all possible</span><br><span class="line">; eventlistener subsection values, create one or more &apos;real&apos;</span><br><span class="line">; eventlistener: sections to be able to handle event notifications</span><br><span class="line">; sent by supervisor.</span><br><span class="line">; 下面是事件监听器的可选配置, supervisor能够处理事件通知.</span><br><span class="line">; eventlistener和program的地位是一样的，也是suopervisor启动的子进程，配置和program相似</span><br><span class="line">; listener的实现可以参考这篇文章 http://codingon.com/2015/11/21/supervisor-event/</span><br><span class="line"></span><br><span class="line">;[eventlistener:theeventlistenername]</span><br><span class="line">;command=/bin/eventlistener    ; 运行的程序 (相对使用PATH路径, 可以使用参数)</span><br><span class="line">;process_name=%(program_name)s ; 进程名表达式，默认为%(program_name)s</span><br><span class="line">;numprocs=1                    ; 默认启动的进程数目，默认为1</span><br><span class="line">;events=EVENT                  ; event事件的类型，comma-separated，只有写在这个地方的事件类型才会被发送</span><br><span class="line">;buffer_size=10                ; 事件缓冲区队列大小，默认10</span><br><span class="line">;directory=/tmp                ; 在运行前cwd到指定的目录，默认不执行cmd</span><br><span class="line">;umask=022                     ; 进程umask，默认None</span><br><span class="line">;priority=-1                   ; 程序运行的优先级，默认-1</span><br><span class="line">;autostart=true                ; 默认随supervisord自动启动，默认true</span><br><span class="line">;autorestart=unexpected        ; whether/when to restart (default: unexpected)</span><br><span class="line">;startsecs=1                   ; number of secs prog must stay running (def. 1)</span><br><span class="line">;startretries=3                ; max # of serial start failures (default 3)</span><br><span class="line">;exitcodes=0,2                 ; 期望的退出码，默认0,2</span><br><span class="line">;stopsignal=QUIT               ; 杀死进程的信号，默认TERM</span><br><span class="line">;stopwaitsecs=10               ; max num secs to wait b4 SIGKILL (default 10)</span><br><span class="line">;stopasgroup=false             ; 向unix进程组发送停止信号，默认false</span><br><span class="line">;killasgroup=false             ; 向unix进程组发送SIGKILL信号，默认false</span><br><span class="line">;user=chrism                   ; setuid to this UNIX account to run the program</span><br><span class="line">;redirect_stderr=true          ; redirect proc stderr to stdout (default false)</span><br><span class="line">;stdout_logfile=/a/path        ; stdout log path, NONE for none; default AUTO</span><br><span class="line">;stdout_logfile_maxbytes=1MB   ; max # logfile bytes b4 rotation (default 50MB)</span><br><span class="line">;stdout_logfile_backups=10     ; # of stdout logfile backups (default 10)</span><br><span class="line">;stdout_events_enabled=false   ; emit events on stdout writes (default false)</span><br><span class="line">;stderr_logfile=/a/path        ; stderr log path, NONE for none; default AUTO</span><br><span class="line">;stderr_logfile_maxbytes=1MB   ; max # logfile bytes b4 rotation (default 50MB)</span><br><span class="line">;stderr_logfile_backups        ; # of stderr logfile backups (default 10)</span><br><span class="line">;stderr_events_enabled=false   ; emit events on stderr writes (default false)</span><br><span class="line">;environment=A=1,B=2           ; process environment additions</span><br><span class="line">;serverurl=AUTO                ; override serverurl computation (childutils)</span><br><span class="line"></span><br><span class="line">; The below sample group section shows all possible group values,</span><br><span class="line">; create one or more &apos;real&apos; group: sections to create &quot;heterogeneous&quot;</span><br><span class="line">; process groups.</span><br><span class="line">; 下面是进程组的可选配置，可以创建一个或多个进程组。</span><br><span class="line">; 注意：program被划分到组里面之后，就相当于原来的配置从supervisor的配置文件里消失了,</span><br><span class="line">; supervisor只会对组进行管理，而不再会对组里面的单个program进行管理了</span><br><span class="line"></span><br><span class="line">[group:appgroup]</span><br><span class="line">programs=wapp,wfapp           ; 这里的进程名是上文 [program:x] 的 x</span><br><span class="line">;priority=999                 ; 程序运行的优先级，默认999</span><br><span class="line"></span><br><span class="line">; The [include] section can just contain the &quot;files&quot; setting.  This</span><br><span class="line">; setting can list multiple files (separated by whitespace or</span><br><span class="line">; newlines).  It can also contain wildcards.  The filenames are</span><br><span class="line">; interpreted as relative to this file.  Included files *cannot*</span><br><span class="line">; include files themselves.</span><br><span class="line">; 这个东西挺有用的，当我们要管理的进程很多的时候，写在一个文件里面就有点大了。</span><br><span class="line">; 我们可以把配置信息写到多个文件中，然后include过来</span><br><span class="line"></span><br><span class="line">;[include]</span><br><span class="line">;files = relative/directory/*.ini</span><br><span class="line"></span><br><span class="line">; 配置一组进程，对于类似的program可以通过这种方式添加，避免手工一个个添加</span><br><span class="line">;[program:bsapp]</span><br><span class="line">;command=/usr1/app/run/%(program_name)s_%(process_num)02d wapp /usr1/app/log/%(program_name)s_%(process_num)02d.tr</span><br><span class="line">;numprocs=3</span><br><span class="line">;process_name=%(program_name)s_%(process_num)02d</span><br><span class="line">;autostart=true</span><br><span class="line">;autorestart=true&lt;/span&gt;&lt;span style=&quot;font-family: 微软雅黑, &apos;Microsoft YaHei&apos;, Oswald, &apos;Helvetica Neue&apos;, Helvetica, Verdana, arial, sans-serif;&quot;&gt;</span><br></pre></td></tr></table></figure>
+<p>（更多配置说明请参考：<a href="http://supervisord.org/configuration.html" target="_blank" rel="noopener">http://supervisord.org/configuration.html</a> ）</p>
+<p><strong>注意：</strong> <code>;</code> 是注释，修改的时候一定要把要配置的行前边那个 <code>;</code> 删了，<br>当时我配置的时候因为没有去掉 <code>; [inet_http_server]</code> 前边的 <code>;</code> 而浪费半个小时的时间。</p>
+<h2 id="命令"><a href="#命令" class="headerlink" title="命令"></a>命令</h2><p>修改好配置文件后，直接执行 <code>supervisord</code> 即可启动。<br>然后可以用 <code>supervisorctl</code> 或用浏览器访问 <a href="http://serverhost:9001" target="_blank" rel="noopener">http://serverhost:9001</a> ，就可以管理进程了。</p>
+<p>更多命令如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">supervisord，初始启动Supervisord，启动、管理配置中设置的进程。</span><br><span class="line">supervisorctl stop programxxx，停止某一个进程（programxxx），programxxx 为[program:example] 里配置的值，这个示例就是 example。</span><br><span class="line">supervisorctl start programxxx，启动某个进程</span><br><span class="line">supervisorctl restart programxxx，重启某个进程</span><br><span class="line">supervisorctl stop groupworker: ，重启所有属于名为 groupworker 这个分组的进程（start，restart 同理）</span><br><span class="line">supervisorctl stop all，停止全部进程，注：start、restart、stop 都不会载入最新的配置文件。</span><br><span class="line">supervisorctl reload，载入最新的配置文件，停止原有进程并按新的配置启动、管理所有进程。</span><br><span class="line">supervisorctl update，根据最新的配置文件，启动新配置或有改动的进程，配置没有改动的进程不会受影响而重启。</span><br><span class="line">注意：显式用 stop 停止掉的进程，用 reload 或 update 都不会自动重启。</span><br></pre></td></tr></table></figure></p>
+<h2 id="常见错误"><a href="#常见错误" class="headerlink" title="常见错误"></a>常见错误</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ supersivord</span><br><span class="line">/usr/lib/python2.7/site-packages/supervisor-3.1.3-py2.7.egg/supervisor/options.py:296: UserWarning: Supervisord is running as root and it is searching for its configuration file in default locations (including its current working directory); you probably want to specify a &quot;-c&quot; argument specifying an absolute path to a configuration file for improved security.</span><br><span class="line">  &apos;Supervisord is running as root and it is searching &apos;</span><br><span class="line">Error: The directory named as part of the path /data/log/supervisor/main.log does not exist.</span><br><span class="line">For help, use /usr/bin/supervisord -h</span><br></pre></td></tr></table></figure>
+<p>这个目录 <code>/data/log/supervisor/</code> 不存在，手动创建就好了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">/usr/lib/python2.7/site-packages/supervisor-3.1.3-py2.7.egg/supervisor/options.py:296: UserWarning: Supervisord is running as root and it is searching for its configuration file in default locations (including its current working directory); you probably want to specify a &quot;-c&quot; argument specifying an absolute path to a configuration file for improved security.</span><br><span class="line">  &apos;Supervisord is running as root and it is searching &apos;</span><br></pre></td></tr></table></figure>
+<p>使用 <code>supervisord -c /etc/supervisord.conf</code> 启动</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ supervisorctl</span><br><span class="line">unix:///var/run/supervisor.sock no such file</span><br></pre></td></tr></table></figure>
+<p>应该是你的 supervisord 没有启动起来，<code>ps -ef | grep supervisord</code> 看看</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ supervisorctl</span><br><span class="line">http://127.0.0.1:9001 refused connection</span><br></pre></td></tr></table></figure>
+<p>首先还是看的 supervisord 启动了没有；其次 <code>netstats -apn | grep 9001</code> 看看端口是否被占用，换个端口试试；最后就是看看配置文件里有没有写错或没去掉前边的那个<code>;</code>（<code>; [inet_http_server]</code>）</p>
+<p>参考<br><a href="http://jwch.sdut.edu.cn/book/server/supervisor.html" target="_blank" rel="noopener">Supervisor – 服务管理</a><br><a href="http://www.tuicool.com/articles/FnMvInf" target="_blank" rel="noopener">用Supervisord管理进程</a></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Yibo</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://ideassea.com/2016/02/02/supervisor-basic/" title="Supervisor 基础">https://ideassea.com/2016/02/02/supervisor-basic/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Operations/" rel="tag"># Operations</a>
+          
+            <a href="/tags/Supervisor/" rel="tag"># Supervisor</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/02/01/rsync/" rel="next" title="rsync 命令详解">
+                <i class="fa fa-chevron-left"></i> rsync 命令详解
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/02/02/supervisor-event/" rel="prev" title="利用 Supervisor 的 Event & Listener 监控进程并报警">
+                利用 Supervisor 的 Event & Listener 监控进程并报警 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://ws2.sinaimg.cn/large/006tKfTcly1fq0mwrckglj30sg0sg0u8.jpg"
+                alt="Yibo" />
+            
+              <p class="site-author-name" itemprop="name">Yibo</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">41</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">21</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Supervisor"><span class="nav-number">1.</span> <span class="nav-text">Supervisor</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装"><span class="nav-number">2.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置"><span class="nav-number">3.</span> <span class="nav-text">配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#命令"><span class="nav-number">4.</span> <span class="nav-text">命令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#常见错误"><span class="nav-number">5.</span> <span class="nav-text">常见错误</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate"> 
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yibo</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/theme-next/hexo-theme-next">NexT.Gemini</a> v6.1.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/reading_progress/reading_progress.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.1.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.1.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.1.0"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+  
+  <script src="/lib/pangu/dist/pangu.min.js?v=3.3"></script>
+  <script type="text/javascript">pangu.spacingPage();</script>
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

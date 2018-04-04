@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.1.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.1.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.1.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.1.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="和 Hexo 相关的一些小配置、小功能就都放这里了。目录：  域名 &amp;amp; DNS README.md 404 页面 评论系统 图床 百度统计 apple-touch-icon">
+<meta name="keywords" content="Hexo">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo 的一些额外配置">
+<meta property="og:url" content="https://ideassea.com/2016/01/01/hexo-extends/index.html">
+<meta property="og:site_name" content="Ideas Sea">
+<meta property="og:description" content="和 Hexo 相关的一些小配置、小功能就都放这里了。目录：  域名 &amp;amp; DNS README.md 404 页面 评论系统 图床 百度统计 apple-touch-icon">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2017-07-19T05:00:40.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Hexo 的一些额外配置">
+<meta name="twitter:description" content="和 Hexo 相关的一些小配置、小功能就都放这里了。目录：  域名 &amp;amp; DNS README.md 404 页面 评论系统 图床 百度统计 apple-touch-icon">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Ideas Sea" type="application/atom+xml" />
+
+
+
+
+  <link rel="canonical" href="https://ideassea.com/2016/01/01/hexo-extends/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Hexo 的一些额外配置 | Ideas Sea</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> 
+
+<div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ideas Sea</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+          
+  <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />标签</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+</li>
+
+      
+
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+  
+
+
+
+ </div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+    <div class="reading-progress-bar"></div>
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://ideassea.com/2016/01/01/hexo-extends/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yibo">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://ws2.sinaimg.cn/large/006tKfTcly1fq0mwrckglj30sg0sg0u8.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ideas Sea">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Hexo 的一些额外配置</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-01-01T12:48:00+08:00">2016-01-01</time>
+            
+
+            
+            
+              
+                
+              
+            
+
+            
+              
+              <span class="post-meta-divider">|</span>
+              
+
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">更新于：</span>
+              
+              <time title="更新于" itemprop="dateModified" datetime="2017-07-19T13:00:40+08:00">2017-07-19</time>
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>和 Hexo 相关的一些小配置、小功能就都放这里了。<br>目录：</p>
+<ul>
+<li>域名 &amp; DNS</li>
+<li>README.md</li>
+<li>404 页面</li>
+<li>评论系统</li>
+<li>图床</li>
+<li>百度统计</li>
+<li>apple-touch-icon</li>
+</ul>
+<a id="more"></a>
+<h2 id="域名-amp-DNS"><a href="#域名-amp-DNS" class="headerlink" title="域名 &amp; DNS"></a>域名 &amp; DNS</h2><p>在 GitHub 上创建好<code>username.github.io</code>项目之后，会自动给你一个 <a href="http://username.github.io" target="_blank" rel="noopener">http://username.github.io</a> 域名以供访问。<br>如果你只是想搭建一个独立博客试试，对独立域名没有要求，那么现在你的独立博客已经 OK 啦。<br>如果你想长期经营这个博客，还是推荐你买一个独立域名的，也不贵，每年就几十块钱。<br>域名推荐在 <a href="http://godaddy.com" title="Godaddy" target="_blank" rel="noopener">GoDaddy</a> 上买，安全保险，支持支付宝，优惠码在网上一搜一大堆，流程也很简单。唯一费脑筋的就是，要想一个既简单好记又没被别人注册的域名了。  </p>
+<p><a href="http://godaddy.com" title="Godaddy" target="_blank" rel="noopener">GoDaddy</a> 一切都很完美，直到遇到了 GFW，原因你肯定懂。所以要用国内的 DNS 服务替代 GoDaddy 的 DNS。<a href="http://dnspod.cn" title="DNSPod" target="_blank" rel="noopener">DNSPod</a> 做得还不错，也是免费的，功能强大，速度快，不用担心被和谐，把 DNS 服务迁移到DNSPod 来，解决后顾之忧，配置比较简单。</p>
+<p>p.s.我的域名图省事，是在万网上买的（万网现在已经到阿里的名下了，应该还算靠谱吧），万网目前提供免费的隐私保护，另外如果你要备案的话，也推荐在万网购买域名，再买个最便宜的阿里云的 ECS，备案会方便一些。</p>
+<h3 id="绑定独立域名"><a href="#绑定独立域名" class="headerlink" title="绑定独立域名"></a>绑定独立域名</h3><p>在 Hexo 的 source 文件夹下面新建 <code>CNAME</code> 文件, 和 source/_post 文件夹并列，里面写入你的域名，比如<a href="http://ideassea.com" title="IdeasSea">ideassea.com</a>。<br>然后<code>ping http://&lt;username&gt;.github.io</code>获取 IP 地址，配置到你的 DNS 服务商里就好了。</p>
+<h2 id="上传-README-md-文件"><a href="#上传-README-md-文件" class="headerlink" title="上传 README.md 文件"></a>上传 README.md 文件</h2><p>用过 GitHub 的都知道 README.md 是干嘛的，就不解释了。但是 Hexo 默认情况下会把所有 .md 文件解析成 html 文件，所以即使你在线生成了 README.md，它也会在你下一次部署时被删去。<br>解决办法如下：<br>在 Hexo 目录下的 source 根目录下添加一个 README.md，<br>修改 Hexo 目录下的 <code>_config.yml</code>，设置<code>skip_render</code>：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">skip_render: README.md</span><br></pre></td></tr></table></figure>
+<p>保存退出, 这样使用 <code>hexo d</code> 命令就不会再渲染 README.md 这个文件了。</p>
+<h2 id="404-页面"><a href="#404-页面" class="headerlink" title="404 页面"></a>404 页面</h2><p>如果没有绑定域名的话是无法创建 404 页面的，只会跳转到 GitHub 默认的 404 页面。<br>绑定了域名的话，可以直接在 source 文件夹下面创建自己的 404.html 或者 404.md 就可以。(<a href="https://help.github.com/articles/custom-404-pages" target="_blank" rel="noopener">GitHub Help - Custom 404 Pages</a>)<br>也可以止咳输入命令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo new page 404</span><br></pre></td></tr></table></figure>
+<p>并设置 /source/404/index.md 里的 Front-Matter ：<code>permalink: /404</code></p>
+<p>推荐<a href="http://www.qq.com/404/" target="_blank" rel="noopener">腾讯的公益 404 页面</a>，html 代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">&lt;script type=&quot;text/javascript&quot; src=&quot;http://www.qq.com/404/search_children.js&quot; charset=&quot;utf-8&quot; homePageUrl=&quot;http://codingon.com&quot; homePageName=&quot;返回主页&quot;&gt;&lt;/script&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+<h2 id="评论系统"><a href="#评论系统" class="headerlink" title="评论系统"></a>评论系统</h2><p><strong>2017年更新：多说已暂停服务，建议使用 Disqus</strong><br>因为我是直接换了主题 yilia 后添加的<a href="http://duoshuo.com" title="多说" target="_blank" rel="noopener">多说</a>评论，所以对于默认主题如何添加评论并不是太清楚（想必你也不会使用默认主题吧嘿嘿）。而第三方主题一般都会在其 <code>_config.yml</code> 中预留评论的配置。<br>比如 yilia 主题的配置文件中：  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">duoshuo: true # duoshuo-key</span><br></pre></td></tr></table></figure>
+<p>不要以为这个默认的值 <code>true</code> 是个布尔值，图样图森破~ 我绝对不会告诉你这是某人（谁知道呢）的 duoshuo-key，当时我看到我还未部署的文章就能那么多的评论，我惊呆了！！！结果只是虚惊一场。</p>
+<p>这里你要到<a href="http://duoshuo.com" title="多说" target="_blank" rel="noopener">多说</a>注册一个帐号，然后创建一个站点，其中你填到“多说域名”那里的就是你的 duoshuo-key，比如我的 <a href="http://ideassea.com">http://ideassea.duoshuo.com</a> 那么我就配置</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">duoshuo: ideassea</span><br></pre></td></tr></table></figure>
+<p>好了，这就 OK 了，去到你的一篇已发布的文章里，拉到最下边，是不是多了个评论框。</p>
+<p>当然，你也可以用 <a href="https://disqus.com/" title="Disqus" target="_blank" rel="noopener">Disqus</a>、<a href="http://www.uyan.cc/" target="_blank" rel="noopener">友言</a>等等第三方社会化评论系统。</p>
+<h2 id="图床"><a href="#图床" class="headerlink" title="图床"></a>图床</h2><p>推荐使用七牛，免费，标准用户 10G 空间（体验用户 1G），支持自定义域名，并且 Hexo 有插件能自动同步上传到七牛（<a href="https://github.com/gyk001/hexo-qiniu-sync" target="_blank" rel="noopener">hexo-qiniu-sync</a>）。只是体验用户升级为标准用户略显麻烦，需要经过激活邮箱、绑定手机、身份认证（上传身份证时记得打水印哦）这三步，估计是怕用户上传违规文件吧。<br>如果你也需要申请，请访问这个<a href="https://portal.qiniu.com/signup?code=3lfwcizd9j61e" target="_blank" rel="noopener">推广链接</a>，这样我可以获得更多的流量（5GB）；或者这个<a href="http://www.qiniu.com/" target="_blank" rel="noopener">官网链接</a>。</p>
+<h2 id="添加百度统计"><a href="#添加百度统计" class="headerlink" title="添加百度统计"></a>添加百度统计</h2><p>因某些原因，Google Analytics 访问不便。所以使用百度统计来替代。<br>以主题 yilia 为例。  </p>
+<ol>
+<li><p>首先申请<a href="http://tongji.baidu.com/" title="百度统计" target="_blank" rel="noopener">百度统计</a>：<br>到其<a href="http://tongji.baidu.com/" title="百度统计" target="_blank" rel="noopener">首页</a>注册帐号（这个帐号不同于普通的在百度首页登录的那个帐号），选择百度统计站长版。注册成功登录后即自动跳转到了统计后台的“网站中心-&gt;代码获取”，那个输入框里的代码的就是一会我们要用到的。  </p>
+</li>
+<li><p>编辑文件 themes/yilia/_config.yml，添加一行配置：</p>
+</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">baidu_analytics: true</span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li>新建 themes/yilia/layout/_partial/baidu_analytics.ejs，内容如下：    </li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;% if (theme.baidu_analytics) &#123; %&gt;</span><br><span class="line">&lt;script type=&quot;text/javascript&quot;&gt;</span><br><span class="line">//这里填上第一步中你的百度统计代码</span><br><span class="line">&lt;/script&gt;</span><br><span class="line">&lt;% &#125; %&gt;</span><br></pre></td></tr></table></figure>
+<ol start="4">
+<li>编辑 themes/yilia/layout/_partial/head.ejs，在 <code>&lt;/head&gt;</code> 前添加</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;%- partial(&quot;baidu_analytics&quot;) %&gt;</span><br></pre></td></tr></table></figure>
+<p>重新生成并部署你的站点。<br>不出意外的话，在你的站点的每个页面的左上角都会看到一个恶心的百度 Logo。不过可以在在“百度统计首页-&gt;网站中心（上边导航）-&gt;系统管理设置（左边导航）-&gt;统计图标设置”中把“显示图标”前边的那个勾去掉，就没有那个 Logo 了。</p>
+<h2 id="添加-apple-touch-icon"><a href="#添加-apple-touch-icon" class="headerlink" title="添加 apple-touch-icon"></a>添加 apple-touch-icon</h2><p>这个 apple-touch-icon 类似于 favicon，只是这个是苹果专门为 Apple 设备配备的，比如 Mac 上用 Safari 保存个书签啦，iPhone 上保存个链接啦。</p>
+<p>添加方法很简单，先编辑文件 themes/yilia/_config.yml，添加一行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apple_touch_icon: # 图片放的位置 图片尺寸最好为180*180的</span><br></pre></td></tr></table></figure>
+<p>然后编辑 themes/yilia/layout/_partial/head.ejs，在 <code>&lt;/head&gt;</code> 前添加：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;% if (theme.apple_touch_icon)&#123; %&gt;¬</span><br><span class="line">  &lt;link rel=&quot;apple-touch-icon&quot; href=&quot;&lt;%- theme.apple_touch_icon %&gt;&quot;&gt;¬</span><br><span class="line">&lt;% &#125; %&gt;¬</span><br></pre></td></tr></table></figure>
+<p>重新生存并部署就好了。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Yibo</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://ideassea.com/2016/01/01/hexo-extends/" title="Hexo 的一些额外配置">https://ideassea.com/2016/01/01/hexo-extends/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Hexo/" rel="tag"># Hexo</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/01/01/hexo-a-blog/" rel="next" title="使用 Hexo 和 Github Pages 搭建一个独立博客">
+                <i class="fa fa-chevron-left"></i> 使用 Hexo 和 Github Pages 搭建一个独立博客
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/01/02/configure-a-kerberos-kdc-on-centos7/" rel="prev" title="在 CentOS 7 上安装、配置 Kerberos">
+                在 CentOS 7 上安装、配置 Kerberos <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://ws2.sinaimg.cn/large/006tKfTcly1fq0mwrckglj30sg0sg0u8.jpg"
+                alt="Yibo" />
+            
+              <p class="site-author-name" itemprop="name">Yibo</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">41</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">21</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#域名-amp-DNS"><span class="nav-number">1.</span> <span class="nav-text">域名 &amp; DNS</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#绑定独立域名"><span class="nav-number">1.1.</span> <span class="nav-text">绑定独立域名</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#上传-README-md-文件"><span class="nav-number">2.</span> <span class="nav-text">上传 README.md 文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#404-页面"><span class="nav-number">3.</span> <span class="nav-text">404 页面</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#评论系统"><span class="nav-number">4.</span> <span class="nav-text">评论系统</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#图床"><span class="nav-number">5.</span> <span class="nav-text">图床</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#添加百度统计"><span class="nav-number">6.</span> <span class="nav-text">添加百度统计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#添加-apple-touch-icon"><span class="nav-number">7.</span> <span class="nav-text">添加 apple-touch-icon</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate"> 
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yibo</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/theme-next/hexo-theme-next">NexT.Gemini</a> v6.1.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/reading_progress/reading_progress.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.1.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.1.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.1.0"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+  
+  <script src="/lib/pangu/dist/pangu.min.js?v=3.3"></script>
+  <script type="text/javascript">pangu.spacingPage();</script>
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

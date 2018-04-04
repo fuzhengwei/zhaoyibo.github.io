@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.1.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.1.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.1.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.1.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="良好的逻辑设计和物理设计是高性能的基石，应该根据系统将要执行的查询语句来设计 schema，这往往需要权衡各种因素。">
+<meta name="keywords" content="MySQL">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MySQL高性能表设计规范">
+<meta property="og:url" content="https://ideassea.com/2017/07/28/high-performance-mysql-schema/index.html">
+<meta property="og:site_name" content="Ideas Sea">
+<meta property="og:description" content="良好的逻辑设计和物理设计是高性能的基石，应该根据系统将要执行的查询语句来设计 schema，这往往需要权衡各种因素。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2017-08-02T00:58:14.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="MySQL高性能表设计规范">
+<meta name="twitter:description" content="良好的逻辑设计和物理设计是高性能的基石，应该根据系统将要执行的查询语句来设计 schema，这往往需要权衡各种因素。">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Ideas Sea" type="application/atom+xml" />
+
+
+
+
+  <link rel="canonical" href="https://ideassea.com/2017/07/28/high-performance-mysql-schema/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>MySQL高性能表设计规范 | Ideas Sea</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> 
+
+<div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ideas Sea</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+          
+  <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />标签</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+</li>
+
+      
+
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+  
+
+
+
+ </div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+    <div class="reading-progress-bar"></div>
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://ideassea.com/2017/07/28/high-performance-mysql-schema/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yibo">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://ws2.sinaimg.cn/large/006tKfTcly1fq0mwrckglj30sg0sg0u8.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ideas Sea">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">MySQL高性能表设计规范</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-07-28T04:04:45+08:00">2017-07-28</time>
+            
+
+            
+            
+              
+                
+              
+            
+
+            
+              
+              <span class="post-meta-divider">|</span>
+              
+
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">更新于：</span>
+              
+              <time title="更新于" itemprop="dateModified" datetime="2017-08-02T08:58:14+08:00">2017-08-02</time>
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>良好的逻辑设计和物理设计是高性能的基石，应该根据系统将要执行的查询语句来设计 schema，这往往需要权衡各种因素。</p>
+<a id="more"></a>
+<h1 id="选择优化的数据类型"><a href="#选择优化的数据类型" class="headerlink" title="选择优化的数据类型"></a>选择优化的数据类型</h1><p>MySQL 支持的数据类型非常多，选择正确的数据类型对于获得高性能至关重要。</p>
+<h2 id="更小的通常更好"><a href="#更小的通常更好" class="headerlink" title="更小的通常更好"></a>更小的通常更好</h2><p>更小的数据类型通常更快，因为它们占用更少的磁盘、内存和 CPU 缓存，并且处理时需要的 CPU 周期也更少。</p>
+<h2 id="简单就好"><a href="#简单就好" class="headerlink" title="简单就好"></a>简单就好</h2><p>简单数据类型的操作通常需要更少的 CPU 周期。例如，整型比字符操作代价更低，因为字符集和校对规则（排序规则）使字符比较比整型比较更复杂。</p>
+<h2 id="尽量避免-NULL"><a href="#尽量避免-NULL" class="headerlink" title="尽量避免 NULL"></a>尽量避免 NULL</h2><p>如果查询中包含可为 NULL 的列，对 MySQL 来说更难优化，因为可为 NULL 的列使得索引、索引统计和值比较都更复杂。可为 NULL 的列会使用更多的存储空间，在 MySQL 里也需要特殊处理。当可为 NULL 的列被索引时，每个索引记录需要一个额外的字节，在 MyISAM 里甚至还可能导致固定大小的索引（例如只有一个整数列的索引）变成可变大小的索引。<br>当然也有例外，例如值得一提的是，lnnoDB 使用单独的位(bit)存储 NULL 值，所以对于稀疏数据有很好的空间效率。</p>
+<h2 id="整数类型"><a href="#整数类型" class="headerlink" title="整数类型"></a>整数类型</h2><p>有两种类型的数字：整数(whole number)和实数(real number)。如果存储整数，可以使用这几种整数类型：TINYINT, SMALLINT, MEDIUMINT, INT, BIGINT，分别使用8, 16, 24, 32, 64位存储空间。</p>
+<p>整数类型有可选的 <strong>UNSIGNED</strong> 属性，表示不允许负值，这大致可以使正数的上限提高一倍。例如 TINYINT UNSIGNED 可以存储的范围是 0~255，而 TINYINT 的存储范围是 -128~127。</p>
+<p><strong>有符号和无符号类型使用相同的存储空间，并具有相同的性能</strong>，因此可以根据实际情况选择合适的类型。</p>
+<p>你的选择决定 MySQL 是怎么在内存和磁盘中保存数据的。然而，整数计算一般使用 64 位的 BIGINT 整数，即使在 32 位环境也是如此。（一些聚合函数是例外，它们使用 DECIMAL 或 DOUBLE 进行计算）。</p>
+<p>MySQL 可以为整数类型指定宽度，例如 INT(11)，对大多数应用这是没有意义的：它不会限制值的合法范围，只是规定了 MySQL 的一些交互工具（例如 MySQL 命令行客户端）用来显示字符的个数。对于存储和计算来说，INT(1) 和 INT(20) 是相同的。</p>
+<h2 id="实数类型"><a href="#实数类型" class="headerlink" title="实数类型"></a>实数类型</h2><p>实数是带有小数部分的数字。然而，它们不只是为了存储小数部分，也可以使用 DECIMAL 存储比 BIGINT 还大的整数。</p>
+<p>FLOAT 和 DOUBLE 类型支持使用标准的浮点运算进行近似计算。<br>DECIMAL 类型用于存储精确的小数。<br>浮点和 DECIMAL 类型都可以指定精度。对于 DECIMAL 列，可以指定小数点前后所允许的最大位数。这会影响列的空间消耗。</p>
+<p>有多种方法可以指定浮点列所需要的精度，这会使得 MySQL 悄悄选择不同的数据类型，或者在存储时对值进行取舍。这些精度定义是非标准的，<strong>所以我们建议只指定数据类型，不指定精度。</strong></p>
+<p><strong>浮点类型在存储同样范围的值时，通常比 DECIMAL 使用更少的空间。FLOAT 使用 4 个字节存储。DOUBLE 占用 8 个字节，相比 FLOAT 有更高的精度和更大的范围。和整数类型一样，能选择的只是存储类型；MySQL 使用 DOUBLE 作为内部浮点计算的类型。</strong></p>
+<p>因为需要额外的空间和计算开销，所以应该尽量只在对小数进行精确计算时才使用DECIMAL。<strong>但在数据最比较大的时候，可以考虑使用 BIGINT 代替 DECIMAL，将需要存储的货币单位根据小数的位数乘以相应的倍数即可。</strong></p>
+<h2 id="字符串类型"><a href="#字符串类型" class="headerlink" title="字符串类型"></a>字符串类型</h2><h3 id="VARCHAR"><a href="#VARCHAR" class="headerlink" title="VARCHAR"></a>VARCHAR</h3><p>用于存储可变⻓字符串，长度支持到 65535，需要使用 1 或 2 个额外字节记录字符串的长度<br>适合：字符串的最大⻓度比平均⻓度⼤很多；更新很少</p>
+<h3 id="CHAR"><a href="#CHAR" class="headerlink" title="CHAR"></a>CHAR</h3><p>定⻓，⻓度范围是1~255<br>适合：存储很短的字符串，或者所有值接近同一个长度；经常变更</p>
+<h3 id="慷慨是不明智的"><a href="#慷慨是不明智的" class="headerlink" title="慷慨是不明智的"></a>慷慨是不明智的</h3><p>使用 VARCHAR(5) 和 VARCHAR(200) 存储 ‘hello’ 的空间开销是一样的。那么使用更短的列有什么优势吗？</p>
+<p>事实证明有很大的优势。更长的列会消耗更多的内存，因为 MySQL 通常会分配固定大小的内存块来保存内部值。尤其是使用内存临时表进行排序或操作时会特别糟糕。在利用磁盘临时表进行排序时也同样糟糕。</p>
+<p>所以最好的策略是只分配真正需要的空间。</p>
+<h2 id="BLOB-和-TEXT-类型"><a href="#BLOB-和-TEXT-类型" class="headerlink" title="BLOB 和 TEXT 类型"></a>BLOB 和 TEXT 类型</h2><p>BLOB 和 TEXT 都是为存储很大的数据而设计的字符串数据类型，分别采用二进制和字符方式存储。</p>
+<p>与其他类型不同，MySQL 把每个 BLOB 和 TEXT 值当作一个独立的对象处理。存储引擎在存储时通常会做特殊处理。当 BLOB 和 TEXT 值太大时，InnoDB 会使用专门的“外部“存储区域来进行存储，此时每个值在行内需要 1-4 个字节存储存储区域存储实际的值。</p>
+<p>BLOB 和 TEXT 之间仅有的不同是 BLOB 类型存储的是二进制数据，没有排序规则或字符集，而 TEXT 类型有字符集和排序规则</p>
+<h2 id="日期和时间类型"><a href="#日期和时间类型" class="headerlink" title="日期和时间类型"></a>日期和时间类型</h2><p>大部分时间类型都没有替代品，因此没有什么是最佳选择的问题。唯一的问题是保存日期和时间的时候需要做什么。MySQL 提供两种相似的日期类型：DATETIME 和 TIMESTAMP。</p>
+<p>但是目前我们更建议存储时间戳的方式，因此该处不再对 DATETIME 和 TIMESTAMP 做过多说明。</p>
+<h2 id="其他类型"><a href="#其他类型" class="headerlink" title="其他类型"></a>其他类型</h2><h3 id="选择标识符"><a href="#选择标识符" class="headerlink" title="选择标识符"></a>选择标识符</h3><p>在可以满足值的范围的需求，井且预留未来增长空间的前提下，应该选择最小的数据类型。</p>
+<ul>
+<li>整数类型</li>
+</ul>
+<p>整数通常是标识列最好的选择，因为它们很快并且可以使用 AUTO_INCREMENT。</p>
+<ul>
+<li>ENUM 和 SET 类型</li>
+</ul>
+<p>对于标识列来说，EMUM 和 SET 类型通常是一个糟糕的选择，尽管对某些只包含固定状态或者类型的静态”定义表”来说可能是没有问题的。ENUM 和 SET 列适合存储固定信息，例如有序的状态、产品类型、人的性别。</p>
+<ul>
+<li>字符串类型</li>
+</ul>
+<p>如果可能，应该避免使用字符串类型作为标识列，因为它们很消耗空间，并且通常比数字类型慢。</p>
+<p>对于完全“随机”的字符串也需要多加注意，例如 MDS()、SHAl() 或者 UUID() 产生的字符串。这些函数生成的新值会任意分布在很大的空间内，这会导致 INSERT 以及一些 SELECT 语句变得很慢。如果存储 UUID 值，则应该移除”-“符号。</p>
+<h3 id="特殊类型数据"><a href="#特殊类型数据" class="headerlink" title="特殊类型数据"></a>特殊类型数据</h3><p>某些类型的数据并不直接与内置类型一致。低于秒级精度的时间戳就是一个例子，另一个例子是一个 IPv4 地址，人们经常使用 VARCHAR(15) 列来存储 IP 地址，然而，它们实际上是 32 位无符号整数，不是字符串。用小数点将地址分成四段的表示方法只是为了让人们阅读容易。所以应该用无符号整数存储 IP 地址。MySQL提供 INET_ATON() 和 INET_NTOA() 函数在这两种表示方法之间转换。</p>
+<h1 id="表结构设计"><a href="#表结构设计" class="headerlink" title="表结构设计"></a>表结构设计</h1><h2 id="范式和反范式"><a href="#范式和反范式" class="headerlink" title="范式和反范式"></a>范式和反范式</h2><p>对于任何给定的数据通常都有很多种表示方法，从完全的范式化到完全的反范式化，以及两者的折中。在范式化的数据库中，每个事实数据会出现并且只出现一次。相反，在反范式化的数据库中，信息是冗余的，可能会存储在多个地方。</p>
+<h3 id="范式的优点和缺点"><a href="#范式的优点和缺点" class="headerlink" title="范式的优点和缺点"></a>范式的优点和缺点</h3><p>为性能提升考虑时，经常会被建议对 schema 进行范式化设计，尤其是写密集的场景。</p>
+<ul>
+<li>范式化的更新操作通常比反范式化要快。</li>
+<li>当数据较好地范式化时，就只有很少或者没有重复数据，所以只需要修改更少的数据。</li>
+<li>范式化的表通常更小，可以更好地放在内存里，所以执行操作会更快。</li>
+<li>很少有多余的数据意味着检索列表数据时更少需要 DISTINCT 或者 GROUP BY 语句。</li>
+</ul>
+<h3 id="反范式的优点和缺点"><a href="#反范式的优点和缺点" class="headerlink" title="反范式的优点和缺点"></a>反范式的优点和缺点</h3><p>不需要关联表，则对大部分查询最差的情况——即使表没有使用索引——是全表扫描。当数据比内存大时这可能比关联要快得多，因为这样避免了随机 I/O。<br>单独的表也能使用更有效的索引策略。</p>
+<h3 id="混用范式化和反范式化"><a href="#混用范式化和反范式化" class="headerlink" title="混用范式化和反范式化"></a>混用范式化和反范式化</h3><p>在实际应用中经常需要混用，可能使用部分范式化的schema、缓存表，以及其他技巧。<br>表适当增加冗余字段，如性能优先，但会增加复杂度。可避免表关联查询。</p>
+<h3 id="简单熟悉数据库范式"><a href="#简单熟悉数据库范式" class="headerlink" title="简单熟悉数据库范式"></a>简单熟悉数据库范式</h3><p>第一范式(1NF)：字段值具有原子性，不能再分(所有关系型数据库系统都满足第一范式)；<br>例如：姓名字段,其中姓和名是一个整体，如果区分姓和名那么必须设立两个独立字段；</p>
+<p>第二范式(2NF)：一个表必须有主键，即每行数据都能被唯一的区分；<br>备注：必须先满足第一范式；</p>
+<p>第三范式(3NF)：一个表中不能包涵其他相关表中非关键字段的信息，即数据表不能有冗余字段；<br>备注：必须先满足第二范式；</p>
+<h2 id="表字段少⽽精"><a href="#表字段少⽽精" class="headerlink" title="表字段少⽽精"></a>表字段少⽽精</h2><ul>
+<li>I/O 高效</li>
+<li>字段分开维护简单</li>
+<li>单表 1G 体积 500W ⾏行评估</li>
+<li>单⾏行不超过 200Byte</li>
+<li>单表不超过 50 个 INT 字段</li>
+<li>单表不超过 20 个 CHAR(10) 字段</li>
+<li>建议单表字段数控制在 20 个以内</li>
+<li>拆分 TEXT/BLOB，TEXT 类型处理性能远低于 VARCHAR，强制生成硬盘临时表浪费更多空间</li>
+</ul>
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><p><a href="https://www.amazon.cn/%E5%9B%BE%E4%B9%A6/dp/B00C1W58DE" target="_blank" rel="noopener">高性能MySQL(第3版)</a></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Yibo</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://ideassea.com/2017/07/28/high-performance-mysql-schema/" title="MySQL高性能表设计规范">https://ideassea.com/2017/07/28/high-performance-mysql-schema/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/MySQL/" rel="tag"># MySQL</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/07/22/trail-running-2017-columbia168-chongli/" rel="next" title="崇礼50KM | 我的首野，我的新大陆">
+                <i class="fa fa-chevron-left"></i> 崇礼50KM | 我的首野，我的新大陆
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/07/30/golang-error-handle/" rel="prev" title="Golang 错误处理">
+                Golang 错误处理 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://ws2.sinaimg.cn/large/006tKfTcly1fq0mwrckglj30sg0sg0u8.jpg"
+                alt="Yibo" />
+            
+              <p class="site-author-name" itemprop="name">Yibo</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">41</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">21</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#选择优化的数据类型"><span class="nav-number">1.</span> <span class="nav-text">选择优化的数据类型</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#更小的通常更好"><span class="nav-number">1.1.</span> <span class="nav-text">更小的通常更好</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#简单就好"><span class="nav-number">1.2.</span> <span class="nav-text">简单就好</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#尽量避免-NULL"><span class="nav-number">1.3.</span> <span class="nav-text">尽量避免 NULL</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#整数类型"><span class="nav-number">1.4.</span> <span class="nav-text">整数类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实数类型"><span class="nav-number">1.5.</span> <span class="nav-text">实数类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#字符串类型"><span class="nav-number">1.6.</span> <span class="nav-text">字符串类型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#VARCHAR"><span class="nav-number">1.6.1.</span> <span class="nav-text">VARCHAR</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CHAR"><span class="nav-number">1.6.2.</span> <span class="nav-text">CHAR</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#慷慨是不明智的"><span class="nav-number">1.6.3.</span> <span class="nav-text">慷慨是不明智的</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#BLOB-和-TEXT-类型"><span class="nav-number">1.7.</span> <span class="nav-text">BLOB 和 TEXT 类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#日期和时间类型"><span class="nav-number">1.8.</span> <span class="nav-text">日期和时间类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其他类型"><span class="nav-number">1.9.</span> <span class="nav-text">其他类型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#选择标识符"><span class="nav-number">1.9.1.</span> <span class="nav-text">选择标识符</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#特殊类型数据"><span class="nav-number">1.9.2.</span> <span class="nav-text">特殊类型数据</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#表结构设计"><span class="nav-number">2.</span> <span class="nav-text">表结构设计</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#范式和反范式"><span class="nav-number">2.1.</span> <span class="nav-text">范式和反范式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#范式的优点和缺点"><span class="nav-number">2.1.1.</span> <span class="nav-text">范式的优点和缺点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#反范式的优点和缺点"><span class="nav-number">2.1.2.</span> <span class="nav-text">反范式的优点和缺点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#混用范式化和反范式化"><span class="nav-number">2.1.3.</span> <span class="nav-text">混用范式化和反范式化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#简单熟悉数据库范式"><span class="nav-number">2.1.4.</span> <span class="nav-text">简单熟悉数据库范式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#表字段少⽽精"><span class="nav-number">2.2.</span> <span class="nav-text">表字段少⽽精</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考资料"><span class="nav-number">3.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate"> 
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yibo</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/theme-next/hexo-theme-next">NexT.Gemini</a> v6.1.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/reading_progress/reading_progress.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.1.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.1.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.1.0"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+  
+  <script src="/lib/pangu/dist/pangu.min.js?v=3.3"></script>
+  <script type="text/javascript">pangu.spacingPage();</script>
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.1.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.1.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.1.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.1.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="公司有个新项目要部署在新的服务器上，几台服务器之间要用 Kerberos 来做身份验证，并由我来安装和配置。期间翻阅了不少网上的文章，也遇到了几个坑，故总结了一下其安装配置的过程，以作笔记。  Kerberos 简介：它是一个身份验证协议，提供一个在客户端跟服务器端之间或者服务器与服务器之间的身份验证机制 （并且是相互的身份验证机制）。   环境配置： 1234OS 版本: CentOS 7Ker">
+<meta name="keywords" content="Operations,Kerberos">
+<meta property="og:type" content="article">
+<meta property="og:title" content="在 CentOS 7 上安装、配置 Kerberos">
+<meta property="og:url" content="https://ideassea.com/2016/01/02/configure-a-kerberos-kdc-on-centos7/index.html">
+<meta property="og:site_name" content="Ideas Sea">
+<meta property="og:description" content="公司有个新项目要部署在新的服务器上，几台服务器之间要用 Kerberos 来做身份验证，并由我来安装和配置。期间翻阅了不少网上的文章，也遇到了几个坑，故总结了一下其安装配置的过程，以作笔记。  Kerberos 简介：它是一个身份验证协议，提供一个在客户端跟服务器端之间或者服务器与服务器之间的身份验证机制 （并且是相互的身份验证机制）。   环境配置： 1234OS 版本: CentOS 7Ker">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2017-10-11T21:45:25.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="在 CentOS 7 上安装、配置 Kerberos">
+<meta name="twitter:description" content="公司有个新项目要部署在新的服务器上，几台服务器之间要用 Kerberos 来做身份验证，并由我来安装和配置。期间翻阅了不少网上的文章，也遇到了几个坑，故总结了一下其安装配置的过程，以作笔记。  Kerberos 简介：它是一个身份验证协议，提供一个在客户端跟服务器端之间或者服务器与服务器之间的身份验证机制 （并且是相互的身份验证机制）。   环境配置： 1234OS 版本: CentOS 7Ker">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Ideas Sea" type="application/atom+xml" />
+
+
+
+
+  <link rel="canonical" href="https://ideassea.com/2016/01/02/configure-a-kerberos-kdc-on-centos7/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>在 CentOS 7 上安装、配置 Kerberos | Ideas Sea</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> 
+
+<div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ideas Sea</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+          
+  <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />标签</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+</li>
+
+      
+
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+  
+
+
+
+ </div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+    <div class="reading-progress-bar"></div>
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://ideassea.com/2016/01/02/configure-a-kerberos-kdc-on-centos7/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yibo">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://ws2.sinaimg.cn/large/006tKfTcly1fq0mwrckglj30sg0sg0u8.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ideas Sea">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">在 CentOS 7 上安装、配置 Kerberos</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-01-02T14:14:00+08:00">2016-01-02</time>
+            
+
+            
+            
+              
+                
+              
+            
+
+            
+              
+              <span class="post-meta-divider">|</span>
+              
+
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">更新于：</span>
+              
+              <time title="更新于" itemprop="dateModified" datetime="2017-10-12T05:45:25+08:00">2017-10-12</time>
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>公司有个新项目要部署在新的服务器上，几台服务器之间要用 Kerberos 来做身份验证，并由我来安装和配置。期间翻阅了不少网上的文章，也遇到了几个坑，故总结了一下其安装配置的过程，以作笔记。</p>
+<p> Kerberos 简介：它是一个身份验证协议，提供一个在客户端跟服务器端之间或者服务器与服务器之间的身份验证机制 （并且是相互的身份验证机制）。  </p>
+<p>环境配置：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">OS 版本: CentOS 7</span><br><span class="line">Kerberos 版本: krb5-1.12.2</span><br><span class="line">Server：grape.jie.hn</span><br><span class="line">Client：peach.jie.hn</span><br></pre></td></tr></table></figure>
+<a id="more"></a>
+<h2 id="配置-DNS-解析和-NTP-服务"><a href="#配置-DNS-解析和-NTP-服务" class="headerlink" title="配置 DNS 解析和 NTP 服务"></a>配置 DNS 解析和 <a href="http://www.certdepot.net/rhel7-set-ntp-service/" target="_blank" rel="noopener">NTP</a> 服务</h2><p>Kerberos 要求参与通信的主机的时钟同步。票据具有一定有效期，因此，如果主机的时钟与 Kerberos 服务器的时钟不同步，认证会失败。默认设置要求时钟的时间相差不超过10分钟。</p>
+<h2 id="配置-Kerberos-Server"><a href="#配置-Kerberos-Server" class="headerlink" title="配置 Kerberos Server"></a>配置 Kerberos Server</h2><h3 id="安装相关模块"><a href="#安装相关模块" class="headerlink" title="安装相关模块"></a>安装相关模块</h3><p>krb5-libs、krb5-server、krb5-workstation、pam_krb5</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install -y krb5-libs krb5-server krb5-workstation pam_krb5</span><br></pre></td></tr></table></figure>
+<p>如果无法从 yum 安装以上模块，也可以直接<a href="http://web.mit.edu/kerberos/" target="_blank" rel="noopener">下载 source</a> 编译安装</p>
+<pre><code># .confirgure &amp;&amp; make &amp;&amp; make install
+</code></pre><p>PAM</p>
+<pre><code># wget http://www.linux-pam.org/library/Linux-PAM-1.2.0.tar.gz
+# tar -zxvf Linux-PAM-1.2.0.tar.gz
+# cd Linux-PAM-1.2.0
+# ./configure --prefix=/usr --libdir=/lib64  --disable-static --enable-shared &amp;&amp; make &amp;&amp; make install
+</code></pre><p><a href="http://sourceforge.net/projects/pam-krb5-ldap/files/" target="_blank" rel="noopener">pam_krb5</a></p>
+<pre><code># tar -xf pam_krb5-2.3.1-3+ldap.tgz
+# cd pam_krb5-2.3.1-3+ldap
+# ./configure --prefix=/usr --libdir=/lib64; make; make install
+</code></pre><p><em>注：可以先不安装和配置 pam_krb5，等 Kerberos 安装完成后先测试一下在无 pam_krb5 的环境下是否能正常运行</em></p>
+<h3 id="编辑-krb5-conf-和-kdc-conf"><a href="#编辑-krb5-conf-和-kdc-conf" class="headerlink" title="编辑 krb5.conf 和 kdc.conf"></a>编辑 <code>krb5.conf</code> 和 <code>kdc.conf</code></h3><p>/etc/krb5.conf</p>
+<pre><code>[logging]
+default = FILE:/var/log/krb5libs.log
+kdc = FILE:/var/log/krb5kdc.log
+admin_server = FILE:/var/log/kadmind.log
+
+[libdefaults]
+ default_realm = EXAMPLE.COM
+ dns_lookup_realm = true
+ dns_lookup_kdc = true
+ ticket_lifetime = 24h
+ forwardable = yes
+
+[realms]
+ EXAMPLE.COM = {
+  kdc = kerberos.d.example.com:88
+  admin_server = kerberos.d.example.com:749
+  default_domain = example.com
+ }
+
+[domain_realm]
+ .example.com = EXAMPLE.COM
+ example.com = EXAMPLE.COM #所有example.com域的用户和机器都可以在EXAMPLE.COM上认证
+ .jie.hn = EXAMPLE.COM
+ jie.hn = EXAMPLE.COM
+
+[appdefaults]
+ pam = {
+   debug = true
+   ticket_lifetime = 36000
+   renew_lifetime = 36000
+   forwardable = true
+   krb4_convert = false
+ }
+</code></pre><p>/var/kerberos/krb5kdc/kdc.conf</p>
+<pre><code>[kdcdefaults]
+ v4_mode = nopreauth
+ kdc_tcp_ports = 88
+
+[realms]
+ EXAMPLE.COM = {
+  #master_key_type = des3-hmac-sha1
+  acl_file = /var/kerberos/krb5kdc/kadm5.acl
+  dict_file = /usr/share/dict/words
+  admin_keytab = /var/kerberos/krb5kdc/kadm5.keytab
+  supported_enctypes = aes256-cts:normal aes128-cts:normal des3-hmac-sha1:normal arcfour-hmac:normal des-hmac-sha1:normal des-cbc-md5:normal des-cbc-crc:normal des-cbc-crc:v4 des-cbc-crc:afs3
+ }
+</code></pre><h3 id="创建-KDC-数据库"><a href="#创建-KDC-数据库" class="headerlink" title="创建 KDC 数据库"></a>创建 KDC 数据库</h3><pre><code># kdb5_util create -s -r EXAMPLE.COM
+</code></pre><p><em><code>-s</code>表示通过 kadmin 登录本机不需要密码</em><br>Loading random data 的时间可能会有点长。之后会让设置一个密码。</p>
+<h3 id="编辑kadm5-acl"><a href="#编辑kadm5-acl" class="headerlink" title="编辑kadm5.acl"></a>编辑<code>kadm5.acl</code></h3><p>编辑 kadmin 的访问控制文件<code>/var/kerberos/krb5kdc/kadm5.acl</code>，添加内容如下：  </p>
+<pre><code>*/admin@EXAMPLE.COM    *
+</code></pre><h3 id="启动-Kerberos-服务"><a href="#启动-Kerberos-服务" class="headerlink" title="启动 Kerberos 服务"></a>启动 Kerberos 服务</h3><pre><code># systemctl start krb5kdc
+# systemctl start kadmin
+</code></pre><p>并设置开启启动</p>
+<pre><code># systemctl enable krb5kdc
+# systemctl enable kadmin
+</code></pre><h3 id="添加-principal"><a href="#添加-principal" class="headerlink" title="添加 principal"></a>添加 principal</h3><p>登录 KDC，添加管理员和一般用户的 principal。<br>首先创建一个有管理权限的 principal：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># kadmin.local</span><br><span class="line">Authenticating as principal root/admin@EXAMPLE.COM with password.</span><br><span class="line">kadmin.local:  addprinc root/admin</span><br><span class="line">Authenticating as principal root/admin@EXAMPLE.COM with password.</span><br><span class="line">WARNING: no policy specified for root/admin@EXAMPLE.COM; defaulting to no policy</span><br><span class="line">Enter password for principal &quot;root/admin@EXAMPLE.COM&quot;: root</span><br><span class="line">Re-enter password for principal &quot;root/admin@EXAMPLE.COM&quot;: root</span><br><span class="line">Principal &quot;root/admin@EXAMPLE.COM&quot; created.</span><br></pre></td></tr></table></figure>
+<p>创建一个普通的 principal：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">kadmin.local:  addprinc yibo</span><br><span class="line">Enter password for principal &quot;yibo@EXAMPLE.COM&quot;: yourpassword</span><br><span class="line">Re-enter password for principal &quot;yibo@EXAMPLE.COM&quot;: yourpassword</span><br><span class="line">Principal &quot;yibo@EXAMPLE.COM&quot; created.</span><br></pre></td></tr></table></figure>
+<p><em>说明：<code>kadmin</code> 和 <code>kadmin.local</code> 都是 KDB 的管理接口，区别在于 <code>kadmin.local</code> 只能在 Server 上使用，无需密码；<code>kadmin</code> 在 Server 和 Client 上都能使用，需要密码——当然，需要在 Server 上启动 Kadmin 服务。</em></p>
+<h3 id="将-KDC-的域名加入到-Kerberos-的数据库"><a href="#将-KDC-的域名加入到-Kerberos-的数据库" class="headerlink" title="将 KDC 的域名加入到 Kerberos 的数据库"></a>将 KDC 的域名加入到 Kerberos 的数据库</h3><pre><code>kadmin.local:  addprinc -randkey host/grape.jie.hn
+Authenticating as principal root/admin@EXAMPLE.COM with password.
+WARNING: no policy specified for host/grape.jie.hn@EXAMPLE.COM; defaulting to no policy
+Principal &quot;host/grape.jie.hn@EXAMPLE.COM&quot; created.
+</code></pre><p>导出 kadmin 服务的 keytab 文件：</p>
+<pre><code>kadmin.local:  ktadd host/grape.jie.hn
+Authenticating as principal root/admin@EXAMPLE.COM with password.
+Entry for principal host/grape.jie.hn with kvno 2, encryption type aes256-cts-hmac-sha1-96 added to keytab WRFILE:/etc/krb5.keytab.
+Entry for principal host/grape.jie.hn with kvno 2, encryption type aes128-cts-hmac-sha1-96 added to keytab WRFILE:/etc/krb5.keytab.
+Entry for principal host/grape.jie.hn with kvno 2, encryption type des3-cbc-sha1 added to keytab WRFILE:/etc/krb5.keytab.
+Entry for principal host/grape.jie.hn with kvno 2, encryption type arcfour-hmac added to keytab WRFILE:/etc/krb5.keytab.
+Entry for principal host/grape.jie.hn with kvno 2, encryption type camellia256-cts-cmac added to keytab WRFILE:/etc/krb5.keytab.
+Entry for principal host/grape.jie.hn with kvno 2, encryption type camellia128-cts-cmac added to keytab WRFILE:/etc/krb5.keytab.
+Entry for principal host/grape.jie.hn with kvno 2, encryption type des-hmac-sha1 added to keytab WRFILE:/etc/krb5.keytab.
+Entry for principal host/grape.jie.hn with kvno 2, encryption type des-cbc-md5 added to keytab WRFILE:/etc/krb5.keytab.
+kadmin.local:  quit
+# klist -k
+Keytab name: FILE:/etc/krb5.keytab
+KVNO Principal
+---- --------------------------------------------------------------------------
+   8 host/grape.jie.hn@EXAMPLE.COM
+   8 host/grape.jie.hn@EXAMPLE.COM
+   8 host/grape.jie.hn@EXAMPLE.COM
+   8 host/grape.jie.hn@EXAMPLE.COM
+   8 host/grape.jie.hn@EXAMPLE.COM
+   8 host/grape.jie.hn@EXAMPLE.COM
+</code></pre><h3 id="修改-etc-ssh-ssh-config"><a href="#修改-etc-ssh-ssh-config" class="headerlink" title="修改/etc/ssh/ssh_config"></a>修改<code>/etc/ssh/ssh_config</code></h3><pre><code>GSSAPIAuthentication yes
+GSSAPIDelegateCredentials yes
+GSSAPITrustDNS yes
+</code></pre><p>重启 sshd</p>
+<pre><code># systemctl reload sshd
+</code></pre><h3 id="配置-PAM"><a href="#配置-PAM" class="headerlink" title="配置 PAM"></a>配置 PAM</h3><pre><code># authconfig-tui
+</code></pre><p>选择 <code>“[*] Use Kerberos”</code> 并选择 <code>Next</code> ，确定 Realm、KDC 和 Admin Server 是否正确，并选择 <code>“[*] Use DNS to resolve hosts to realms”</code>、<code>“[*] Use DNS to locate KDCs for realms”</code>，选择 OK 保存。</p>
+<pre><code># authconfig --enablekrb5 --update
+</code></pre><p>或者</p>
+<pre><code># setup
+</code></pre><p>进入 Authentication configuration 设置，设置同上。</p>
+<h3 id="配置-firewall（如果开启了的话）"><a href="#配置-firewall（如果开启了的话）" class="headerlink" title="配置 firewall（如果开启了的话）"></a>配置 firewall（如果开启了的话）</h3><p>创建<code>/etc/firewalld/services/kerberos.xml</code>文件并写入:</p>
+<pre><code>&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+&lt;service&gt;
+  &lt;short&gt;Kerberos&lt;/short&gt;
+  &lt;description&gt;Kerberos network authentication protocol server&lt;/description&gt;
+  &lt;port protocol=&quot;tcp&quot; port=&quot;88&quot;/&gt;
+  &lt;port protocol=&quot;udp&quot; port=&quot;88&quot;/&gt;
+  &lt;port protocol=&quot;tcp&quot; port=&quot;749&quot;/&gt;
+&lt;/service&gt;
+</code></pre><p>向 firewall 中添加 service</p>
+<pre><code># firewall-cmd --permanent --add-service=kerberos
+</code></pre><p>重新加载 firewall 配置</p>
+<pre><code># firewall-cmd --reload
+</code></pre><h3 id="向-root-k5login添加-principal"><a href="#向-root-k5login添加-principal" class="headerlink" title="向/root/.k5login添加 principal"></a>向<code>/root/.k5login</code>添加 principal</h3><pre><code>yibo@EXAMPLE.COM
+</code></pre><h2 id="配置-Kerberos-Client"><a href="#配置-Kerberos-Client" class="headerlink" title="配置 Kerberos Client"></a>配置 Kerberos Client</h2><h3 id="安装相关模块-1"><a href="#安装相关模块-1" class="headerlink" title="安装相关模块"></a>安装相关模块</h3><pre><code>yum install -y krb5-libs krb5-workstation pam_krb5
+</code></pre><h3 id="配置文件"><a href="#配置文件" class="headerlink" title="配置文件"></a>配置文件</h3><p>将 Server 上的<code>/etc/krb5.conf</code>直接 copy 过来即可</p>
+<h3 id="向-Kerberos-数据库中添加-Client-的域名"><a href="#向-Kerberos-数据库中添加-Client-的域名" class="headerlink" title="向 Kerberos 数据库中添加 Client 的域名"></a>向 Kerberos 数据库中添加 Client 的域名</h3><pre><code># kdestroy
+# kadmin 
+Authenticating as principal root/admin@EXAMPLE.COM with password.
+Password for root/admin@EXAMPLE.COM: root
+kadmin:  addprinc -randkey host/peach.jie.hn
+NOTICE: no policy specified for host/peach.jie.hn@EXAMPLE.COM; assigning &quot;default&quot;
+Principal &quot;host/peach.jie.hn@EXAMPLE.COM&quot; created.
+kadmin:  ktadd host/peach.jie.hn
+Entry for principal host/peach.jie.hn with kvno 2, encryption type aes256-cts-hmac-sha1-96 added to keytab FILE:/etc/krb5.keytab.
+Entry for principal host/peach.jie.hn with kvno 2, encryption type aes128-cts-hmac-sha1-96 added to keytab FILE:/etc/krb5.keytab.
+Entry for principal host/peach.jie.hn with kvno 2, encryption type des3-cbc-sha1 added to keytab FILE:/etc/krb5.keytab.
+Entry for principal host/peach.jie.hn with kvno 2, encryption type arcfour-hmac added to keytab FILE:/etc/krb5.keytab.
+Entry for principal host/peach.jie.hn with kvno 2, encryption type des-hmac-sha1 added to keytab FILE:/etc/krb5.keytab.
+Entry for principal host/peach.jie.hn with kvno 2, encryption type des-cbc-md5 added to keytab FILE:/etc/krb5.keytab.
+</code></pre><h3 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h3><pre><code># klist -k
+Keytab name: FILE:/etc/krb5.keytab
+KVNO Principal
+---- --------------------------------------------------------------------------
+   2 host/peach.jie.hn@EXAMPLE.COM
+   2 host/peach.jie.hn@EXAMPLE.COM
+   2 host/peach.jie.hn@EXAMPLE.COM
+   2 host/peach.jie.hn@EXAMPLE.COM
+   2 host/peach.jie.hn@EXAMPLE.COM
+   2 host/peach.jie.hn@EXAMPLE.COM
+
+# kinit yibo
+Password for yibo@EXAMPLE.COM: 
+# klist
+Ticket cache: FILE:/tmp/krb5cc_0
+Default principal: yibo@EXAMPLE.COM
+
+Valid starting       Expires              Service principal
+05/15/2015 13:51:45  05/16/2015 13:51:45  krbtgt/EXAMPLE.COM@EXAMPLE.COM
+
+# ssh grape.jie.hn
+</code></pre><p>到这里应该就不需要密码能直接登陆了。如果还需要密码，请查看是否漏了哪个步骤，并检查防火墙和 selinux。</p>
+<h2 id="一些补充"><a href="#一些补充" class="headerlink" title="一些补充"></a>一些补充</h2><p><strong>Principal</strong>：在 Kerberos 中，Principal 是参加认证的基本实体。一般来说有两种，一种用来表示 Kerberos 数据库中的用户，另一种用来代表某一特定主机，也就是说 Principal是用来表示客户端和服务端身份的实体, Principal 的格式采用 ASN.1 标准,即 Abstract Syntax Notation One，来准确定义)，Principal 是由三个部分组成：名字（name），实例（instance），REALM（域）。比如一个标准的 Kerberos 的用户是：name/instance@REALM 。<br><strong>Name</strong>：第一部分。在代表客户方的情况，它是一个用户名；在代表主机的情况，它是写成 host。<br><strong>Instance</strong>：第二部分。对 name 的进一步描述，例如 name 所在的主机名或 name 的类型等,可省略。它与第一部分之间用‘ / ’分隔，但是作为主机的描述时写成 host/Instance。<br><strong>Realm</strong>：第三部分。是 Kerberos 在管理上的划分，在 KDC 中所负责的一个域数据库称作为 Realm。这个数据库中存放有该网络范围内的所有 Principal 和它们的密钥，数据库的内容被 Kerberos 的认证服务器 AS 和票据授权服务器 TGS 所使用。Realm 通常是永远是大写的字符,并且在大多数 Kerberos 系统的配置中，一般 Realm 和该网络环境的 DNS 域是一致的。与第二部分之间用‘@’分隔，缺省为本地的 Realm。<br><strong>KDC</strong>：密钥分配中心(起到分发密钥的作用)<br><strong>Client</strong>：客户端(被服务的对象)<br><strong>Server</strong>：服务端(提供服务的主机)</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="http://web.mit.edu/kerberos/krb5-latest/doc/" target="_blank" rel="noopener">MIT Kerberos Documentation</a><br><a href="http://docs.oracle.com/cd/E24847_01/html/819-7061/seamtm-1.html#scrolltoc" target="_blank" rel="noopener">Oracle Solaris 10 8/11 Information Library</a></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Yibo</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://ideassea.com/2016/01/02/configure-a-kerberos-kdc-on-centos7/" title="在 CentOS 7 上安装、配置 Kerberos">https://ideassea.com/2016/01/02/configure-a-kerberos-kdc-on-centos7/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Operations/" rel="tag"># Operations</a>
+          
+            <a href="/tags/Kerberos/" rel="tag"># Kerberos</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/01/01/hexo-extends/" rel="next" title="Hexo 的一些额外配置">
+                <i class="fa fa-chevron-left"></i> Hexo 的一些额外配置
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/01/03/golang-note-1/" rel="prev" title="Golang 学习笔记（一）——安装、环境">
+                Golang 学习笔记（一）——安装、环境 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://ws2.sinaimg.cn/large/006tKfTcly1fq0mwrckglj30sg0sg0u8.jpg"
+                alt="Yibo" />
+            
+              <p class="site-author-name" itemprop="name">Yibo</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">41</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">21</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#配置-DNS-解析和-NTP-服务"><span class="nav-number">1.</span> <span class="nav-text">配置 DNS 解析和 NTP 服务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置-Kerberos-Server"><span class="nav-number">2.</span> <span class="nav-text">配置 Kerberos Server</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装相关模块"><span class="nav-number">2.1.</span> <span class="nav-text">安装相关模块</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#编辑-krb5-conf-和-kdc-conf"><span class="nav-number">2.2.</span> <span class="nav-text">编辑 krb5.conf 和 kdc.conf</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建-KDC-数据库"><span class="nav-number">2.3.</span> <span class="nav-text">创建 KDC 数据库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#编辑kadm5-acl"><span class="nav-number">2.4.</span> <span class="nav-text">编辑kadm5.acl</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#启动-Kerberos-服务"><span class="nav-number">2.5.</span> <span class="nav-text">启动 Kerberos 服务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#添加-principal"><span class="nav-number">2.6.</span> <span class="nav-text">添加 principal</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#将-KDC-的域名加入到-Kerberos-的数据库"><span class="nav-number">2.7.</span> <span class="nav-text">将 KDC 的域名加入到 Kerberos 的数据库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#修改-etc-ssh-ssh-config"><span class="nav-number">2.8.</span> <span class="nav-text">修改/etc/ssh/ssh_config</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置-PAM"><span class="nav-number">2.9.</span> <span class="nav-text">配置 PAM</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置-firewall（如果开启了的话）"><span class="nav-number">2.10.</span> <span class="nav-text">配置 firewall（如果开启了的话）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#向-root-k5login添加-principal"><span class="nav-number">2.11.</span> <span class="nav-text">向/root/.k5login添加 principal</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置-Kerberos-Client"><span class="nav-number">3.</span> <span class="nav-text">配置 Kerberos Client</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装相关模块-1"><span class="nav-number">3.1.</span> <span class="nav-text">安装相关模块</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置文件"><span class="nav-number">3.2.</span> <span class="nav-text">配置文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#向-Kerberos-数据库中添加-Client-的域名"><span class="nav-number">3.3.</span> <span class="nav-text">向 Kerberos 数据库中添加 Client 的域名</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#测试"><span class="nav-number">3.4.</span> <span class="nav-text">测试</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#一些补充"><span class="nav-number">4.</span> <span class="nav-text">一些补充</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">5.</span> <span class="nav-text">参考</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate"> 
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yibo</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/theme-next/hexo-theme-next">NexT.Gemini</a> v6.1.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/reading_progress/reading_progress.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.1.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.1.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.1.0"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+  
+  <script src="/lib/pangu/dist/pangu.min.js?v=3.3"></script>
+  <script type="text/javascript">pangu.spacingPage();</script>
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

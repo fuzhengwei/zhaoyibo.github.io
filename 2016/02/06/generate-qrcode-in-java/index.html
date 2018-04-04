@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.1.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.1.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.1.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.1.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="项目中涉及到生成二维码（像微信那种的），就用 ZXing 并混合 Java 的图形库搞了一个工具类。 奉上效果图一张 废话不多说，直接上代码：">
+<meta name="keywords" content="Java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java 中生成二维码（带 logo）">
+<meta property="og:url" content="https://ideassea.com/2016/02/06/generate-qrcode-in-java/index.html">
+<meta property="og:site_name" content="Ideas Sea">
+<meta property="og:description" content="项目中涉及到生成二维码（像微信那种的），就用 ZXing 并混合 Java 的图形库搞了一个工具类。 奉上效果图一张 废话不多说，直接上代码：">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://ws1.sinaimg.cn/large/6e3b2269ly1fq0fas3krvj20dw0dwmxz">
+<meta property="og:updated_time" content="2017-10-11T21:57:46.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java 中生成二维码（带 logo）">
+<meta name="twitter:description" content="项目中涉及到生成二维码（像微信那种的），就用 ZXing 并混合 Java 的图形库搞了一个工具类。 奉上效果图一张 废话不多说，直接上代码：">
+<meta name="twitter:image" content="https://ws1.sinaimg.cn/large/6e3b2269ly1fq0fas3krvj20dw0dwmxz">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Ideas Sea" type="application/atom+xml" />
+
+
+
+
+  <link rel="canonical" href="https://ideassea.com/2016/02/06/generate-qrcode-in-java/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Java 中生成二维码（带 logo） | Ideas Sea</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> 
+
+<div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ideas Sea</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+          
+  <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />标签</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+</li>
+
+      
+
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+  
+
+
+
+ </div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+    <div class="reading-progress-bar"></div>
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://ideassea.com/2016/02/06/generate-qrcode-in-java/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yibo">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://ws2.sinaimg.cn/large/006tKfTcly1fq0mwrckglj30sg0sg0u8.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ideas Sea">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Java 中生成二维码（带 logo）</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-02-06T06:40:00+08:00">2016-02-06</time>
+            
+
+            
+            
+              
+                
+              
+            
+
+            
+              
+              <span class="post-meta-divider">|</span>
+              
+
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">更新于：</span>
+              
+              <time title="更新于" itemprop="dateModified" datetime="2017-10-12T05:57:46+08:00">2017-10-12</time>
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>项目中涉及到生成二维码（像微信那种的），就用 <a href="https://github.com/zxing/zxing" target="_blank" rel="noopener">ZXing</a> 并混合 Java 的图形库搞了一个工具类。</p>
+<p>奉上效果图一张<br><img src="https://ws1.sinaimg.cn/large/6e3b2269ly1fq0fas3krvj20dw0dwmxz" alt="qrcode-1"></p>
+<p>废话不多说，直接上<a href="https://gist.github.com/zhaoyibo/a012f53386fd154cc9f4" target="_blank" rel="noopener">代码</a>：</p>
+<a id="more"></a>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br><span class="line">303</span><br><span class="line">304</span><br><span class="line">305</span><br><span class="line">306</span><br><span class="line">307</span><br><span class="line">308</span><br><span class="line">309</span><br><span class="line">310</span><br><span class="line">311</span><br><span class="line">312</span><br><span class="line">313</span><br><span class="line">314</span><br><span class="line">315</span><br><span class="line">316</span><br><span class="line">317</span><br><span class="line">318</span><br><span class="line">319</span><br><span class="line">320</span><br><span class="line">321</span><br><span class="line">322</span><br><span class="line">323</span><br><span class="line">324</span><br><span class="line">325</span><br><span class="line">326</span><br><span class="line">327</span><br><span class="line">328</span><br><span class="line">329</span><br><span class="line">330</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.awt.*;</span><br><span class="line"><span class="keyword">import</span> java.awt.geom.AffineTransform;</span><br><span class="line"><span class="keyword">import</span> java.awt.image.*;</span><br><span class="line"><span class="keyword">import</span> java.io.*;</span><br><span class="line"><span class="keyword">import</span> java.net.URL;</span><br><span class="line"><span class="keyword">import</span> java.util.*;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> javax.imageio.ImageIO;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.apache.commons.io.IOUtils;</span><br><span class="line"><span class="keyword">import</span> org.slf4j.*;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.google.zxing.*;</span><br><span class="line"><span class="keyword">import</span> com.google.zxing.common.BitMatrix;</span><br><span class="line"><span class="keyword">import</span> com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 二维码生成工具类</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> zhaoyibochn@gmail.com</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">QRCodeUtils</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// logo 宽度 </span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> LOGO_WIDTH = <span class="number">110</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> LOGO_HEIGHT = LOGO_WIDTH;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// logo 边框宽度 </span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> LOGO_FRAME_WIDTH = <span class="number">5</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// logo 边框颜色 </span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> LOGO_FRAME_COLOR = <span class="number">0xffffffff</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// logo 边缘颜色 </span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> LOGO_BORDER_COLOR = <span class="number">0x00000000</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// logo 圆角半径 </span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> LOGO_RADIUS = <span class="number">10</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 二维码前景色 </span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> QRCODE_FOREGROUND_COLOR = <span class="number">0x00000000</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 二维码背景色 </span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> QRCODE_BACKGROUND_COLOR = <span class="number">0xffffffff</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 二维码四周留白宽度 </span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> QRCODE_SPECIFIES_MARGIN = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 二维码写码器 </span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> MultiFormatWriter mutiWriter = <span class="keyword">new</span> MultiFormatWriter();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Logger logger = LoggerFactory.getLogger(QRCodeUtils.class);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 将生成的二维码输出到流中</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> content</span></span><br><span class="line"><span class="comment">     *        二维码存储的信息</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> width</span></span><br><span class="line"><span class="comment">     *        二维码的宽度</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> height</span></span><br><span class="line"><span class="comment">     *        二维码的高度</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> logo</span></span><br><span class="line"><span class="comment">     *        输入流: Logo 源</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> out</span></span><br><span class="line"><span class="comment">     *        输出流</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">generateToStream</span><span class="params">(String content, <span class="keyword">int</span> width, <span class="keyword">int</span> height, InputStream logo,</span></span></span><br><span class="line"><span class="function"><span class="params">            OutputStream out)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            ImageIO.write(genQRCode(content, width, height, logo), <span class="string">"jpg"</span>, out);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">            logger.warn(<span class="string">"Oops."</span>, e);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (WriterException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">            logger.warn(<span class="string">"Oops."</span>, e);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 生成二维码</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> content</span></span><br><span class="line"><span class="comment">     *        二维码存储的信息</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> width</span></span><br><span class="line"><span class="comment">     *        二维码的宽度</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> height</span></span><br><span class="line"><span class="comment">     *        二维码的高度</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> logo</span></span><br><span class="line"><span class="comment">     *        InputSteam of the logo</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> &#123;<span class="doctag">@link</span> BufferedImage&#125;</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@throws</span> WriterException</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@throws</span> IOException</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> BufferedImage <span class="title">genQRCode</span><span class="params">(String content, <span class="keyword">int</span> width, <span class="keyword">int</span> height, InputStream logo)</span></span></span><br><span class="line"><span class="function">            <span class="keyword">throws</span> WriterException, IOException </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> r = LOGO_RADIUS;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 读取 logo 源图像 </span></span><br><span class="line">        <span class="keyword">int</span> logoPixels[][] = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">boolean</span> hasLogo = <span class="keyword">false</span>;</span><br><span class="line">        <span class="keyword">if</span> (logo != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                logoPixels = getLogoPixels(scale(logo, LOGO_WIDTH, LOGO_HEIGHT, <span class="keyword">true</span>), r);</span><br><span class="line">                hasLogo = <span class="keyword">true</span>;</span><br><span class="line">            &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">                logger.warn(<span class="string">"Oops. Read the logo failed."</span>, e);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        Map&lt;EncodeHintType, Object&gt; hint = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">        hint.put(EncodeHintType.CHARACTER_SET, <span class="string">"utf-8"</span>);</span><br><span class="line">        hint.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.H);</span><br><span class="line">        hint.put(EncodeHintType.MARGIN, QRCODE_SPECIFIES_MARGIN);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 生成二维码 </span></span><br><span class="line">        BitMatrix matrix = mutiWriter.encode(content, BarcodeFormat.QR_CODE, width, height, hint);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> foregroundColor = QRCODE_FOREGROUND_COLOR;</span><br><span class="line">        <span class="keyword">int</span> backgroundColor = QRCODE_BACKGROUND_COLOR;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 二维矩阵转为一维像素数组 </span></span><br><span class="line">        <span class="keyword">int</span> halfW = matrix.getWidth() / <span class="number">2</span>;</span><br><span class="line">        <span class="keyword">int</span> halfH = matrix.getHeight() / <span class="number">2</span>;</span><br><span class="line">        <span class="keyword">int</span>[] pixels = <span class="keyword">new</span> <span class="keyword">int</span>[width * height];</span><br><span class="line">        <span class="keyword">int</span> logoHalfWidth = LOGO_WIDTH / <span class="number">2</span>;</span><br><span class="line">        <span class="keyword">int</span> near = halfW - logoHalfWidth - LOGO_FRAME_WIDTH + r;</span><br><span class="line">        <span class="keyword">int</span> far = halfW + logoHalfWidth + LOGO_FRAME_WIDTH - r;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> y = <span class="number">0</span>; y &lt; matrix.getHeight(); y++) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> x = <span class="number">0</span>; x &lt; matrix.getWidth(); x++) &#123;</span><br><span class="line">                <span class="keyword">if</span> (!hasLogo) &#123;</span><br><span class="line">                    <span class="comment">// 没有 logo 的二维码  </span></span><br><span class="line">                    pixels[y * width + x] = matrix.get(x, y) ? foregroundColor : backgroundColor;</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    <span class="comment">// logo</span></span><br><span class="line">                    <span class="keyword">if</span> (x &gt; halfW - logoHalfWidth &amp;&amp; x &lt; halfW + logoHalfWidth</span><br><span class="line">                            &amp;&amp; y &gt; halfH - logoHalfWidth &amp;&amp; y &lt; halfH + logoHalfWidth) &#123;</span><br><span class="line">                        pixels[y * width + x] = logoPixels[x - halfW + logoHalfWidth][y - halfH</span><br><span class="line">                                + logoHalfWidth];</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="comment">// 在图片四周形成边框 </span></span><br><span class="line">                    <span class="keyword">else</span> <span class="keyword">if</span> ((x &gt; halfW - logoHalfWidth - LOGO_FRAME_WIDTH</span><br><span class="line">                            &amp;&amp; x &lt; halfW - logoHalfWidth + LOGO_FRAME_WIDTH</span><br><span class="line">                            &amp;&amp; y &gt; halfH - logoHalfWidth - LOGO_FRAME_WIDTH</span><br><span class="line">                            &amp;&amp; y &lt; halfH + logoHalfWidth + LOGO_FRAME_WIDTH)</span><br><span class="line">                            || (x &gt; halfW + logoHalfWidth - LOGO_FRAME_WIDTH</span><br><span class="line">                                    &amp;&amp; x &lt; halfW + logoHalfWidth + LOGO_FRAME_WIDTH</span><br><span class="line">                                    &amp;&amp; y &gt; halfH - logoHalfWidth - LOGO_FRAME_WIDTH</span><br><span class="line">                                    &amp;&amp; y &lt; halfH + logoHalfWidth + LOGO_FRAME_WIDTH)</span><br><span class="line">                            || (x &gt; halfW - logoHalfWidth - LOGO_FRAME_WIDTH</span><br><span class="line">                                    &amp;&amp; x &lt; halfW + logoHalfWidth + LOGO_FRAME_WIDTH</span><br><span class="line">                                    &amp;&amp; y &gt; halfH - logoHalfWidth - LOGO_FRAME_WIDTH</span><br><span class="line">                                    &amp;&amp; y &lt; halfH - logoHalfWidth + LOGO_FRAME_WIDTH)</span><br><span class="line">                            || (x &gt; halfW - logoHalfWidth - LOGO_FRAME_WIDTH</span><br><span class="line">                                    &amp;&amp; x &lt; halfW + logoHalfWidth + LOGO_FRAME_WIDTH</span><br><span class="line">                                    &amp;&amp; y &gt; halfH + logoHalfWidth - LOGO_FRAME_WIDTH</span><br><span class="line">                                    &amp;&amp; y &lt; halfH + logoHalfWidth + LOGO_FRAME_WIDTH)) &#123;</span><br><span class="line"></span><br><span class="line">                        <span class="comment">// 圆角处理  </span></span><br><span class="line">                        <span class="keyword">if</span> (x &lt; near &amp;&amp; y &lt; near</span><br><span class="line">                                &amp;&amp; (near - x) * (near - x) + (near - y) * (near - y) &gt; r * r) &#123;</span><br><span class="line">                            <span class="comment">// 左上圆角  </span></span><br><span class="line">                            pixels[y * width + x] = matrix.get(x, y) ? foregroundColor</span><br><span class="line">                                    : backgroundColor;</span><br><span class="line">                        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (x &gt; far &amp;&amp; y &lt; near</span><br><span class="line">                                &amp;&amp; (x - far) * (x - far) + (near - y) * (near - y) &gt; r * r) &#123;</span><br><span class="line">                            <span class="comment">// 右上圆角  </span></span><br><span class="line">                            pixels[y * width + x] = matrix.get(x, y) ? foregroundColor</span><br><span class="line">                                    : backgroundColor;</span><br><span class="line">                        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (x &lt; near &amp;&amp; y &gt; far</span><br><span class="line">                                &amp;&amp; (near - x) * (near - x) + (y - far) * (y - far) &gt; r * r) &#123;</span><br><span class="line">                            <span class="comment">// 左下圆角  </span></span><br><span class="line">                            pixels[y * width + x] = matrix.get(x, y) ? foregroundColor</span><br><span class="line">                                    : backgroundColor;</span><br><span class="line">                        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (x &gt; far &amp;&amp; y &gt; far</span><br><span class="line">                                &amp;&amp; (x - far) * (x - far) + (y - far) * (y - far) &gt; r * r) &#123;</span><br><span class="line">                            <span class="comment">// 右下圆角   </span></span><br><span class="line">                            pixels[y * width + x] = matrix.get(x, y) ? foregroundColor</span><br><span class="line">                                    : backgroundColor;</span><br><span class="line">                        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                            <span class="comment">// 边框填充颜色  </span></span><br><span class="line">                            pixels[y * width + x] = backgroundColor;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                        pixels[y * width + x] = matrix.get(x, y) ? foregroundColor</span><br><span class="line">                                : backgroundColor;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        BufferedImage image = <span class="keyword">new</span> BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);</span><br><span class="line">        image.getRaster().setDataElements(<span class="number">0</span>, <span class="number">0</span>, width, height, pixels);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> image;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 对图片进行圆角处理, 并生成数组</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> logo</span></span><br><span class="line"><span class="comment">     *        BufferedImage of the log</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> radius</span></span><br><span class="line"><span class="comment">     *        圆角半径</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> logo 像素数组</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span>[][] getLogoPixels(BufferedImage logo, <span class="keyword">int</span> radius) &#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> borderColor = LOGO_BORDER_COLOR;</span><br><span class="line">        <span class="keyword">int</span> whiteColor = LOGO_FRAME_COLOR;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> srcPixels[][] = <span class="keyword">new</span> <span class="keyword">int</span>[LOGO_WIDTH][LOGO_HEIGHT];</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> r = radius;<span class="comment">// 圆角处理半径 </span></span><br><span class="line">        <span class="keyword">int</span> max = LOGO_WIDTH;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> x = <span class="number">0</span>; x &lt; LOGO_WIDTH; x++) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> y = <span class="number">0</span>; y &lt; LOGO_HEIGHT; y++) &#123;</span><br><span class="line">                <span class="keyword">if</span> (x &lt; r &amp;&amp; y &lt; r &amp;&amp; ((r - x) * (r - x) + (r - y) * (r - y) &gt; (r - <span class="number">1</span>) * (r - <span class="number">1</span>))) &#123;</span><br><span class="line">                    <span class="comment">// 左上圆角 </span></span><br><span class="line">                    <span class="keyword">if</span> ((r - x) * (r - x) + (r - y) * (r - y) &gt; r * r) &#123;</span><br><span class="line">                        srcPixels[x][y] = whiteColor;</span><br><span class="line">                    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                        srcPixels[x][y] = borderColor;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125; <span class="keyword">else</span> <span class="keyword">if</span> (x &gt; (max - r) &amp;&amp; y &lt; r</span><br><span class="line">                        &amp;&amp; (x + r - max) * (x + r - max) + (r - y) * (r - y) &gt; (r - <span class="number">1</span>) * (r - <span class="number">1</span>)) &#123;</span><br><span class="line">                    <span class="comment">// 右上圆角 </span></span><br><span class="line">                    <span class="keyword">if</span> ((x + r - max) * (x + r - max) + (r - y) * (r - y) &gt; r * r) &#123;</span><br><span class="line">                        srcPixels[x][y] = whiteColor;</span><br><span class="line">                    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                        srcPixels[x][y] = borderColor;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125; <span class="keyword">else</span> <span class="keyword">if</span> (x &lt; r &amp;&amp; y &gt; (max - r)</span><br><span class="line">                        &amp;&amp; (r - x) * (r - x) + (y + r - max) * (y + r - max) &gt; (r - <span class="number">1</span>) * (r - <span class="number">1</span>)) &#123;</span><br><span class="line">                    <span class="comment">// 左下圆角 </span></span><br><span class="line">                    <span class="keyword">if</span> ((r - x) * (r - x) + (y + r - max) * (y + r - max) &gt; r * r) &#123;</span><br><span class="line">                        srcPixels[x][y] = whiteColor;</span><br><span class="line">                    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                        srcPixels[x][y] = borderColor;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125; <span class="keyword">else</span> <span class="keyword">if</span> (x &gt; (max - r) &amp;&amp; y &gt; (max - r) &amp;&amp; (x + r - max) * (x + r - max)</span><br><span class="line">                        + (y + r - max) * (y + r - max) &gt; (r - <span class="number">1</span>) * (r - <span class="number">1</span>)) &#123;</span><br><span class="line">                    <span class="comment">// 右下圆角 </span></span><br><span class="line">                    <span class="keyword">if</span> ((x + r - max) * (x + r - max) + (y + r - max) * (y + r - max) &gt; r * r) &#123;</span><br><span class="line">                        srcPixels[x][y] = whiteColor;</span><br><span class="line">                    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                        srcPixels[x][y] = borderColor;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    <span class="keyword">if</span> (((x &gt;= r &amp;&amp; x &lt;= max - r) &amp;&amp; (y == <span class="number">0</span> || y == <span class="number">1</span> || y == max - <span class="number">1</span> || y == max))</span><br><span class="line">                            || ((y &gt;= r &amp;&amp; y &lt;= max - r)</span><br><span class="line">                                    &amp;&amp; (x == <span class="number">0</span> || x == <span class="number">1</span> || x == max - <span class="number">1</span> || x == max))) &#123;</span><br><span class="line">                        <span class="comment">// 四周除圆角的边框 </span></span><br><span class="line">                        srcPixels[x][y] = borderColor;</span><br><span class="line">                    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                        <span class="comment">// 图片值 </span></span><br><span class="line">                        srcPixels[x][y] = logo.getRGB(x, y);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> srcPixels;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 把传入的原始图像按高度和宽度进行缩放，生成符合要求的图标</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> src</span></span><br><span class="line"><span class="comment">     *        源</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> height</span></span><br><span class="line"><span class="comment">     *        目标高度</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> width</span></span><br><span class="line"><span class="comment">     *        目标宽度</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> hasFiller</span></span><br><span class="line"><span class="comment">     *        比例不对时是否需要补白：true 为补白; false 为不补白;</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> &#123;<span class="doctag">@link</span> BufferedImage&#125;</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@throws</span> IOException</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> BufferedImage <span class="title">scale</span><span class="params">(InputStream src, <span class="keyword">int</span> height, <span class="keyword">int</span> width, <span class="keyword">boolean</span> hasFiller)</span></span></span><br><span class="line"><span class="function">            <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        <span class="keyword">double</span> ratio = <span class="number">0.0</span>D; <span class="comment">// 缩放比例 </span></span><br><span class="line">        BufferedImage srcImage = ImageIO.read(src);</span><br><span class="line">        Image destImage = srcImage.getScaledInstance(width, height, BufferedImage.SCALE_SMOOTH);</span><br><span class="line">        <span class="comment">// 计算比例 </span></span><br><span class="line">        <span class="keyword">if</span> ((srcImage.getHeight() &gt; height) || (srcImage.getWidth() &gt; width)) &#123;</span><br><span class="line">            <span class="keyword">if</span> (srcImage.getHeight() &gt; srcImage.getWidth()) &#123;</span><br><span class="line">                ratio = (<span class="keyword">new</span> Integer(height)).doubleValue() / srcImage.getHeight();</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                ratio = (<span class="keyword">new</span> Integer(width)).doubleValue() / srcImage.getWidth();</span><br><span class="line">            &#125;</span><br><span class="line">            AffineTransformOp op = <span class="keyword">new</span> AffineTransformOp(</span><br><span class="line">                    AffineTransform.getScaleInstance(ratio, ratio), <span class="keyword">null</span>);</span><br><span class="line">            destImage = op.filter(srcImage, <span class="keyword">null</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 补白 </span></span><br><span class="line">        <span class="keyword">if</span> (hasFiller) &#123;</span><br><span class="line">            BufferedImage image = <span class="keyword">new</span> BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);</span><br><span class="line">            Graphics2D graphic = image.createGraphics();</span><br><span class="line">            graphic.setColor(Color.white);</span><br><span class="line">            graphic.fillRect(<span class="number">0</span>, <span class="number">0</span>, width, height);</span><br><span class="line">            <span class="keyword">if</span> (width == destImage.getWidth(<span class="keyword">null</span>))</span><br><span class="line">                graphic.drawImage(destImage, <span class="number">0</span>, (height - destImage.getHeight(<span class="keyword">null</span>)) / <span class="number">2</span>,</span><br><span class="line">                        destImage.getWidth(<span class="keyword">null</span>), destImage.getHeight(<span class="keyword">null</span>), Color.white, <span class="keyword">null</span>);</span><br><span class="line">            <span class="keyword">else</span> graphic.drawImage(destImage, (width - destImage.getWidth(<span class="keyword">null</span>)) / <span class="number">2</span>, <span class="number">0</span>,</span><br><span class="line">                    destImage.getWidth(<span class="keyword">null</span>), destImage.getHeight(<span class="keyword">null</span>), Color.white, <span class="keyword">null</span>);</span><br><span class="line">            graphic.dispose();</span><br><span class="line">            destImage = image;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> (BufferedImage) destImage;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        InputStream in = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            in = <span class="keyword">new</span> URL(<span class="string">"https://dn-codingon.qbox.me/img/avatar/me.jpeg"</span>).openStream();</span><br><span class="line">            generateToStream(<span class="string">"https://codingon.com"</span>, <span class="number">500</span>, <span class="number">500</span>, in,</span><br><span class="line">                    <span class="keyword">new</span> FileOutputStream(<span class="string">"/Users/yibo/Desktop/qrcode.jpg"</span>));</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            IOUtils.closeQuietly(in);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>依赖：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.google.zxing<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>javase<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>3.2.1<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">type</span>&gt;</span>jar<span class="tag">&lt;/<span class="name">type</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>相关阅读：<br><a href="http://coolshell.cn/articles/10590.html" target="_blank" rel="noopener">二维码的生成细节和原理</a></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Yibo</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://ideassea.com/2016/02/06/generate-qrcode-in-java/" title="Java 中生成二维码（带 logo）">https://ideassea.com/2016/02/06/generate-qrcode-in-java/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"># Java</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/02/04/echarts-quickstart/" rel="next" title="在 Java 项目中使用 ECharts">
+                <i class="fa fa-chevron-left"></i> 在 Java 项目中使用 ECharts
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/02/09/elk-stack/" rel="prev" title="ELK 部署笔记">
+                ELK 部署笔记 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://ws2.sinaimg.cn/large/006tKfTcly1fq0mwrckglj30sg0sg0u8.jpg"
+                alt="Yibo" />
+            
+              <p class="site-author-name" itemprop="name">Yibo</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">41</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">21</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate"> 
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yibo</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/theme-next/hexo-theme-next">NexT.Gemini</a> v6.1.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/reading_progress/reading_progress.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.1.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.1.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.1.0"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+  
+  <script src="/lib/pangu/dist/pangu.min.js?v=3.3"></script>
+  <script type="text/javascript">pangu.spacingPage();</script>
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

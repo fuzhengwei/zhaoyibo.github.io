@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.1.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.1.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.1.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.1.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Ghost 1.0.0 已经 RC1 了，我用着比之前的版本舒服多了。不过嘛，既然是候选版本，问题肯定还是有的（主要是新版 Casper 主题样式上的），结合我目前体验发现的一些 BUG 做个汇总。">
+<meta name="keywords" content="Ghost,Blog">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Ghost 1.0.0 调教指南">
+<meta property="og:url" content="https://ideassea.com/2017/07/20/improve-ghost/index.html">
+<meta property="og:site_name" content="Ideas Sea">
+<meta property="og:description" content="Ghost 1.0.0 已经 RC1 了，我用着比之前的版本舒服多了。不过嘛，既然是候选版本，问题肯定还是有的（主要是新版 Casper 主题样式上的），结合我目前体验发现的一些 BUG 做个汇总。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2017-07-31T18:26:06.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Ghost 1.0.0 调教指南">
+<meta name="twitter:description" content="Ghost 1.0.0 已经 RC1 了，我用着比之前的版本舒服多了。不过嘛，既然是候选版本，问题肯定还是有的（主要是新版 Casper 主题样式上的），结合我目前体验发现的一些 BUG 做个汇总。">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Ideas Sea" type="application/atom+xml" />
+
+
+
+
+  <link rel="canonical" href="https://ideassea.com/2017/07/20/improve-ghost/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Ghost 1.0.0 调教指南 | Ideas Sea</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> 
+
+<div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ideas Sea</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+          
+  <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />标签</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+</li>
+
+      
+
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+  
+
+
+
+ </div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+    <div class="reading-progress-bar"></div>
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://ideassea.com/2017/07/20/improve-ghost/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yibo">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://ws2.sinaimg.cn/large/006tKfTcly1fq0mwrckglj30sg0sg0u8.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ideas Sea">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Ghost 1.0.0 调教指南</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-07-20T06:16:48+08:00">2017-07-20</time>
+            
+
+            
+            
+              
+                
+              
+            
+
+            
+              
+              <span class="post-meta-divider">|</span>
+              
+
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">更新于：</span>
+              
+              <time title="更新于" itemprop="dateModified" datetime="2017-08-01T02:26:06+08:00">2017-08-01</time>
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><a href="https://docs.ghost.org/" target="_blank" rel="noopener">Ghost 1.0.0</a> 已经 RC1 了，我用着比之前的版本舒服多了。不过嘛，既然是候选版本，问题肯定还是有的（主要是新版 Casper 主题样式上的），结合我目前体验发现的一些 BUG 做个汇总。</p>
+<a id="more"></a>
+<h1 id="表格中内容太长导致表格超出屏幕范围"><a href="#表格中内容太长导致表格超出屏幕范围" class="headerlink" title="表格中内容太长导致表格超出屏幕范围"></a>表格中内容太长导致表格超出屏幕范围</h1><p>这个问题我已经在 github 上提了 <a href="https://github.com/TryGhost/Casper/issues/328" target="_blank" rel="noopener">issue</a>，希望能早日解决吧。<br>解决办法：手动修改 <code>content/themes/casper/assets/built/screen.css</code>，找到 <code>.post-full-content table</code>，将里边的 <code>white-space: nowrap</code> 去掉，重启 ghost。</p>
+<h1 id="代码高亮"><a href="#代码高亮" class="headerlink" title="代码高亮"></a>代码高亮</h1><p>默认是没有代码高亮显示的，添加方法也简单：<br>进入 ghost 后台，在 Code injection 里，在 Blog Header 里添加<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!--  加载highlight.js样式 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">link</span> <span class="attr">href</span>=<span class="string">"//cdn.bootcss.com/highlight.js/9.9.0/styles/tomorrow-night-eighties.min.css"</span> <span class="attr">rel</span>=<span class="string">"stylesheet"</span>&gt;</span></span><br><span class="line"><span class="comment">&lt;!--  加载google字体 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">link</span> <span class="attr">href</span>=<span class="string">"https://fonts.googleapis.com/css?family=Lato|Oleo+Script"</span> <span class="attr">rel</span>=<span class="string">"stylesheet"</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">style</span> <span class="attr">type</span>=<span class="string">"text/css"</span>&gt;</span><span class="undefined"></span></span><br><span class="line"><span class="undefined">/* 设置字体、代码高亮 */</span></span><br><span class="line"><span class="undefined">body,p,code,h1, h2, h3, h4, h5, h6,.hljs &#123;</span></span><br><span class="line"><span class="undefined">	font-family: 'Lato', "PingFang SC", "Microsoft YaHei", sans-serif;</span></span><br><span class="line"><span class="undefined">&#125;</span></span><br><span class="line"><span class="undefined">.nav &#123;</span></span><br><span class="line"><span class="undefined">	font-family: 'Oleo Script', cursive;</span></span><br><span class="line"><span class="undefined">&#125;</span></span><br><span class="line"><span class="undefined">.hljs &#123;</span></span><br><span class="line"><span class="undefined">	font-size: 0.8em</span></span><br><span class="line"><span class="undefined">&#125;</span></span><br><span class="line"><span class="undefined"></span><span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>然后再在 Blog Footer 添加</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!--  执行highlight.js --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"//cdn.bootcss.com/highlight.js/9.9.0/highlight.min.js"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="undefined">hljs.initHighlightingOnLoad();</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>保存后刷新即可看到效果</p>
+<h1 id="图片超出文章宽度"><a href="#图片超出文章宽度" class="headerlink" title="图片超出文章宽度"></a>图片超出文章宽度</h1><p>默认的 CSS 会导致图片超过文章的总图宽度，而且会带动图片上面一段文字和图片等宽，看起来很不舒服。<br>解决办法：在 Code injection 的 Blog Header 添加<br>    <figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">style</span> <span class="attr">type</span>=<span class="string">"text/css"</span>&gt;</span><span class="undefined"></span></span><br><span class="line"><span class="undefined">.post-full-content img &#123;</span></span><br><span class="line"><span class="undefined">max-width: 100% !important;</span></span><br><span class="line"><span class="undefined">&#125;</span></span><br><span class="line"><span class="undefined"></span><span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<h1 id="在移动设备中文章超出屏幕宽度"><a href="#在移动设备中文章超出屏幕宽度" class="headerlink" title="在移动设备中文章超出屏幕宽度"></a>在移动设备中文章超出屏幕宽度</h1><p>有时候在手机上浏览文章，会发现同一篇文章的某些段落的宽度会比较宽，超出屏幕宽度无法正常浏览。<br>解决办法：在 Code injection 的 Blog Header 添加<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">style</span> <span class="attr">type</span>=<span class="string">"text/css"</span>&gt;</span><span class="undefined"></span></span><br><span class="line"><span class="undefined">.post-full-content p,</span></span><br><span class="line"><span class="undefined">.post-full-content ul,</span></span><br><span class="line"><span class="undefined">.post-full-content ol,</span></span><br><span class="line"><span class="undefined">.post-full-content dl,</span></span><br><span class="line"><span class="undefined">.post-full-content pre,</span></span><br><span class="line"><span class="undefined">.post-full-content h1,</span></span><br><span class="line"><span class="undefined">.post-full-content h2,</span></span><br><span class="line"><span class="undefined">.post-full-content h3,</span></span><br><span class="line"><span class="undefined">.post-full-content h4,</span></span><br><span class="line"><span class="undefined">.post-full-content h5,</span></span><br><span class="line"><span class="undefined">.post-full-content h6,</span></span><br><span class="line"><span class="undefined">.footnotes &#123;</span></span><br><span class="line"><span class="undefined">	max-width: 100%;</span></span><br><span class="line"><span class="undefined">&#125;</span></span><br><span class="line"><span class="undefined"></span><span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<h1 id="Disqus-评论框的宽度比正文宽"><a href="#Disqus-评论框的宽度比正文宽" class="headerlink" title="Disqus 评论框的宽度比正文宽"></a>Disqus 评论框的宽度比正文宽</h1><p>这个属于个人喜好吧，我喜欢同宽的，看起来比较和谐。默认的 <code>.post-full-comments</code> 是 <code>min-width: 100%;</code><br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">style</span> <span class="attr">type</span>=<span class="string">"text/css"</span>&gt;</span><span class="undefined"></span></span><br><span class="line"><span class="undefined">.post-full-comments &#123;</span></span><br><span class="line"><span class="undefined">	min-width: 50%;</span></span><br><span class="line"><span class="undefined">&#125;</span></span><br><span class="line"><span class="undefined"></span><span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<h1 id="修改分享按钮（Twitter→微博，FB→微信）"><a href="#修改分享按钮（Twitter→微博，FB→微信）" class="headerlink" title="修改分享按钮（Twitter→微博，FB→微信）"></a>修改分享按钮（Twitter→微博，FB→微信）</h1><p>效果不多说了，你看下我右上角的分享按钮就知道了。<br>改动的地方比较多<br>先去百度分享获取分享代码，只选择“页面分享功能”就行了，获取到的代码大概是这样：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"bdsharebuttonbox"</span>&gt;</span><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"#"</span> <span class="attr">class</span>=<span class="string">"bds_more"</span> <span class="attr">data-cmd</span>=<span class="string">"more"</span>&gt;</span><span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"#"</span> <span class="attr">class</span>=<span class="string">"bds_tsina"</span> <span class="attr">data-cmd</span>=<span class="string">"tsina"</span> <span class="attr">title</span>=<span class="string">"分享到新浪微博"</span>&gt;</span><span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"#"</span> <span class="attr">class</span>=<span class="string">"bds_weixin"</span> <span class="attr">data-cmd</span>=<span class="string">"weixin"</span> <span class="attr">title</span>=<span class="string">"分享到微信"</span>&gt;</span><span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="undefined">window._bd_share_config=&#123;"common":&#123;"bdSnsKey":&#123;&#125;,"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"16"&#125;,"share":&#123;&#125;&#125;;with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>上边的那段 div 的可以不要，要保留下边的 script 部分。<br>将代码添加到 Code injection 的 Blog Footer 中，保存。<br>修改 <code>content/themes/casper/partials/floating-header.hbs</code><br>未修改前的 header.hbs 是这样的</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"floating-header"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"floating-header-logo"</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"&#123;&#123;@blog.url&#125;&#125;"</span>&gt;</span></span><br><span class="line">		&#123;&#123;#if @blog.icon&#125;&#125;</span><br><span class="line">			<span class="tag">&lt;<span class="name">img</span> <span class="attr">src</span>=<span class="string">"&#123;&#123;@blog.icon&#125;&#125;"</span> <span class="attr">alt</span>=<span class="string">"&#123;&#123;@blog.title&#125;&#125; icon"</span> /&gt;</span></span><br><span class="line">		&#123;&#123;/if&#125;&#125;</span><br><span class="line">		<span class="tag">&lt;<span class="name">span</span>&gt;</span>&#123;&#123;@blog.title&#125;&#125;<span class="tag">&lt;/<span class="name">span</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">span</span> <span class="attr">class</span>=<span class="string">"floating-header-divider"</span>&gt;</span>&amp;mdash;<span class="tag">&lt;/<span class="name">span</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"floating-header-title"</span>&gt;</span>&#123;&#123;title&#125;&#125;<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"floating-header-share"</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"floating-header-share-label"</span>&gt;</span>Share this &#123;&#123;&gt; "icons/point"&#125;&#125;<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">a</span> <span class="attr">class</span>=<span class="string">"floating-header-share-tw"</span> <span class="attr">href</span>=<span class="string">"https://twitter.com/share?text=&#123;&#123;encode title&#125;&#125;&amp;amp;url=&#123;&#123;url absolute="</span><span class="attr">true</span>"&#125;&#125;"</span></span><br><span class="line"><span class="tag">		<span class="attr">onclick</span>=<span class="string">"window.open(this.href, 'share-twitter', 'width=550,height=235');return false;"</span>&gt;</span></span><br><span class="line">		&#123;&#123;&gt; "icons/twitter"&#125;&#125;</span><br><span class="line">	<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">a</span> <span class="attr">class</span>=<span class="string">"floating-header-share-fb"</span> <span class="attr">href</span>=<span class="string">"https://www.facebook.com/sharer/sharer.php?u=&#123;&#123;url absolute="</span><span class="attr">true</span>"&#125;&#125;"</span></span><br><span class="line"><span class="tag">		<span class="attr">onclick</span>=<span class="string">"window.open(this.href, 'share-facebook','width=580,height=296');return false;"</span>&gt;</span></span><br><span class="line">		&#123;&#123;&gt; "icons/facebook"&#125;&#125;</span><br><span class="line">	<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">progress</span> <span class="attr">class</span>=<span class="string">"progress"</span> <span class="attr">value</span>=<span class="string">"0"</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"progress-container"</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">span</span> <span class="attr">class</span>=<span class="string">"progress-bar"</span>&gt;</span><span class="tag">&lt;/<span class="name">span</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">progress</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>修改后的是这样的<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"floating-header"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"floating-header-logo"</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"&#123;&#123;@blog.url&#125;&#125;"</span>&gt;</span></span><br><span class="line">		&#123;&#123;#if @blog.icon&#125;&#125;</span><br><span class="line">			<span class="tag">&lt;<span class="name">img</span> <span class="attr">src</span>=<span class="string">"&#123;&#123;@blog.icon&#125;&#125;"</span> <span class="attr">alt</span>=<span class="string">"&#123;&#123;@blog.title&#125;&#125; icon"</span> /&gt;</span></span><br><span class="line">		&#123;&#123;/if&#125;&#125;</span><br><span class="line">		<span class="tag">&lt;<span class="name">span</span>&gt;</span>&#123;&#123;@blog.title&#125;&#125;<span class="tag">&lt;/<span class="name">span</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">span</span> <span class="attr">class</span>=<span class="string">"floating-header-divider"</span>&gt;</span>&amp;mdash;<span class="tag">&lt;/<span class="name">span</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"floating-header-title"</span>&gt;</span>&#123;&#123;title&#125;&#125;<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"floating-header-share bdsharebuttonbox"</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"floating-header-share-label"</span>&gt;</span>Share this &#123;&#123;&gt; "icons/point"&#125;&#125;<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"javascript:void(0)"</span> <span class="attr">class</span>=<span class="string">"bds_tsina floating-header-share-tw"</span> <span class="attr">data-cmd</span>=<span class="string">"tsina"</span>&gt;</span></span><br><span class="line">		&#123;&#123;&gt; "icons/weibo"&#125;&#125;</span><br><span class="line">	<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"javascript:void(0)"</span> <span class="attr">class</span>=<span class="string">"bds_weixin floating-header-share-fb"</span> <span class="attr">data-cmd</span>=<span class="string">"weixin"</span>&gt;</span></span><br><span class="line">		&#123;&#123;&gt; "icons/wechat"&#125;&#125;</span><br><span class="line">	<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">progress</span> <span class="attr">class</span>=<span class="string">"progress"</span> <span class="attr">value</span>=<span class="string">"0"</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"progress-container"</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">span</span> <span class="attr">class</span>=<span class="string">"progress-bar"</span>&gt;</span><span class="tag">&lt;/<span class="name">span</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">progress</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>并向 <code>content/themes/casper/partials/icons/</code> 里放两个 svg 图标，后缀改名为 hbs，我这里放的是 weibo.hbs 和 wechat.hbs</p>
+<p>这时重启后再看下页面，雏形已经出来了，不过样式还需再调整一下。<br>Code injection 的 Blog Header 添加<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">style</span> <span class="attr">type</span>=<span class="string">"text/css"</span>&gt;</span><span class="undefined"></span></span><br><span class="line"><span class="undefined">/* 取消百度分享的样式 */</span></span><br><span class="line"><span class="undefined">.bdsharebuttonbox a&#123;</span></span><br><span class="line"><span class="undefined">	background-image: none !important;</span></span><br><span class="line"><span class="undefined">	padding-left: 0px !important;</span></span><br><span class="line"><span class="undefined">	height: -webkit-fill-available !important;</span></span><br><span class="line"><span class="undefined">	margin: 0px !important;</span></span><br><span class="line"><span class="undefined">&#125;</span></span><br><span class="line"><span class="undefined">div[class*="bdshare-button-style"]:after &#123;</span></span><br><span class="line"><span class="undefined">	content: "" !important;</span></span><br><span class="line"><span class="undefined">&#125;</span></span><br><span class="line"><span class="undefined">/* 让 svg 永远不会成为鼠标事件的target */   </span></span><br><span class="line"><span class="undefined">svg&#123;</span></span><br><span class="line"><span class="undefined">	pointer-events: none;</span></span><br><span class="line"><span class="undefined">&#125;</span></span><br><span class="line"><span class="undefined">/* 改分享按钮的背景色 */</span></span><br><span class="line"><span class="undefined">.floating-header-share-fb &#123;</span></span><br><span class="line"><span class="undefined">	background: #51ca52;</span></span><br><span class="line"><span class="undefined">&#125;</span></span><br><span class="line"><span class="undefined">.floating-header-share-tw &#123;</span></span><br><span class="line"><span class="undefined">	background: #e66b57;</span></span><br><span class="line"><span class="undefined">&#125;</span></span><br><span class="line"><span class="undefined"></span><span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>保存后再刷新看一下，是不是和原有的 tw、fb 差不多了。其实不用百度分享也能自己搞分享，微信分享就是将当前网址生成一个二维码然后呈现出来；微博自己去设置 url 就行了，不过谁让我懒呢，哈哈。</p>
+<h1 id="手动指定摘要位置"><a href="#手动指定摘要位置" class="headerlink" title="手动指定摘要位置"></a>手动指定摘要位置</h1><p>修改 <code>current/core/server/data/meta/excerpt.js</code><br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> downsize = <span class="built_in">require</span>(<span class="string">'downsize'</span>);</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">getExcerpt</span>(<span class="params">html, truncateOptions</span>) </span>&#123;</span><br><span class="line">	truncateOptions = truncateOptions || &#123;&#125;;</span><br><span class="line">	<span class="comment">// Strip inline and bottom footnotes</span></span><br><span class="line">	<span class="keyword">var</span> excerpt = html.replace(<span class="regexp">/&lt;a href="#fn.*?rel="footnote"&gt;.*?&lt;\/a&gt;/gi</span>, <span class="string">''</span>);</span><br><span class="line">	excerpt = excerpt.replace(<span class="regexp">/&lt;div class="footnotes"&gt;&lt;ol&gt;.*?&lt;\/ol&gt;&lt;\/div&gt;/</span>, <span class="string">''</span>);</span><br><span class="line">	<span class="comment">// Strip other html</span></span><br><span class="line">	excerpt = excerpt.replace(<span class="regexp">/&lt;\/?[^&gt;]+&gt;/gi</span>, <span class="string">''</span>);</span><br><span class="line">	excerpt = excerpt.replace(<span class="regexp">/(\r\n|\n|\r)+/gm</span>, <span class="string">' '</span>);</span><br><span class="line">	<span class="comment">/*jslint regexp:false */</span></span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (!truncateOptions.words &amp;&amp; !truncateOptions.characters) &#123;</span><br><span class="line">		truncateOptions.words = <span class="number">50</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> downsize(excerpt, truncateOptions);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports = getExcerpt;</span><br></pre></td></tr></table></figure></p>
+<p>修改为<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> downsize = <span class="built_in">require</span>(<span class="string">'downsize'</span>);</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">getExcerpt</span>(<span class="params">html, truncateOptions</span>) </span>&#123;</span><br><span class="line">	truncateOptions = truncateOptions || &#123;&#125;;</span><br><span class="line">	<span class="comment">// Strip inline and bottom footnotes</span></span><br><span class="line">	<span class="keyword">var</span> excerpt = html.replace(<span class="regexp">/&lt;a href="#fn.*?rel="footnote"&gt;.*?&lt;\/a&gt;/gi</span>, <span class="string">''</span>);</span><br><span class="line">	excerpt = excerpt.replace(<span class="regexp">/&lt;div class="footnotes"&gt;&lt;ol&gt;.*?&lt;\/ol&gt;&lt;\/div&gt;/</span>, <span class="string">''</span>);</span><br><span class="line">	<span class="comment">// Strip other html</span></span><br><span class="line">	excerpt = excerpt.slice(<span class="number">0</span>, excerpt.search(<span class="string">'&lt;!-- more --&gt;'</span>))</span><br><span class="line">	excerpt = excerpt.replace(<span class="regexp">/\s*&lt;\/?code&gt;\s*/g</span>, <span class="string">' '</span>)  </span><br><span class="line">	excerpt = excerpt.replace(<span class="regexp">/&lt;\/?[^&gt;]+&gt;/gi</span>, <span class="string">''</span>);</span><br><span class="line">	excerpt = excerpt.replace(<span class="regexp">/(\r\n|\n|\r)+/gm</span>, <span class="string">' '</span>);</span><br><span class="line">	<span class="comment">// ideassea.com </span></span><br><span class="line">	excerpt = excerpt.replace(<span class="regexp">/^(&lt;br&gt;)+/gm</span>, <span class="string">''</span>); </span><br><span class="line">	<span class="comment">/*jslint regexp:false */</span></span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (!truncateOptions.words &amp;&amp; !truncateOptions.characters) &#123;</span><br><span class="line">		truncateOptions.words = <span class="number">50</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> downsize(excerpt, truncateOptions);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports = getExcerpt;</span><br></pre></td></tr></table></figure></p>
+<p>以上增加的代码是为了增加 <code>&lt;!-- more --&gt;</code> 支持, 以及摘要分行显示. </p>
+<h1 id="全站-SSL"><a href="#全站-SSL" class="headerlink" title="全站 SSL"></a>全站 SSL</h1><p>SSL 用免费的 Let’s encrypt 来实现。可以参考我之前写的「<a href="/letsencrypt">Let’s Encrypt 试用手记</a>」或者直接使用这个<a href="https://github.com/xdtianyu/scripts/tree/master/lets-encrypt" target="_blank" rel="noopener">脚本</a><br>至于之前用的百度分享不支持 https，可以参考<a href="https://github.com/hrwhisper/baiduShare" target="_blank" rel="noopener">百度分享不支持Https的解决方案</a><br>将 <code>config.production.json</code> 中的 <code>url</code> 改为 <code>https://your.domain.com</code>，重启 ghost。<br>可能会遇到 <code>TOO_MANY_REDIRECTS</code> 这个错误。解决办法是在 nginx 里添加 <code>proxy_set_header X-Forwarded-Proto https;</code>。参考这个 <a href="https://github.com/TryGhost/Ghost/issues/2796" target="_blank" rel="noopener">issue</a><br>另外建议在 <code>config.production.json</code> 配置中添加 <code>&quot;forceAdminSSL&quot;: true</code> 以使后台也实现 https</p>
+<h1 id="未备案引起的一些问题"><a href="#未备案引起的一些问题" class="headerlink" title="未备案引起的一些问题"></a>未备案引起的一些问题</h1><h2 id="微信分享之“分享给朋友”"><a href="#微信分享之“分享给朋友”" class="headerlink" title="微信分享之“分享给朋友”"></a>微信分享之“分享给朋友”</h2><p>现在微信自定义图片、文案分享，只能通过它的 js-sdk 接口，相关文档<a href="https://mp.weixin.qq.com/wiki?t=resource/res_main&amp;id=mp1421141115" target="_blank" rel="noopener">在这</a>。它需要你在一个微信公众号里边设置“JS接口安全域名”，而微信要求这个安全域名是已备案的。那我没备案怎么办？比如像我这样用的国外空间的，肯定是无法通过备案的。好在它有个测试用的平台，<a href="https://mp.weixin.qq.com/debug/cgi-bin/sandbox?t=sandbox/login" target="_blank" rel="noopener">微信公众平台接口测试帐号申请</a>，剩下的就不用说了吧😄<br>不晓得测试账号获取 jsapi_ticket 和 access_token 有没有总数的限制，微信文档的说的是1w：“目前为了方便测试提供了1w的获取量，超过阀值后，服务将不再可用，请确保在服务上线前一定全局缓存access_token和jsapi_ticket，两者有效期均为7200秒，否则一旦上线触发频率限制，服务将不再可用”</p>
+<h2 id="微信分享之“分享到朋友圈”"><a href="#微信分享之“分享到朋友圈”" class="headerlink" title="微信分享之“分享到朋友圈”"></a>微信分享之“分享到朋友圈”</h2><p>微信很奇怪，分享给朋友的链接不会被它重新排版，而分享到朋友圈的链接，可能会被它重新排版（主要是去除了 js）导致非常难看甚至无法正常浏览。我试过直接把网址贴在正文里也不行。最后发现一种不是办法的办法，把网址生成二维码，然后 po 图上去。别人扫你的这个二维码打开的链接不会被重新排版。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Yibo</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://ideassea.com/2017/07/20/improve-ghost/" title="Ghost 1.0.0 调教指南">https://ideassea.com/2017/07/20/improve-ghost/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Ghost/" rel="tag"># Ghost</a>
+          
+            <a href="/tags/Blog/" rel="tag"># Blog</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/07/19/ghost-vs-hexo/" rel="next" title="Ghost vs Hexo">
+                <i class="fa fa-chevron-left"></i> Ghost vs Hexo
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/07/21/rip-chester-bennington/" rel="prev" title="R.I.P. Chester Bennington, 1976-2017">
+                R.I.P. Chester Bennington, 1976-2017 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://ws2.sinaimg.cn/large/006tKfTcly1fq0mwrckglj30sg0sg0u8.jpg"
+                alt="Yibo" />
+            
+              <p class="site-author-name" itemprop="name">Yibo</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">41</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">21</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#表格中内容太长导致表格超出屏幕范围"><span class="nav-number">1.</span> <span class="nav-text">表格中内容太长导致表格超出屏幕范围</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#代码高亮"><span class="nav-number">2.</span> <span class="nav-text">代码高亮</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#图片超出文章宽度"><span class="nav-number">3.</span> <span class="nav-text">图片超出文章宽度</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#在移动设备中文章超出屏幕宽度"><span class="nav-number">4.</span> <span class="nav-text">在移动设备中文章超出屏幕宽度</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Disqus-评论框的宽度比正文宽"><span class="nav-number">5.</span> <span class="nav-text">Disqus 评论框的宽度比正文宽</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#修改分享按钮（Twitter→微博，FB→微信）"><span class="nav-number">6.</span> <span class="nav-text">修改分享按钮（Twitter→微博，FB→微信）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#手动指定摘要位置"><span class="nav-number">7.</span> <span class="nav-text">手动指定摘要位置</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#全站-SSL"><span class="nav-number">8.</span> <span class="nav-text">全站 SSL</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#未备案引起的一些问题"><span class="nav-number">9.</span> <span class="nav-text">未备案引起的一些问题</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#微信分享之“分享给朋友”"><span class="nav-number">9.1.</span> <span class="nav-text">微信分享之“分享给朋友”</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#微信分享之“分享到朋友圈”"><span class="nav-number">9.2.</span> <span class="nav-text">微信分享之“分享到朋友圈”</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate"> 
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yibo</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/theme-next/hexo-theme-next">NexT.Gemini</a> v6.1.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/reading_progress/reading_progress.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.1.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.1.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.1.0"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+  
+  <script src="/lib/pangu/dist/pangu.min.js?v=3.3"></script>
+  <script type="text/javascript">pangu.spacingPage();</script>
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

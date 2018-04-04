@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.1.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.1.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.1.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.1.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="项目后台要加一个统计，产品只要求能看到数据就行了，但是做完后我发现只有文本不够直观，就想着用图表的形式的展现一下（顺便温习一下曾经用过的 JFreeChart XD）。JFreeChat  虽好，但也有些年头了，就去网上搜了搜有没有什么更好的图表生成的类库。 当在8 个华丽而实用的 Java 图表应用看到 ECharts 的时候，发现 JFreeChart 跟它比就不是一个级别的呀！至于开头说的温">
+<meta name="keywords" content="ECharts">
+<meta property="og:type" content="article">
+<meta property="og:title" content="在 Java 项目中使用 ECharts">
+<meta property="og:url" content="https://ideassea.com/2016/02/04/echarts-quickstart/index.html">
+<meta property="og:site_name" content="Ideas Sea">
+<meta property="og:description" content="项目后台要加一个统计，产品只要求能看到数据就行了，但是做完后我发现只有文本不够直观，就想着用图表的形式的展现一下（顺便温习一下曾经用过的 JFreeChart XD）。JFreeChat  虽好，但也有些年头了，就去网上搜了搜有没有什么更好的图表生成的类库。 当在8 个华丽而实用的 Java 图表应用看到 ECharts 的时候，发现 JFreeChart 跟它比就不是一个级别的呀！至于开头说的温">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://ws1.sinaimg.cn/large/6e3b2269ly1fq0fatk6ywj21kw0jw41j">
+<meta property="og:updated_time" content="2017-07-17T22:22:15.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="在 Java 项目中使用 ECharts">
+<meta name="twitter:description" content="项目后台要加一个统计，产品只要求能看到数据就行了，但是做完后我发现只有文本不够直观，就想着用图表的形式的展现一下（顺便温习一下曾经用过的 JFreeChart XD）。JFreeChat  虽好，但也有些年头了，就去网上搜了搜有没有什么更好的图表生成的类库。 当在8 个华丽而实用的 Java 图表应用看到 ECharts 的时候，发现 JFreeChart 跟它比就不是一个级别的呀！至于开头说的温">
+<meta name="twitter:image" content="https://ws1.sinaimg.cn/large/6e3b2269ly1fq0fatk6ywj21kw0jw41j">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Ideas Sea" type="application/atom+xml" />
+
+
+
+
+  <link rel="canonical" href="https://ideassea.com/2016/02/04/echarts-quickstart/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>在 Java 项目中使用 ECharts | Ideas Sea</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> 
+
+<div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ideas Sea</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+          
+  <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />标签</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+</li>
+
+      
+
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+  
+
+
+
+ </div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+    <div class="reading-progress-bar"></div>
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://ideassea.com/2016/02/04/echarts-quickstart/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yibo">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://ws2.sinaimg.cn/large/006tKfTcly1fq0mwrckglj30sg0sg0u8.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ideas Sea">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">在 Java 项目中使用 ECharts</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-02-04T06:12:00+08:00">2016-02-04</time>
+            
+
+            
+            
+              
+                
+              
+            
+
+            
+              
+              <span class="post-meta-divider">|</span>
+              
+
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">更新于：</span>
+              
+              <time title="更新于" itemprop="dateModified" datetime="2017-07-18T06:22:15+08:00">2017-07-18</time>
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>项目后台要加一个统计，产品只要求能看到数据就行了，但是做完后我发现只有文本不够直观，就想着用图表的形式的展现一下（顺便温习一下曾经用过的 <a href="http://www.jfree.org/jfreechart/index.html" target="_blank" rel="noopener">JFreeChart</a> XD）。JFreeChat  虽好，但也有些年头了，就去网上搜了搜有没有什么更好的图表生成的类库。</p>
+<p>当在<a href="http://www.codeceo.com/article/8-java-graph.html" target="_blank" rel="noopener">8 个华丽而实用的 Java 图表应用</a>看到 ECharts 的时候，发现 JFreeChart 跟它比就不是一个级别的呀！至于开头说的温习嘛，就缓缓吧，先看一下 ECharts。</p>
+<p>先看一下用 ECharts 做的柱状图：</p>
+<p><img src="https://ws1.sinaimg.cn/large/6e3b2269ly1fq0fatk6ywj21kw0jw41j" alt="echarts-bar"></p>
+<a id="more"></a>
+<h2 id="ECharts"><a href="#ECharts" class="headerlink" title="ECharts"></a>ECharts</h2><p>开源的 <a href="http://echarts.baidu.com/" target="_blank" rel="noopener">ECharts</a> 来自百度 <a href="http://efe.baidu.com/" target="_blank" rel="noopener">EFE</a> 数据可视化团队。至于 ECharts 有哪些好处？可以看看其<a href="http://echarts.baidu.com/" target="_blank" rel="noopener">官网</a>和官方的 PPT <a href="http://echarts.baidu.com/doc/slide/whyEcharts.html#/" target="_blank" rel="noopener">Why ECharts</a>。</p>
+<h2 id="ECharts-Java"><a href="#ECharts-Java" class="headerlink" title="ECharts-Java"></a>ECharts-Java</h2><p>首先感谢<a href="http://blog.csdn.net/isea533" target="_blank" rel="noopener">isea533</a>写的这个类库。</p>
+<p>ECharts 说白了就是一个 JavaScript 图表库，它的图表样式和数据都是由一个 Json 对象提供。因为 ECharts 的强大，在后端构造各种 Json 结构的时候就会比较痛苦。<a href="http://blog.csdn.net/isea533" target="_blank" rel="noopener">isea533</a> 就写了这么一个类库(<a href="http://blog.csdn.net/isea533/article/details/43225717" target="_blank" rel="noopener">http://blog.csdn.net/isea533/article/details/43225717</a> )，它实现了所有 ECharts 中的 Json 结构对应的 Java 对象，目前是针对 ECharts 2.0 的。</p>
+<p>ECharts-Java类库地址：<br><a href="http://git.oschina.net/free/ECharts" target="_blank" rel="noopener">http://git.oschina.net/free/ECharts</a><br><a href="https://github.com/abel533/ECharts" target="_blank" rel="noopener">https://github.com/abel533/ECharts</a></p>
+<h2 id="Action"><a href="#Action" class="headerlink" title="Action"></a>Action</h2><p>下面是一个完整的柱状图的例子。<br>（效果见本文开头的图，参考自<a href="http://echarts.baidu.com/doc/example/bar1.html" target="_blank" rel="noopener">http://echarts.baidu.com/doc/example/bar1.html</a> ）</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- pom.xml --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.github.abel533<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>ECharts<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.2.6<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.google.code.gson<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>gson<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.5<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// java</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">barChart</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 创建Option</span></span><br><span class="line">    <span class="comment">// Option 无需任何依赖; GsonOption 依赖 Gson, FsonOption 依赖 FastJson</span></span><br><span class="line">    Option option = <span class="keyword">new</span> GsonOption();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 设置标题与子标题</span></span><br><span class="line">    option.title().text(<span class="string">"某地区蒸发量和降水量"</span>).subtext(<span class="string">"纯属虚构"</span>).x(X.left).y(Y.top);</span><br><span class="line">    <span class="comment">// 设置右上角工具箱</span></span><br><span class="line">    option.toolbox().show(<span class="keyword">true</span>).feature(Tool.mark, Tool.dataView, Tool.restore,</span><br><span class="line">            Tool.saveAsImage);</span><br><span class="line">    <span class="comment">// 图例</span></span><br><span class="line">    option.legend().data(<span class="string">"蒸发量"</span>, <span class="string">"降水量"</span>);</span><br><span class="line">    <span class="comment">// 设置 x 轴为类目轴, y 轴为值轴</span></span><br><span class="line">    option.xAxis(<span class="keyword">new</span> CategoryAxis().data(<span class="string">"1月"</span>, <span class="string">"2月"</span>, <span class="string">"3月"</span>, <span class="string">"4月"</span>, <span class="string">"5月"</span>, <span class="string">"6月"</span>, <span class="string">"7月"</span>, <span class="string">"8月"</span>, <span class="string">"9月"</span>,</span><br><span class="line">            <span class="string">"10月"</span>, <span class="string">"11月"</span>, <span class="string">"12月"</span>)).yAxis(<span class="keyword">new</span> ValueAxis().max(<span class="number">200</span>));</span><br><span class="line">    <span class="comment">// 气泡提示框</span></span><br><span class="line">    option.tooltip().trigger(Trigger.axis);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 柱状数据, 实验嘛，就用模拟数据了。</span></span><br><span class="line">    Bar bar1 = <span class="keyword">new</span> Bar(<span class="string">"蒸发量"</span>);</span><br><span class="line">    bar1.data(<span class="number">2.0</span>, <span class="number">4.9</span>, <span class="number">7.0</span>, <span class="number">23.2</span>, <span class="number">25.6</span>, <span class="number">76.7</span>, <span class="number">135.6</span>, <span class="number">162.2</span>, <span class="number">32.6</span>, <span class="number">20.0</span>, <span class="number">6.4</span>, <span class="number">3.3</span>);</span><br><span class="line">    bar1.markPoint().data(<span class="keyword">new</span> PointData().type(MarkType.max).name(<span class="string">"最大值"</span>),</span><br><span class="line">            <span class="keyword">new</span> PointData().type(MarkType.min).name(<span class="string">"最小值"</span>));</span><br><span class="line">    bar1.markLine().data(<span class="keyword">new</span> PointData().type(MarkType.average).name(<span class="string">"平均值"</span>));</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 又一个柱状数据</span></span><br><span class="line">    Bar bar2 = <span class="keyword">new</span> Bar(<span class="string">"降水量"</span>);</span><br><span class="line">    bar2.data(<span class="number">2.6</span>, <span class="number">5.9</span>, <span class="number">9.0</span>, <span class="number">26.4</span>, <span class="number">28.7</span>, <span class="number">70.7</span>, <span class="number">175.6</span>, <span class="number">182.2</span>, <span class="number">48.7</span>, <span class="number">18.8</span>, <span class="number">6.0</span>, <span class="number">2.3</span>);</span><br><span class="line">    bar2.markPoint().data(<span class="keyword">new</span> PointData().type(MarkType.max).name(<span class="string">"最大值"</span>),</span><br><span class="line">            <span class="keyword">new</span> PointData().type(MarkType.min).name(<span class="string">"最小值"</span>));</span><br><span class="line">    bar2.markLine().data(<span class="keyword">new</span> PointData().type(MarkType.average).name(<span class="string">"平均值"</span>));</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 向 Option 中设置数据</span></span><br><span class="line">    option.series(bar1, bar2);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// GsonOption 重写了 toString() 方法, 返回 Json（用 Gson 实现的）</span></span><br><span class="line">    <span class="keyword">return</span> option.toString();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- jsp --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="comment">&lt;!-- 为ECharts准备一个具备大小（宽高）的Dom --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"main"</span> <span class="attr">style</span>=<span class="string">"height:400px"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="comment">&lt;!-- ECharts单文件引入 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"http://echarts.baidu.com/build/dist/echarts-all.js"</span> <span class="attr">type</span>=<span class="string">"text/javascript"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">"text/javascript"</span>&gt;</span><span class="undefined"></span></span><br><span class="line"><span class="javascript">	<span class="comment">// 基于准备好的dom，初始化echarts图表</span></span></span><br><span class="line"><span class="javascript">	<span class="keyword">var</span> myChart = echarts.init(<span class="built_in">document</span>.getElementById(<span class="string">'main'</span>));</span></span><br><span class="line"><span class="javascript">	<span class="keyword">var</span> option = $&#123;optionJsonStr&#125;;</span></span><br><span class="line"><span class="javascript">	<span class="comment">// 为echarts对象加载数据</span></span></span><br><span class="line"><span class="undefined">	myChart.setOption(option);</span></span><br><span class="line"><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>如果显示不出来的话，使用 <code>eval(&#39;(&#39;+optionJsonStr+&#39;)&#39;)</code> 将 <code>optionJsonStr</code> 转换为 Json 对象试试。我这里直接用 <code>${optionJsonStr}</code> 取出来的就是 Json 对象。至于显示效果嘛，本文开头已经给你看啦~<br>其实懂了 ECharts 的各种数据结构后，用 ECharts-Java 不用怎么看文档就能“写出”对应样式与功能的图表了。百度官方有很多栗子可以参考：<a href="http://echarts.baidu.com/doc/example.html" target="_blank" rel="noopener">http://echarts.baidu.com/doc/example.html</a></p>
+<p>最后引用 ECharts-Java <a href="http://git.oschina.net/free/ECharts/wikis/home" target="_blank" rel="noopener">wiki</a> 里的一段话，以免误入歧途：<br>由于本项目主要目的是方便在Java中构造ECharts中需要使用的各种数据结构，所以你需要了解ECharts本身，你只有知道你自己需要什么样的数据，什么样的样式，什么样的功能时，你才能写出来。<br>所以想通过本项目来了解ECharts是本末倒置。</p>
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><p><a href="http://www.codeceo.com/article/8-java-graph.html" target="_blank" rel="noopener">http://www.codeceo.com/article/8-java-graph.html</a><br><a href="http://echarts.baidu.com/" target="_blank" rel="noopener">http://echarts.baidu.com/</a><br><a href="http://blog.csdn.net/isea533/article/details/43225717" target="_blank" rel="noopener">http://blog.csdn.net/isea533/article/details/43225717</a><br><a href="http://git.oschina.net/free/ECharts/wikis/home" target="_blank" rel="noopener">http://git.oschina.net/free/ECharts/wikis/home</a></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Yibo</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://ideassea.com/2016/02/04/echarts-quickstart/" title="在 Java 项目中使用 ECharts">https://ideassea.com/2016/02/04/echarts-quickstart/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/ECharts/" rel="tag"># ECharts</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/02/03/letsencrypt/" rel="next" title="Let's Encrypt 试用手记">
+                <i class="fa fa-chevron-left"></i> Let's Encrypt 试用手记
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/02/06/generate-qrcode-in-java/" rel="prev" title="Java 中生成二维码（带 logo）">
+                Java 中生成二维码（带 logo） <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://ws2.sinaimg.cn/large/006tKfTcly1fq0mwrckglj30sg0sg0u8.jpg"
+                alt="Yibo" />
+            
+              <p class="site-author-name" itemprop="name">Yibo</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">41</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">21</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#ECharts"><span class="nav-number">1.</span> <span class="nav-text">ECharts</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ECharts-Java"><span class="nav-number">2.</span> <span class="nav-text">ECharts-Java</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Action"><span class="nav-number">3.</span> <span class="nav-text">Action</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Reference"><span class="nav-number">4.</span> <span class="nav-text">Reference</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate"> 
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yibo</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/theme-next/hexo-theme-next">NexT.Gemini</a> v6.1.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/reading_progress/reading_progress.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.1.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.1.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.1.0"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+  
+  <script src="/lib/pangu/dist/pangu.min.js?v=3.3"></script>
+  <script type="text/javascript">pangu.spacingPage();</script>
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

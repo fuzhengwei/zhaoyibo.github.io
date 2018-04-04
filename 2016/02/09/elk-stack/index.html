@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.1.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.1.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.1.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.1.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="ELK 是 Elasticsearch、Logstash、Kibana 三个开源软件的组合。在实时数据检索和分析场合，三者通常是配合共用，而且又都先后归于 Elastic.co 公司名下，故有此简称。 ELK 在最近两年迅速崛起，成为机器数据分析，或者说实时日志处理领域，开源界的第一选择。和传统的日志处理方案相比，ELK 具有如下几个优点：  处理方式灵活。Elasticsearch 是实时全文索">
+<meta name="keywords" content="ELK,Operations">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ELK 部署笔记">
+<meta property="og:url" content="https://ideassea.com/2016/02/09/elk-stack/index.html">
+<meta property="og:site_name" content="Ideas Sea">
+<meta property="og:description" content="ELK 是 Elasticsearch、Logstash、Kibana 三个开源软件的组合。在实时数据检索和分析场合，三者通常是配合共用，而且又都先后归于 Elastic.co 公司名下，故有此简称。 ELK 在最近两年迅速崛起，成为机器数据分析，或者说实时日志处理领域，开源界的第一选择。和传统的日志处理方案相比，ELK 具有如下几个优点：  处理方式灵活。Elasticsearch 是实时全文索">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://ws1.sinaimg.cn/large/6e3b2269ly1fq0faubc11j20qo0f0wg4">
+<meta property="og:image" content="https://ws1.sinaimg.cn/large/6e3b2269ly1fq0fauolc2j21ee0hadl0">
+<meta property="og:image" content="https://ws1.sinaimg.cn/large/6e3b2269ly1fq0fauz56xj21kw0rvak5">
+<meta property="og:image" content="https://ws1.sinaimg.cn/large/6e3b2269ly1fq0favdjsij20za0iu76r">
+<meta property="og:image" content="https://ws1.sinaimg.cn/large/6e3b2269ly1fq0favokvjj20zk0iu41a">
+<meta property="og:image" content="https://ws1.sinaimg.cn/large/6e3b2269ly1fq0favxdfdj20zk0iutcn">
+<meta property="og:image" content="https://ws1.sinaimg.cn/large/6e3b2269ly1fq0faw2jj3j20zk0iu0v1">
+<meta property="og:updated_time" content="2017-07-19T06:07:11.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ELK 部署笔记">
+<meta name="twitter:description" content="ELK 是 Elasticsearch、Logstash、Kibana 三个开源软件的组合。在实时数据检索和分析场合，三者通常是配合共用，而且又都先后归于 Elastic.co 公司名下，故有此简称。 ELK 在最近两年迅速崛起，成为机器数据分析，或者说实时日志处理领域，开源界的第一选择。和传统的日志处理方案相比，ELK 具有如下几个优点：  处理方式灵活。Elasticsearch 是实时全文索">
+<meta name="twitter:image" content="https://ws1.sinaimg.cn/large/6e3b2269ly1fq0faubc11j20qo0f0wg4">
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Ideas Sea" type="application/atom+xml" />
+
+
+
+
+  <link rel="canonical" href="https://ideassea.com/2016/02/09/elk-stack/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>ELK 部署笔记 | Ideas Sea</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"> 
+
+<div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Ideas Sea</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+          
+  <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />标签</a>
+</li>
+
+      
+        
+        
+          
+  <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+</li>
+
+      
+
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+  
+
+
+
+ </div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+    <div class="reading-progress-bar"></div>
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://ideassea.com/2016/02/09/elk-stack/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yibo">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://ws2.sinaimg.cn/large/006tKfTcly1fq0mwrckglj30sg0sg0u8.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Ideas Sea">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">ELK 部署笔记</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-02-09T06:44:00+08:00">2016-02-09</time>
+            
+
+            
+            
+              
+                
+              
+            
+
+            
+              
+              <span class="post-meta-divider">|</span>
+              
+
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-check-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">更新于：</span>
+              
+              <time title="更新于" itemprop="dateModified" datetime="2017-07-19T14:07:11+08:00">2017-07-19</time>
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>ELK 是 Elasticsearch、Logstash、Kibana 三个开源软件的组合。在实时数据检索和分析场合，三者通常是配合共用，而且又都先后归于 <a href="https://www.elastic.co/" target="_blank" rel="noopener">Elastic.co</a> 公司名下，故有此简称。</p>
+<p>ELK 在最近两年迅速崛起，成为机器数据分析，或者说实时日志处理领域，开源界的第一选择。和传统的日志处理方案相比，ELK 具有如下几个优点：</p>
+<ul>
+<li>处理方式灵活。Elasticsearch 是实时全文索引，不需要像 <a href="https://storm.apache.org" target="_blank" rel="noopener">Storm</a> 那样预先编程才能使用；</li>
+<li>配置简易上手。Elasticsearch 全部采用 JSON 接口，Logstash 是 Ruby DSL 设计，都是目前业界最通用的配置语法设计；</li>
+<li>检索性能高效。虽然每次查询都是实时计算，但是优秀的设计和实现基本可以达到全天数据查询的秒级响应；</li>
+<li>集群线性扩展。不管是 Elasticsearch 集群还是 Logstash 集群都是可以线性扩展的；</li>
+<li>前端操作炫丽。Kibana 界面上，只需要点击鼠标，就可以完成搜索、聚合功能，生成炫丽的仪表板。</li>
+</ul>
+<a id="more"></a>
+<h2 id="ELK-Architecture"><a href="#ELK-Architecture" class="headerlink" title="ELK Architecture"></a>ELK Architecture</h2><ul>
+<li>Elasticsearch 是个开源分布式搜索引擎，与 <a href="http://lucene.apache.org/solr/" target="_blank" rel="noopener">Solr</a> 类似，它隐藏了 <a href="http://lucene.apache.org/" title="Lucene" target="_blank" rel="noopener">Lucene</a> 的复杂性。其特点有：分布式，零配置，自动发现，索引自动分片，索引副本机制，RESTful 风格接口，多数据源，负载均衡等。</li>
+<li>Logstash 是一个完全开源的工具，它可以对你的日志进行收集、分析，并将其存储供以后使用。</li>
+<li>Kibana 也是一个开源和免费的工具，它可以为 Logstash 和 ElasticSearch 提供的日志分析友好的 Web 界面，可以帮助你汇总、分析和搜索重要数据日志。</li>
+</ul>
+<p><img src="https://ws1.sinaimg.cn/large/6e3b2269ly1fq0faubc11j20qo0f0wg4" alt="elk-architecture"></p>
+<h2 id="Java-Runtime-Environment"><a href="#Java-Runtime-Environment" class="headerlink" title="Java Runtime Environment"></a>Java Runtime Environment</h2><p>因为 Elasticsearch 是基于 Lucene 用 Java 开发的， Logstash 是 JRuby 写的，所以你需要先配置一个 Java 运行环境。（Java 版本的最低要求是  Java 7，推荐 Java 8）</p>
+<h2 id="Elasticsearch"><a href="#Elasticsearch" class="headerlink" title="Elasticsearch"></a>Elasticsearch</h2><p>我所接触的主机都是 CentOS 系统的，所以这里就用 yum 安装了（图方便）。其他安装方式可参考 <a href="https://www.elastic.co/downloads" target="_blank" rel="noopener">https://www.elastic.co/downloads</a> 。</p>
+<p>首先导入公钥数字证书</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ rpm --import https://packages.elastic.co/GPG-KEY-elasticsearch</span><br></pre></td></tr></table></figure>
+<p>添加 yum 源并安装</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">$ cat &gt;&gt;/etc/yum.repos.d/elasticsearch.repo&lt;&lt;EOF</span><br><span class="line">[elasticsearch-2.x]</span><br><span class="line">name=Elasticsearch repository <span class="keyword">for</span> 2.x packages</span><br><span class="line">baseurl=http://packages.elastic.co/elasticsearch/2.x/centos</span><br><span class="line">gpgcheck=1</span><br><span class="line">gpgkey=http://packages.elastic.co/GPG-KEY-elasticsearch</span><br><span class="line">enabled=1</span><br><span class="line">EOF</span><br><span class="line">$ yum install -y elasticsearch</span><br></pre></td></tr></table></figure>
+<p>安装完成后执行</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ service elasticsearch start</span><br></pre></td></tr></table></figure>
+<p>再测试一下是否启动成功</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ curl -X GET http://localhost:9200/</span><br></pre></td></tr></table></figure>
+<p>如果返回以下结果则标明 ES 启动成功</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  &quot;name&quot; : &quot;Arkady Rossovich&quot;,</span><br><span class="line">  &quot;cluster_name&quot; : &quot;elasticsearch&quot;,</span><br><span class="line">  &quot;version&quot; : &#123;</span><br><span class="line">    &quot;number&quot; : &quot;2.1.1&quot;,</span><br><span class="line">    &quot;build_hash&quot; : &quot;40e2c53a6b6c2972b3d13846e450e66f4375bd71&quot;,</span><br><span class="line">    &quot;build_timestamp&quot; : &quot;2015-12-15T13:05:55Z&quot;,</span><br><span class="line">    &quot;build_snapshot&quot; : false,</span><br><span class="line">    &quot;lucene_version&quot; : &quot;5.3.1&quot;</span><br><span class="line">  &#125;,</span><br><span class="line">  &quot;tagline&quot; : &quot;You Know, for Search&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>tips: ES 限制只能以<strong>非 root 用户</strong>启动。</p>
+<p>如果你想要一个监控界面来控制和了解ES的话，可以下载 <a href="https://www.elastic.co/products/marvel" target="_blank" rel="noopener">marvel</a>。<code>Marvel</code>是Elasticsearch的管理和监控工具，在开发环境下免费使用。它包含了一个叫做 Sense 的交互式控制台，使用户方便的通过浏览器直接与 Elasticsearch 进行交互。不过这个东西不能进行商用。另外一个可视化的插件是 <a href="https://github.com/mobz/elasticsearch-head.git" target="_blank" rel="noopener">Header</a>，同样是一个 ES 的管理和监控的工具，不过它的功能稍微要少一些。</p>
+<p>安装 Header 的话非常简单,直接在 es 的 <code>bin</code> 目录中执行 <code>sudo ./plugin install mobz/elasticsearch-head</code> 即可，它会自动的下载并解压安装包到<code>plugins</code>目录。</p>
+<p>安装完成后，在浏览器中浏览<a href="http://localhost:9200/_plugin/head/" target="_blank" rel="noopener">http://host:9200/_plugin/head/</a></p>
+<p><img src="https://ws1.sinaimg.cn/large/6e3b2269ly1fq0fauolc2j21ee0hadl0" alt="plugin-header"></p>
+<p>安装 Marvel 稍微要麻烦一点，最新的 Marvel2.X 需要依赖 Kiabana。首先需要安装License 模块：<code>./plugin install license</code>，然后在 ES 中安装 marvel-agent：<code>./plugin install marvel-agent</code>，最后需要在 <code>Kiabana</code> 中安装Marvel ：<code>./kibana plugin --install elasticsearch/marvel/latest</code></p>
+<p>安装完成后，启动 Elasticsearch 和 Kiabana，然后在浏览器中浏览<a href="http://localhost:5601/app/marvel" target="_blank" rel="noopener">http://localhost:5601/app/marvel</a> 即可。</p>
+<p><img src="https://ws1.sinaimg.cn/large/6e3b2269ly1fq0fauz56xj21kw0rvak5" alt="marvel"></p>
+<p>相关阅读：</p>
+<p><a href="https://www.elastic.co/guide/en/elasticsearch/guide/current/index.html" target="_blank" rel="noopener">Elasticsearch: The Definitive Guide</a> （英语不好可以参考这个<a href="http://es.xiaoleilu.com/" target="_blank" rel="noopener">中文版</a> ）</p>
+<h2 id="Kibana"><a href="#Kibana" class="headerlink" title="Kibana"></a>Kibana</h2><p>Kibana 的 rpm 包的版本还停留在 4.1.1 （目前官方最新的版本是 4.3.1），所以直接下载二进制包了。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ curl -O https://download.elastic.co/kibana/kibana/kibana-4.3.1-linux-x64.tar.gz</span><br><span class="line">$ tar -zxvf kibana-4.3.1-linux-x64.tar.gz</span><br><span class="line">$ <span class="built_in">cd</span> kibana-4.3.1-linux-x64</span><br><span class="line">$ ./bin/kibana</span><br></pre></td></tr></table></figure>
+<p>然后打开浏览器访问 <a href="http://host:5601" target="_blank" rel="noopener">http://host:5601</a> 即可，Kibana 会自动的在ES中创建它自己所需的索引文件。</p>
+<p>刚打开的时候会提示你创建 index pattern，但是这时候 ES 中其实还没有数据，这部分可以在配置好 Logstash 后再配置，这里先把步骤给出来：</p>
+<ol>
+<li><p>这页按默认的就好，无需改动，直接 Create </p>
+<p><img src="https://ws1.sinaimg.cn/large/6e3b2269ly1fq0favdjsij20za0iu76r" alt="kibana-settings-0"></p>
+</li>
+<li><p>出现这个页面就说明配置成功了</p>
+<p><img src="https://ws1.sinaimg.cn/large/6e3b2269ly1fq0favokvjj20zk0iu41a" alt="kibana-settings-1"></p>
+</li>
+<li><p>进入上方 navbar 的 Discover，就能看到数据并查询了</p>
+<p><img src="https://ws1.sinaimg.cn/large/6e3b2269ly1fq0favxdfdj20zk0iutcn" alt="kibana-discover"></p>
+</li>
+<li><p>进入上方 navbar 的 Visualize，可以建立不同的图表以供分析</p>
+<p><img src="https://ws1.sinaimg.cn/large/6e3b2269ly1fq0faw2jj3j20zk0iu0v1" alt="kibana-visualize"></p>
+</li>
+</ol>
+<p>tips：如果你的 Kibana 和 Elasticsearch 不是在一台机器上或者之前你修改了 Elasticsearch 的默认端口 <code>9200</code>，那么你需要在修改 Kibana <code>config/kibana.yml</code> 的 <code>elasticsearch.url</code>。</p>
+<h2 id="Logstash"><a href="#Logstash" class="headerlink" title="Logstash"></a>Logstash</h2><p>安装 logstash</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">$ cat &gt;&gt;/etc/yum.repos.d/logstash.repo&lt;&lt;EOF</span><br><span class="line">[logstash-2.1]</span><br><span class="line">name=Logstash repository <span class="keyword">for</span> 2.1.x packages</span><br><span class="line">baseurl=http://packages.elastic.co/logstash/2.1/centos</span><br><span class="line">gpgcheck=1</span><br><span class="line">gpgkey=http://packages.elastic.co/GPG-KEY-elasticsearch</span><br><span class="line">enabled=1</span><br><span class="line">EOF</span><br><span class="line">$ yum install -y logstash</span><br></pre></td></tr></table></figure>
+<p>先测试一下</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ service logstash configtest</span><br><span class="line">There aren<span class="string">'t any configuration files in /etc/logstash/conf.d[FAILED]</span></span><br></pre></td></tr></table></figure>
+<p>提示缺少配置文件，那下边就要好好说说这个配置文件了。</p>
+<p>tips: 这里也可能报错 <code>/etc/init.d/logstash: line 140: echo_failure: command not found</code>，这是因为启动脚本有些问题，用 vim 打开 <code>/etc/init.d/logstash</code> 并在开头的位置添加<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Source function library.</span></span><br><span class="line">. /lib/lsb/init-functions</span><br></pre></td></tr></table></figure></p>
+<p>Logstash的日志采集过程主要有三个部分，分别是 <em>input</em>、 <em>filter</em> 和 <em>output</em>，分别对应了日志的收集、整理和输出。同时在 <em>filter</em> 的前后允许配置 <em>codec</em>，也就是编解码。每一个过程都提供了非常多的插件来辅助处理，具体有哪些插件可以查看<a href="https://www.elastic.co/guide/en/logstash/current/index.html" target="_blank" rel="noopener">这里</a>。</p>
+<p>比如最简单的一个 conf 文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># logstash-simple.conf</span><br><span class="line">input &#123; stdin &#123; &#125; &#125;</span><br><span class="line">output &#123;</span><br><span class="line">   stdout &#123; codec=&gt; rubydebug &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>它指定了日志采集的输入源为命令行输入，不经过任何的处理，输出源为控制台输出，输出的时候编码为ruby 的 debug 格式。</p>
+<p>执行这个采集的效果就是:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">$ /opt/logstash/bin/logstash agent -f logstash-simple.conf</span><br><span class="line">Logstash startup completed</span><br><span class="line">hello World </span><br><span class="line">&#123;</span><br><span class="line">      <span class="string">"message"</span> =&gt; <span class="string">"helloWorld"</span>,</span><br><span class="line">     <span class="string">"@version"</span> =&gt; <span class="string">"1"</span>,</span><br><span class="line">   <span class="string">"@timestamp"</span> =&gt; <span class="string">"2015-12-14T12:08:28.688Z"</span>,</span><br><span class="line">         <span class="string">"host"</span> =&gt; <span class="string">"localhost"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>再看一个复杂一点的例子（我用于测试环境中抓取 Java Web 服务的配置）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line">input &#123;</span><br><span class="line">    file &#123;</span><br><span class="line">        type =&gt; &quot;example&quot;</span><br><span class="line">        path =&gt; [</span><br><span class="line">            &quot;/data/log/example/main.log&quot;,</span><br><span class="line">            &quot;/data/log/example/monitor.log&quot;</span><br><span class="line">        ]</span><br><span class="line">        tags =&gt; [&quot;example&quot;]</span><br><span class="line">        codec =&gt; multiline &#123;</span><br><span class="line">            pattern =&gt; &quot;^\d&#123;4&#125;-\d&#123;2&#125;-\d&#123;2&#125;\s\d&#123;2&#125;:\d&#123;2&#125;:\d&#123;2&#125;.\d&#123;3&#125;&quot;</span><br><span class="line">            negate =&gt; true</span><br><span class="line">            what =&gt; &quot;previous&quot;</span><br><span class="line">        &#125;</span><br><span class="line">        start_position =&gt; &quot;beginning&quot; </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">filter &#123;</span><br><span class="line">    if [type] == &quot;example&quot; &#123;</span><br><span class="line">    	if [message] =~ &quot;^\s+&quot; &#123;</span><br><span class="line">            drop&#123;&#125;</span><br><span class="line">        &#125;</span><br><span class="line">        mutate &#123;</span><br><span class="line">            gsub =&gt; [&quot;message&quot;, &quot;&apos;&quot;, &quot;`&quot;]</span><br><span class="line">        &#125;</span><br><span class="line">        grok &#123;</span><br><span class="line">            match =&gt; [</span><br><span class="line">                &quot;message&quot;, &quot;(\d&#123;4&#125;-\d&#123;2&#125;-\d&#123;2&#125;\s\d&#123;2&#125;:\d&#123;2&#125;:\d&#123;2&#125;.\d&#123;3&#125;)\s(WARN|ERROR)\s%&#123;JAVACLASS:java_class&#125;\s##\s(?&lt;err_msg&gt;\w*)&quot;,</span><br><span class="line">                &quot;message&quot;, &quot;(\d&#123;4&#125;-\d&#123;2&#125;-\d&#123;2&#125;\s\d&#123;2&#125;:\d&#123;2&#125;:\d&#123;2&#125;.\d&#123;3&#125;)\|(50\d)\|(?&lt;method&gt;\w*)\|(?&lt;url&gt;.*?)\|.*\s%&#123;JAVACLASS:java_class&#125;:\s(?&lt;err_msg&gt;\w*)&quot;</span><br><span class="line">            ]</span><br><span class="line">            add_tag =&gt; &quot;has_err&quot;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        if &quot;has_err&quot; in [tags] and &quot;Invalid password for user&quot; not in [err_msg] &#123;</span><br><span class="line">            throttle &#123;</span><br><span class="line">                period =&gt; 1800</span><br><span class="line">                before_count =&gt; 5</span><br><span class="line">                after_count =&gt; 6</span><br><span class="line">                key =&gt; &quot;%&#123;java_class&#125;&quot;</span><br><span class="line">                add_tag =&gt; &quot;throttled&quot;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">output &#123;</span><br><span class="line">    elasticsearch &#123;</span><br><span class="line">        hosts =&gt; [</span><br><span class="line">            &quot;localhost:9200&quot;</span><br><span class="line">        ]</span><br><span class="line">    &#125;</span><br><span class="line">    if &quot;throttled&quot; not in [tags] and [type] == &quot;example&quot; and &quot;has_err&quot; in [tags] &#123;</span><br><span class="line">        exec &#123;</span><br><span class="line">            command =&gt; &quot;echo -e &apos;%&#123;@timestamp&#125;: Alert on %&#123;host&#125; from path %&#123;path&#125;:\n\n%&#123;message&#125;&apos; | mail -s &apos;LOG ERROR&apos; your@email.com -- -f alert@logstash.com&quot;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这个配置用到了几个插件：</p>
+<ul>
+<li><a href="https://www.elastic.co/guide/en/logstash/current/plugins-inputs-file.html" target="_blank" rel="noopener">input/file</a>：从文件读取</li>
+<li><a href="https://www.elastic.co/guide/en/logstash/current/plugins-codecs-multiline.html" target="_blank" rel="noopener">codec/multiline</a>：多行合并——处理  Java stack traces</li>
+<li><a href="https://www.elastic.co/guide/en/logstash/current/plugins-filters-mutate.html" target="_blank" rel="noopener">filter/mutate</a>：数据修改——特定字符转义</li>
+<li><a href="https://www.elastic.co/guide/en/logstash/current/plugins-filters-grok.html" target="_blank" rel="noopener">filter/grok</a>：正则捕获——匹配并标记异常的 message</li>
+<li><a href="https://www.elastic.co/guide/en/logstash/current/plugins-filters-throttle.html" target="_blank" rel="noopener">filter/throttle</a>：节流阀——用于避免报警邮件爆满</li>
+<li><a href="https://www.elastic.co/guide/en/logstash/current/plugins-outputs-elasticsearch.html" target="_blank" rel="noopener">output/elasticsearch</a>：保存进 Elasticsearch</li>
+<li><a href="https://www.elastic.co/guide/en/logstash/current/plugins-outputs-exec.html" target="_blank" rel="noopener">output/exec</a>：调用命令执行——调用 mail 发报警邮件</li>
+</ul>
+<p>该配置的简单解读：</p>
+<ol>
+<li><em>input</em> 中监控两个本地 log 文件，并且给日志添加了一个 <code>type</code> 属性用于在 <em>filter</em> 和 <em>output</em> 中区别来源。使用 <em>codec</em> 的 multiline 来将多行合并为一行（主要是处理像 Java stack traces 这样的，如果你的日志系统使用的是 Log4J，也可以使用 <a href="https://www.elastic.co/guide/en/logstash/current/plugins-inputs-log4j.html" target="_blank" rel="noopener">input/log4j</a> 来处理)。最后指定 logstash 从什么位置开始读取文件数据。</li>
+<li><em>filter</em> 中首先判断来源，然后舍弃掉空白符开头的行，将日志中 <code>&#39;</code> 替换为 <code>`</code>（因为它会干扰到邮件报警），使用 grok 匹配异常并标记，之后判断是否是异常信息，如果是，则经过 throttle 进行节流处理。</li>
+<li><em>ouput</em> 中首先输出到 Elasticsearch，然后判断是否异常，异常则发邮件报警。</li>
+</ol>
+<p>tips：</p>
+<ol>
+<li>可以在 grok 中写普通的正则，不过更优雅的做法是把预定义的 grok 表达式写入到文件中，logstash 已经<a href="https://github.com/logstash-plugins/logstash-patterns-core/tree/master/patterns" target="_blank" rel="noopener">内置一些预定义 grok 表达式</a>，对于自己写的 grok 表达式，我建议你使用 <a href="http://grokdebug.herokuapp.com/" title="grokdebug" target="_blank" rel="noopener">Grok Debugger</a> 来调试。</li>
+<li>文档中说 filters/grok 插件的 <code>match</code> 参数应该接受的是一个 Hash 值。但是因为早期的 logstash 语法中 Hash 值也是用 <code>[]</code> 这种方式书写的，所以向我上边那样传递 Array 值给 <code>match</code> 参数也完全没问题。这样就实现了多项匹配，logstash 会按照这个定义次序依次尝试匹配，到匹配成功为止。虽然效果上和在正则中使用 <code>|</code> 的效果是一样的，不过这样可读性更佳。</li>
+</ol>
+<p>到此， ELK 平台部署和基本的测试已完成。</p>
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><ul>
+<li><a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html" target="_blank" rel="noopener">Elasticsearch 官方文档</a></li>
+<li><a href="https://www.gitbook.com/book/fuxiaopang/learnelasticsearch/details" target="_blank" rel="noopener">ElasticSearch 权威指南——GitHub上的中文译本</a></li>
+<li><a href="https://www.elastic.co/guide/en/kibana/current/index.html" target="_blank" rel="noopener">Kibana 官方文档</a></li>
+<li><a href="https://www.elastic.co/guide/en/logstash/current/index.html" target="_blank" rel="noopener">Logstash 官方文档</a></li>
+<li><a href="https://github.com/chenryn/logstash-best-practice-cn" target="_blank" rel="noopener">Logstash 最佳实践——GitHub上的中文译本</a></li>
+<li><a href="http://www.cnblogs.com/yiwenshengmei/p/4956033.html" target="_blank" rel="noopener">Logstash实践: 分布式系统的日志监控</a></li>
+<li><a href="http://kibana.logstash.es/" target="_blank" rel="noopener">ELKstack 中文指南</a></li>
+<li><a href="http://sunxiang0918.cn/2015/12/21/ELK%E5%88%9D%E5%AE%9E%E8%B7%B5/" target="_blank" rel="noopener">ELK初实践</a></li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Yibo</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://ideassea.com/2016/02/09/elk-stack/" title="ELK 部署笔记">https://ideassea.com/2016/02/09/elk-stack/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/ELK/" rel="tag"># ELK</a>
+          
+            <a href="/tags/Operations/" rel="tag"># Operations</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/02/06/generate-qrcode-in-java/" rel="next" title="Java 中生成二维码（带 logo）">
+                <i class="fa fa-chevron-left"></i> Java 中生成二维码（带 logo）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/02/10/map-sort-by-value/" rel="prev" title="Java 中 Map 按值排序">
+                Java 中 Map 按值排序 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://ws2.sinaimg.cn/large/006tKfTcly1fq0mwrckglj30sg0sg0u8.jpg"
+                alt="Yibo" />
+            
+              <p class="site-author-name" itemprop="name">Yibo</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">41</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">21</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#ELK-Architecture"><span class="nav-number">1.</span> <span class="nav-text">ELK Architecture</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Java-Runtime-Environment"><span class="nav-number">2.</span> <span class="nav-text">Java Runtime Environment</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Elasticsearch"><span class="nav-number">3.</span> <span class="nav-text">Elasticsearch</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Kibana"><span class="nav-number">4.</span> <span class="nav-text">Kibana</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Logstash"><span class="nav-number">5.</span> <span class="nav-text">Logstash</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Reference"><span class="nav-number">6.</span> <span class="nav-text">Reference</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate"> 
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yibo</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/theme-next/hexo-theme-next">NexT.Gemini</a> v6.1.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/reading_progress/reading_progress.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.1.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.1.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.1.0"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+  
+  <script src="/lib/pangu/dist/pangu.min.js?v=3.3"></script>
+  <script type="text/javascript">pangu.spacingPage();</script>
+
+
+  
+
+  
+
+  
+
+</body>
+</html>
