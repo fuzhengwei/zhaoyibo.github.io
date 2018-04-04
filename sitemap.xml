@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://note.windrun.me/404.html</loc>
+    
+    <lastmod>2018-04-04T13:23:23.000Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://note.windrun.me/2018/04/04/managing-multiple-versions-of-java-on-macos/</loc>
     
     <lastmod>2018-04-04T09:59:24.985Z</lastmod>
