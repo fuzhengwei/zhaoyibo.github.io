@@ -597,7 +597,7 @@
 <ol>
 <li>使用 maven 插件 maven-shade-plugin <a href="http://blog.csdn.net/sunshine920103/article/details/51659936" target="_blank" rel="noopener">http://blog.csdn.net/sunshine920103/article/details/51659936</a></li>
 <li>直接修改 guava 18 的源代码 <a href="https://my.oschina.net/u/1404252/blog/814260" target="_blank" rel="noopener">https://my.oschina.net/u/1404252/blog/814260</a></li>
-<li>升级 hbase 的依赖 <a href="http://housong.github.io/2016/%E7%89%88%E6%9C%AC%E5%85%BC%E5%AE%B9%E6%80%A7%E9%97%AE%E9%A2%98/" target="_blank" rel="noopener">http://housong.github.io/2016/%E7%89%88%E6%9C%AC%E5%85%BC%E5%AE%B9%E6%80%A7%E9%97%AE%E9%A2%98/</a></li>
+<li>升级 hbase 的依赖 <a href="http://housong.github.io/2016/版本兼容性问题/" target="_blank" rel="noopener">http://housong.github.io/2016/版本兼容性问题/</a></li>
 <li>单独再开个工程，不再依赖（或间接依赖）guava</li>
 </ol>
 <p><strong>我最终采取的解决办法：修改 guava 18 的源码，重新打 jar 包，上传到了 maven 私服的 thirdparty，将 thirdparty 的优先级调到 maven 中央仓库的前边，删除掉本地仓库已经下载下来的 jar 包，重新导入 Maven 依赖。</strong></p>
