@@ -103,25 +103,18 @@
 
 
 
-  <meta name="description" content="Git 强大的撤销、版本回退功能，让我们在开发的过程中能够随意的回到任何一个时间点的状态，本文我们就来看看 Git 中的各种后悔药! 本文将从如下三个方面介绍 Git 中的后悔药：   工作区的代码想撤销 add 到暂存区的代码想撤销 提交到本地仓库的代码想撤销">
-<meta name="keywords" content="Git">
+  <meta name="description" content="在使用 Java 开发时候，经常会接触到不同的版本。比如我大部分的时间使用的都是 Java 8，而有时又想看看 Java 7 的源代码，现在 Java 9、10 都出来了，又想试试新特性。一般情况下都是是配置 JAVA_HOME，以指定特定的Java 版本，但是这都需要手动输入。每次都要这么重新设置，实在是太痛苦了。终于，我发现了 jEnv - Manage your Java environme">
+<meta name="keywords" content="Java">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Git 中的各种后悔药">
-<meta property="og:url" content="https://note.windrun.me/2017/11/14/git-undo/index.html">
+<meta property="og:title" content="在 OS X 中使用 jEnv 管理多个 Java 版本">
+<meta property="og:url" content="https://note.windrun.me/2018/04/04/managing-multiple-versions-of-java-on-macos/index.html">
 <meta property="og:site_name" content="Ideas Sea">
-<meta property="og:description" content="Git 强大的撤销、版本回退功能，让我们在开发的过程中能够随意的回到任何一个时间点的状态，本文我们就来看看 Git 中的各种后悔药! 本文将从如下三个方面介绍 Git 中的后悔药：   工作区的代码想撤销 add 到暂存区的代码想撤销 提交到本地仓库的代码想撤销">
+<meta property="og:description" content="在使用 Java 开发时候，经常会接触到不同的版本。比如我大部分的时间使用的都是 Java 8，而有时又想看看 Java 7 的源代码，现在 Java 9、10 都出来了，又想试试新特性。一般情况下都是是配置 JAVA_HOME，以指定特定的Java 版本，但是这都需要手动输入。每次都要这么重新设置，实在是太痛苦了。终于，我发现了 jEnv - Manage your Java environme">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https://ws1.sinaimg.cn/large/6e3b2269ly1flhyy77ttog20fa07zb29.gif">
-<meta property="og:image" content="https://ws1.sinaimg.cn/large/6e3b2269ly1flhyywmn2hg20fa07zx6p.gif">
-<meta property="og:image" content="https://ws1.sinaimg.cn/large/6e3b2269ly1flhyz822lij209l07n74g.jpg">
-<meta property="og:image" content="https://ws1.sinaimg.cn/large/6e3b2269ly1flhyzkommlj209c04q74a.jpg">
-<meta property="og:image" content="https://ws1.sinaimg.cn/large/6e3b2269ly1flhyzurnt1j209504oaa1.jpg">
-<meta property="og:image" content="https://ws1.sinaimg.cn/large/6e3b2269ly1flhz03gp4bj209104ymx6.jpg">
-<meta property="og:updated_time" content="2018-04-01T08:28:21.000Z">
+<meta property="og:updated_time" content="2018-04-04T09:37:40.539Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Git 中的各种后悔药">
-<meta name="twitter:description" content="Git 强大的撤销、版本回退功能，让我们在开发的过程中能够随意的回到任何一个时间点的状态，本文我们就来看看 Git 中的各种后悔药! 本文将从如下三个方面介绍 Git 中的后悔药：   工作区的代码想撤销 add 到暂存区的代码想撤销 提交到本地仓库的代码想撤销">
-<meta name="twitter:image" content="https://ws1.sinaimg.cn/large/6e3b2269ly1flhyy77ttog20fa07zb29.gif">
+<meta name="twitter:title" content="在 OS X 中使用 jEnv 管理多个 Java 版本">
+<meta name="twitter:description" content="在使用 Java 开发时候，经常会接触到不同的版本。比如我大部分的时间使用的都是 Java 8，而有时又想看看 Java 7 的源代码，现在 Java 9、10 都出来了，又想试试新特性。一般情况下都是是配置 JAVA_HOME，以指定特定的Java 版本，但是这都需要手动输入。每次都要这么重新设置，实在是太痛苦了。终于，我发现了 jEnv - Manage your Java environme">
 
 
 
@@ -130,7 +123,7 @@
 
 
 
-  <link rel="canonical" href="https://note.windrun.me/2017/11/14/git-undo/"/>
+  <link rel="canonical" href="https://note.windrun.me/2018/04/04/managing-multiple-versions-of-java-on-macos/"/>
 
 
 
@@ -140,7 +133,7 @@
   };
 </script>
 
-  <title>Git 中的各种后悔药 | Ideas Sea</title>
+  <title>在 OS X 中使用 jEnv 管理多个 Java 版本 | Ideas Sea</title>
   
 
 
@@ -300,7 +293,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://note.windrun.me/2017/11/14/git-undo/">
+    <link itemprop="mainEntityOfPage" href="https://note.windrun.me/2018/04/04/managing-multiple-versions-of-java-on-macos/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Yibo">
@@ -317,7 +310,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Git 中的各种后悔药</h1>
+          <h1 class="post-title" itemprop="name headline">在 OS X 中使用 jEnv 管理多个 Java 版本</h1>
         
 
         <div class="post-meta">
@@ -329,7 +322,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-14T14:18:45+08:00">2017-11-14</time>
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-04T17:34:23+08:00">2018-04-04</time>
             
 
             
@@ -350,7 +343,7 @@
               
                 <span class="post-meta-item-text">更新于：</span>
               
-              <time title="更新于" itemprop="dateModified" datetime="2018-04-01T16:28:21+08:00">2018-04-01</time>
+              <time title="更新于" itemprop="dateModified" datetime="2018-04-04T17:37:40+08:00">2018-04-04</time>
             
           </span>
 
@@ -363,9 +356,9 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2017/11/14/git-undo/#comments" itemprop="discussionUrl">
+                <a href="/2018/04/04/managing-multiple-versions-of-java-on-macos/#comments" itemprop="discussionUrl">
                   <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2017/11/14/git-undo/" itemprop="commentCount"></span>
+                        data-disqus-identifier="2018/04/04/managing-multiple-versions-of-java-on-macos/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -393,48 +386,28 @@
       
 
       
-        <p>Git 强大的撤销、版本回退功能，让我们在开发的过程中能够随意的回到任何一个时间点的状态，本文我们就来看看 Git 中的各种后悔药!</p>
-<p>本文将从如下三个方面介绍 Git 中的后悔药：</p>
-<blockquote>
-<ol>
-<li>工作区的代码想撤销</li>
-<li>add 到暂存区的代码想撤销</li>
-<li>提交到本地仓库的代码想撤销</li>
-</ol>
-</blockquote>
+        <p>在使用 Java 开发时候，经常会接触到不同的版本。比如我大部分的时间使用的都是 Java 8，而有时又想看看 Java 7 的源代码，现在 Java 9、10 都出来了，又想试试新特性。一般情况下都是是配置 JAVA_HOME，以指定特定的Java 版本，但是这都需要手动输入。每次都要这么重新设置，实在是太痛苦了。终于，我发现了 <a href="http://www.jenv.be/" target="_blank" rel="noopener">jEnv - Manage your Java environment</a></p>
+<p>正如它的官网所宣称的那样，它是来让你忘记怎么配置 JAVA_HOME 环境变量的神队友。使用简单的命令就可以在不同的 Java 版本之间进行切换。</p>
 <a id="more"></a>
-<h2 id="工作区的代码想撤销"><a href="#工作区的代码想撤销" class="headerlink" title="工作区的代码想撤销"></a>工作区的代码想撤销</h2><p>可能有一天我正在写代码，写了很久发现写错了，想恢复到一开始的状态，一个笨办法就是把刚刚写的代码一行一行的删除，不过这种方式成本太高，我们可以通过 <code>git checkout -- &lt;file&gt;</code> 命令来撤销工作区的代码修改。如下图：</p>
-<p><img src="https://ws1.sinaimg.cn/large/6e3b2269ly1flhyy77ttog20fa07zb29.gif" alt=""></p>
-<p>首先我们执行了 git status 命令，发现工作区是干净的，然后执行了 cat 命令，发现文件只有两行内容，然后通过 vi 编辑器向文件中添加一行，保存并退出，退出来之后又执行了 git status 命令，此时工作区的状态已经发生变化，然后我们执行了 git checkout – git01.txt 命令，表示撤销之前的操作，让 git01.txt 恢复到之前的状态，该命令执行成功之后，我们再执行 cat 命令发现文件内容已经恢复了，此时再执行 git status，状态也恢复了。</p>
-<h2 id="add-到暂存区的代码想撤销"><a href="#add-到暂存区的代码想撤销" class="headerlink" title="add 到暂存区的代码想撤销"></a>add 到暂存区的代码想撤销</h2><p>如果想要撤销，但是代码已经提交到暂存区了，不用担心，也能撤销，分两个步骤：</p>
-<ol>
-<li>将暂存区的代码撤销到工作区</li>
-<li>将工作区的代码撤销 (具体操作和’工作区的代码想撤销’一致)</li>
-</ol>
-<p>将暂存区的代码撤销，我们可以使用 <code>git reset HEAD</code> 命令来实现。如下图：</p>
-<p><img src="https://ws1.sinaimg.cn/large/6e3b2269ly1flhyywmn2hg20fa07zx6p.gif" alt=""></p>
-<p>这里的代码都比较简单，核心的过程就是先执行 <code>git reset HEAD</code> 命令，从暂存区撤销，剩下的操作参考’工作区的代码想撤销’一节。</p>
-<h2 id="提交到本地仓库的代码想撤销"><a href="#提交到本地仓库的代码想撤销" class="headerlink" title="提交到本地仓库的代码想撤销"></a>提交到本地仓库的代码想撤销</h2><p>同样的，提交到本地仓库的代码一样也可以撤销，我们可以利用 <code>git reset --hard &lt;版本号&gt;</code> 命令来实现版本回退，该命令中的版本号有几种不同的写法：</p>
-<blockquote>
-<ol>
-<li>可以使用 <code>HEAD^</code> 来描述版本，一个 <code>^</code> 表示前一个版本，两个 <code>^^</code> 表示前两个版本，以此类推。</li>
-<li>也可以使用数字来代替 <code>^</code>，比如说前 100 个版本可以写作 <code>HEAD~100</code>。</li>
-<li>也可以直接写版本号，表示跳转到某一个版本处。我们每次提交成功后，都会生成一个哈希码作为版本号，所以这里我们也可以直接填版本号，哈希码很长，但是我们不用全部输入，只需要输入前面几个字符即可，就能识别出来。</li>
-</ol>
-</blockquote>
-<p>看下面一系列的操作：</p>
-<ol>
-<li><p>通过 <code>git log</code> 查看当前提交日志：<br><img src="https://ws1.sinaimg.cn/large/6e3b2269ly1flhyz822lij209l07n74g.jpg" alt=""></p>
-</li>
-<li><p>通过 <code>git reset HEAD^^</code> 向前回退两个版本：<br><img src="https://ws1.sinaimg.cn/large/6e3b2269ly1flhyzkommlj209c04q74a.jpg" alt=""></p>
-</li>
-<li><p>查看日志，发现最后一次提交的版本号是 <code>695ce1fe</code>, 利用 <code>git reset --hard 695ce1fe</code> 命令回到回退之前的状态：<br><img src="https://ws1.sinaimg.cn/large/6e3b2269ly1flhyzurnt1j209504oaa1.jpg" alt=""></p>
-</li>
-<li><p>通过 <code>git reset --hard HEAD~1</code> 回到上一个版本：<br><img src="https://ws1.sinaimg.cn/large/6e3b2269ly1flhz03gp4bj209104ymx6.jpg" alt=""></p>
-</li>
-</ol>
-<p>好了，Git 中的后悔药我们就先介绍到这里，有问题欢迎留言讨论。</p>
-<p>参考资料：<br>1.《GitHub 入门与实践》<br>2.《Pro Git》</p>
+<h2 id="基本使用"><a href="#基本使用" class="headerlink" title="基本使用"></a>基本使用</h2><p>在 macOS 下使用 Homebrew 安装 jEnv<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> brew install jenv</span><br></pre></td></tr></table></figure></p>
+<p>安装后进行简单的配置，以使 jEnv 生效<br>使用 bash 的情况<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> echo 'export PATH="$HOME/.jenv/bin:$PATH"' &gt;&gt; ~/.bash_profile</span><br><span class="line"><span class="meta">$</span> echo 'eval "$(jenv init -)"' &gt;&gt; ~/.bash_profile</span><br></pre></td></tr></table></figure></p>
+<p>使用 zsh 的情况<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> echo 'export PATH="$HOME/.jenv/bin:$PATH"' &gt;&gt; ~/.zshrc</span><br><span class="line"><span class="meta">$</span> echo 'eval "$(jenv init -)"' &gt;&gt; ~/.zshrc</span><br></pre></td></tr></table></figure></p>
+<p>好了，jEnv 已经安装好了，让我们来看一下它找见哪个 Java 版本了<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> jenv versions</span><br><span class="line">* system (set by /Users/yibo/.jenv/version)</span><br></pre></td></tr></table></figure></p>
+<p>它只找到了系统默认的 Java，即使我已经下载了其他版本的 Java。<code>*</code>表示当前选择的版本。</p>
+<p>和 rbenv 不同的是，jEnv 不能自己安装任何版本的 Java，所以需要我们手动安装好之后再用 jEnv 指向它们。</p>
+<p>Java 7、8、9 都可以从 <a href="http://www.oracle.com/technetwork/java/archive-139210.html" target="_blank" rel="noopener">Oracle Java Archive</a> 下载到。安装 Java 6，需要在 <a href="http://support.apple.com/kb/DL1572" target="_blank" rel="noopener">Apple</a> 进行下载。它们都将安装到<code>/System/Library/Java/JavaVirtualMachines/</code>下。</p>
+<p>使用<code>jenv add</code>将 Java 8 加入 jEnv 中<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> jenv add /Library/Java/JavaVirtualMachines/jdk1.8.0_151.jdk/Contents/Home/</span><br><span class="line">oracle64-1.8.0.151 added</span><br><span class="line">1.8.0.151 added</span><br><span class="line">1.8 added</span><br></pre></td></tr></table></figure></p>
+<p>运行<code>jenv versions</code>时会显示<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> jenv versions</span><br><span class="line">* system (set by /Users/yibo/.jenv/version)</span><br><span class="line">  1.8</span><br><span class="line">  1.8.0.151</span><br><span class="line">  oracle64-1.8.0.151</span><br></pre></td></tr></table></figure></p>
+<p>同样将 Java 7 也加入其中<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> jenv add /Library/Java/JavaVirtualMachines/jdk1.7.0_80.jdk/Contents/Home</span><br><span class="line">oracle64-1.7.0.80 added</span><br><span class="line">1.7.0.80 added</span><br><span class="line">1.7 added</span><br></pre></td></tr></table></figure></p>
+<p>现在运行<code>jenv versions</code>会显示<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> jenv versions</span><br><span class="line">* system (set by /Users/yibo/.jenv/version)</span><br><span class="line">  1.7</span><br><span class="line">  1.7.0.80</span><br><span class="line">  1.8</span><br><span class="line">  1.8.0.151</span><br><span class="line">  oracle64-1.7.0.80</span><br><span class="line">  oracle64-1.8.0.151</span><br></pre></td></tr></table></figure></p>
+<p>对于博主这种不是处女座的人来说，也觉得需要对版本再管理一下，使用<code>jenv remove</code>可以从 jEnv 中去掉不需要的 Java 版本<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> jenv remove 1.7</span><br><span class="line">JDK 1.7 removed</span><br></pre></td></tr></table></figure></p>
+<p>整理后，再运行<code>jenv versions</code>会显示<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> jenv versions</span><br><span class="line">* system (set by /Users/yibo/.jenv/version)</span><br><span class="line">  1.7.0.80</span><br><span class="line">  1.8.0.151</span><br></pre></td></tr></table></figure></p>
+<p>选择一个 Java 版本，运行<code>jenv local</code>，例如<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">$ jenv local 1.8.0.151</span><br><span class="line">$ java -version</span><br><span class="line">java version &quot;1.8.0_151&quot;</span><br><span class="line">Java(TM) SE Runtime Environment (build 1.8.0_151-b12)</span><br><span class="line">Java HotSpot(TM) 64-Bit Server VM (build 25.151-b12, mixed mode)</span><br><span class="line">$ jenv local 1.7.0.80</span><br><span class="line">$ java -version</span><br><span class="line">java version &quot;1.7.0_80&quot;</span><br><span class="line">Java(TM) SE Runtime Environment (build 1.7.0_80-b15)</span><br><span class="line">Java HotSpot(TM) 64-Bit Server VM (build 24.80-b11, mixed mode)</span><br></pre></td></tr></table></figure></p>
+<p>DangDangDangDang，我们已经成功地指定了某文件夹中 local 的 Java 版本。（注意：记得取消自己手动设置的 <code>JAVA_HOME</code>）</p>
+<p>你可以运行<code>jenv global</code>设置一个默认的 Java 版本，运行<code>jenv which java</code>显示可执行的 Java 的完整路径。</p>
+<p>你也可以在特定的文件夹下使用. java-version 文件来设定 Java 的版本。当我需要在 Project 中使用 Java 6 时，我仅仅需要把<code>1.6.0.65</code>作为内容保存在. java-version 文件中，当我进入该文件夹时 jEnv 会自动地帮助我设定 local 的 Java 的版本。</p>
+<p>没错，我们现在有了 Java 的多个版本，并且可以在它们之间轻松切换。更多的使用方法可以在 <a href="http://www.jenv.be/" target="_blank" rel="noopener">jEnv 官网</a>的官网查询到。</p>
+<h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><p><a href="http://www.jenv.be/" target="_blank" rel="noopener">jEnv 官网</a><br><a href="http://andrew-jones.com/blog/managing-multiple-versions-of-java-on-os-x/" target="_blank" rel="noopener">Managing multiple versions of Java on OS X</a></p>
 
       
     </div>
@@ -456,7 +429,7 @@
     <strong>本文作者： </strong>Yibo</li>
   <li class="post-copyright-link">
     <strong>本文链接：</strong>
-    <a href="https://note.windrun.me/2017/11/14/git-undo/" title="Git 中的各种后悔药">https://note.windrun.me/2017/11/14/git-undo/</a>
+    <a href="https://note.windrun.me/2018/04/04/managing-multiple-versions-of-java-on-macos/" title="在 OS X 中使用 jEnv 管理多个 Java 版本">https://note.windrun.me/2018/04/04/managing-multiple-versions-of-java-on-macos/</a>
   </li>
   <li class="post-copyright-license">
     <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！</li>
@@ -469,7 +442,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/Git/" rel="tag"># Git</a>
+            <a href="/tags/Java/" rel="tag"># Java</a>
           
         </div>
       
@@ -482,8 +455,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/10/25/text-watermark/" rel="next" title="给图片加文字水印（纯前端实现）">
-                <i class="fa fa-chevron-left"></i> 给图片加文字水印（纯前端实现）
+              <a href="/2018/04/01/spring-aop-words-again/" rel="next" title="再说 Spring AOP">
+                <i class="fa fa-chevron-left"></i> 再说 Spring AOP
               </a>
             
           </div>
@@ -491,10 +464,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018/02/03/java7-8-hashmap-and-concurrenthashmap/" rel="prev" title="Java7/8 中的 HashMap 和 ConcurrentHashMap 全解析">
-                Java7/8 中的 HashMap 和 ConcurrentHashMap 全解析 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -682,7 +651,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#工作区的代码想撤销"><span class="nav-number">1.</span> <span class="nav-text">工作区的代码想撤销</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#add-到暂存区的代码想撤销"><span class="nav-number">2.</span> <span class="nav-text">add 到暂存区的代码想撤销</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#提交到本地仓库的代码想撤销"><span class="nav-number">3.</span> <span class="nav-text">提交到本地仓库的代码想撤销</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#基本使用"><span class="nav-number">1.</span> <span class="nav-text">基本使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考文献"><span class="nav-number">2.</span> <span class="nav-text">参考文献</span></a></li></ol></div>
             
 
           </div>
@@ -857,9 +826,9 @@
   
     <script type="text/javascript">
       var disqus_config = function () {
-        this.page.url = 'https://note.windrun.me/2017/11/14/git-undo/';
-        this.page.identifier = '2017/11/14/git-undo/';
-        this.page.title = 'Git 中的各种后悔药';
+        this.page.url = 'https://note.windrun.me/2018/04/04/managing-multiple-versions-of-java-on-macos/';
+        this.page.identifier = '2018/04/04/managing-multiple-versions-of-java-on-macos/';
+        this.page.title = '在 OS X 中使用 jEnv 管理多个 Java 版本';
       };
       function loadComments () {
         var d = document, s = d.createElement('script');

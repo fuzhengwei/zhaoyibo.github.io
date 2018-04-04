@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://note.windrun.me/"/>
-  <updated>2018-04-01T16:58:39.000Z</updated>
+  <updated>2018-04-04T09:37:40.539Z</updated>
   <id>https://note.windrun.me/</id>
   
   <author>
@@ -15,6 +15,25 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>在 OS X 中使用 jEnv 管理多个 Java 版本</title>
+    <link href="https://note.windrun.me/2018/04/04/managing-multiple-versions-of-java-on-macos/"/>
+    <id>https://note.windrun.me/2018/04/04/managing-multiple-versions-of-java-on-macos/</id>
+    <published>2018-04-04T09:34:23.000Z</published>
+    <updated>2018-04-04T09:37:40.539Z</updated>
+    
+    <summary type="html">
+    
+      &lt;p&gt;在使用 Java 开发时候，经常会接触到不同的版本。比如我大部分的时间使用的都是 Java 8，而有时又想看看 Java 7 的源代码，现在 Java 9、10 都出来了，又想试试新特性。一般情况下都是是配置 JAVA_HOME，以指定特定的Java 版本，但是这都需要手动输入。每次都要这么重新设置，实在是太痛苦了。终于，我发现了 &lt;a href=&quot;http://www.jenv.be/&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;jEnv - Manage your Java environment&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;正如它的官网所宣称的那样，它是来让你忘记怎么配置 JAVA_HOME 环境变量的神队友。使用简单的命令就可以在不同的 Java 版本之间进行切换。&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="Java" scheme="https://note.windrun.me/tags/Java/"/>
+    
+  </entry>
   
   <entry>
     <title>再说 Spring AOP</title>
@@ -435,25 +454,6 @@
     
     </summary>
     
-    
-  </entry>
-  
-  <entry>
-    <title>在 Mac OS X 上编译 native-hadoop library</title>
-    <link href="https://note.windrun.me/2016/02/12/build-native-hadoop-library-on-mac-osx/"/>
-    <id>https://note.windrun.me/2016/02/12/build-native-hadoop-library-on-mac-osx/</id>
-    <published>2016-02-11T23:02:00.000Z</published>
-    <updated>2017-10-11T22:00:28.000Z</updated>
-    
-    <summary type="html">
-    
-      &lt;p&gt;一般大家在安装完 Hadoop 后运行相关的命令，都会看到这样一个警告&lt;br&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;意思也就是加载不了 Hadoop 的本地库，这个问题不解决也不影响 Hadoop 的功能，因为它在加载不了本地库的情况下会去加载对应的 Java 代码库。&lt;br&gt;可是对应的 Java 实现的效率肯定不如本地库的，另外肯定有人像我一样，每次执行命令时看到这个 WARN 就感觉闹心，那就让我们来消灭这个警告。&lt;/p&gt;
-    
-    </summary>
-    
-    
-      <category term="Hadoop" scheme="https://note.windrun.me/tags/Hadoop/"/>
     
   </entry>
   

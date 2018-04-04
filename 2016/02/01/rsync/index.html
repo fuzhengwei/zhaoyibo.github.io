@@ -350,6 +350,17 @@
 
           
             
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2016/02/01/rsync/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2016/02/01/rsync/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
           
 
           
@@ -650,6 +661,16 @@ Password:
           
 
   
+    <div class="comments" id="comments">
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    </div>
+
+  
 
 
 
@@ -701,7 +722,7 @@ Password:
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">41</span>
+                    <span class="site-state-item-count">42</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -969,6 +990,31 @@ Password:
 
   
 
+  
+    <script id="dsq-count-scr" src="https://windrun.disqus.com/count.js" async></script>
+  
+
+  
+    <script type="text/javascript">
+      var disqus_config = function () {
+        this.page.url = 'https://note.windrun.me/2016/02/01/rsync/';
+        this.page.identifier = '2016/02/01/rsync/';
+        this.page.title = 'rsync 命令详解';
+      };
+      function loadComments () {
+        var d = document, s = d.createElement('script');
+        s.src = 'https://windrun.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      }
+      
+        loadComments();
+      
+    </script>
+  
+
+
+
 
 
 	
@@ -980,10 +1026,6 @@ Password:
   
 
 
-
-
-
-  
 
 
 
